@@ -388,14 +388,44 @@ class edusign_submission_signing extends edusign_submission_plugin {
         // Note that this check is the same logic as the result from the is_empty function but we do
         // not call it directly because we already have the submission record.
         if ($signingsubmission && !empty($signingsubmission->signing)) {
-            // Do not pass the text through format_text. The result may not be displayed in Moodle and
-            // may be passed to external services such as document conversion or portfolios.
-            $formattedtext = $this->edusignment->download_rewrite_pluginfile_urls($signingsubmission->signing, $user, $this);
-            $head = '<head><meta charset="UTF-8"></head>';
-            $submissioncontent = '<!DOCTYPE html><html>' . $head . '<body>' . $formattedtext . '</body></html>';
+            $signing = trim($signingsubmission->signing);
 
-            $filename = get_string('signingfilename', 'edusignsubmission_signing');
-            $files[$filename] = array($submissioncontent);
+            // The signature is saved as a data URI (e.g. data:image/png;base64,...) - decode it to a real image file.
+            if (preg_match('!^data:image/(?<type>\w+);base64,(?<data>.+)$!', $signing, $matches)) {
+                $extension = $matches['type'] === 'jpeg' ? 'jpg' : $matches['type'];
+                $imagedata = base64_decode($matches['data']);
+
+                // The signing pad draws black strokes on a transparent canvas, which image viewers with a dark
+                // background render as invisible black-on-black - flatten it onto white before exporting.
+                $source = imagecreatefromstring($imagedata);
+                if ($source) {
+                    $width = imagesx($source);
+                    $height = imagesy($source);
+                    $flattened = imagecreatetruecolor($width, $height);
+                    imagefilledrectangle($flattened, 0, 0, $width, $height, imagecolorallocate($flattened, 255, 255, 255));
+                    imagecopy($flattened, $source, 0, 0, 0, 0, $width, $height);
+
+                    ob_start();
+                    imagepng($flattened);
+                    $imagedata = ob_get_clean();
+                    $extension = 'png';
+
+                    imagedestroy($flattened);
+                    imagedestroy($source);
+                }
+
+                $files['signing.' . $extension] = array($imagedata);
+            } else {
+                // Fallback for legacy submissions that were not saved as a data URI.
+                // Do not pass the text through format_text. The result may not be displayed in Moodle and
+                // may be passed to external services such as document conversion or portfolios.
+                $formattedtext = $this->edusignment->download_rewrite_pluginfile_urls($signingsubmission->signing, $user, $this);
+                $head = '<head><meta charset="UTF-8"></head>';
+                $submissioncontent = '<!DOCTYPE html><html>' . $head . '<body>' . $formattedtext . '</body></html>';
+
+                $filename = get_string('signingfilename', 'edusignsubmission_signing');
+                $files[$filename] = array($submissioncontent);
+            }
 
             $fs = get_file_storage();
 

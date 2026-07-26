@@ -54,6 +54,8 @@ class edusign_grading_table extends table_sql implements renderable {
     private $hasgrantextension = false;
     /** @var boolean $hasgrade - Only do the capability check once for the entire table */
     private $hasgrade = false;
+    /** @var boolean $hasviewblind - Only do the capability check once for the entire table */
+    private $hasviewblind = false;
     /** @var array $groupsubmissions - A static cache of group submissions */
     private $groupsubmissions = array();
     /** @var array $submissiongroups - A static cache of submission groups */
