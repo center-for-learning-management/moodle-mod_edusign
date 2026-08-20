@@ -22,7 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$settings->add(new admin_setting_configcheckbox('edusignsubmission_signing/default',
-        new lang_string('default', 'edusignsubmission_signing'),
-        new lang_string('default_help', 'edusignsubmission_signing'), 1));
-
+$settings->add(new admin_setting_configcheckbox(
+    'edusignsubmission_signing/default',
+    new lang_string('default', 'edusignsubmission_signing'),
+    new lang_string('default_help', 'edusignsubmission_signing'), 1
+));

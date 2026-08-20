@@ -41,10 +41,10 @@ class mod_edusign_confirm_submission_form extends moodleform {
     public function definition() {
         $mform = $this->_form;
 
-        list($requiresubmissionstatement,
+        [$requiresubmissionstatement,
                 $submissionstatement,
                 $coursemoduleid,
-                $data) = $this->_customdata;
+                $data] = $this->_customdata;
 
         if ($requiresubmissionstatement) {
             $mform->addElement('checkbox', 'submissionstatement', '', $submissionstatement);
@@ -62,5 +62,4 @@ class mod_edusign_confirm_submission_form extends moodleform {
             $this->set_data($data);
         }
     }
-
 }

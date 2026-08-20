@@ -54,13 +54,13 @@ class assessable_submitted extends base {
     public static function create_from_submission(\edusign $edusign, \stdClass $submission, $editable) {
         global $USER;
 
-        $data = array(
+        $data = [
                 'context' => $edusign->get_context(),
                 'objectid' => $submission->id,
-                'other' => array(
+                'other' => [
                         'submission_editable' => $editable,
-                ),
-        );
+                ],
+        ];
         if (!empty($submission->userid) && ($submission->userid != $USER->id)) {
             $data['relateduserid'] = $submission->userid;
         }
@@ -93,7 +93,7 @@ class assessable_submitted extends base {
         $eventdata->itemid = $this->objectid;
         $eventdata->courseid = $this->courseid;
         $eventdata->userid = $this->userid;
-        $eventdata->params = array('submission_editable' => $this->other['submission_editable']);
+        $eventdata->params = ['submission_editable' => $this->other['submission_editable']];
         return $eventdata;
     }
 
@@ -141,7 +141,7 @@ class assessable_submitted extends base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'edusign_submission', 'restore' => 'submission');
+        return ['db' => 'edusign_submission', 'restore' => 'submission'];
     }
 
     public static function get_other_mapping() {

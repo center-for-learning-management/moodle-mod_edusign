@@ -35,7 +35,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 trait submission_legacy_polyfill {
-
     /**
      * Retrieves the contextids associated with the provided userid for this subplugin.
      * NOTE if your subplugin must have an entry in the edusign_submission table to work, then this

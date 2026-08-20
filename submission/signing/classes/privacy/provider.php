@@ -28,10 +28,10 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/edusign/locallib.php');
 
-use \core_privacy\local\metadata\collection;
-use \core_privacy\local\request\writer;
-use \core_privacy\local\request\contextlist;
-use \mod_edusign\privacy\edusign_plugin_request_data;
+use core_privacy\local\metadata\collection;
+use core_privacy\local\request\writer;
+use core_privacy\local\request\contextlist;
+use mod_edusign\privacy\edusign_plugin_request_data;
 
 /**
  * Privacy class for requesting user data.
@@ -44,7 +44,6 @@ class provider implements
     \core_privacy\local\metadata\provider,
     \mod_edusign\privacy\edusignsubmission_provider,
     \mod_edusign\privacy\edusignsubmission_user_provider {
-
     /**
      * Return meta data about this plugin.
      *
@@ -55,7 +54,7 @@ class provider implements
         $detail = [
             'edusignment' => 'privacy:metadata:edusignmentid',
             'submission' => 'privacy:metadata:submissionpurpose',
-            'signing' => 'privacy:metadata:textpurpose'
+            'signing' => 'privacy:metadata:textpurpose',
         ];
         $collection->add_database_table('edusignsubmission_signing', $detail, 'privacy:metadata:tablepurpose');
         $collection->link_subsystem('core_files', 'privacy:metadata:filepurpose');
@@ -132,7 +131,7 @@ class provider implements
                 'course' => $coursecontext->instanceid,
                 'userid' => $userid,
                 'content' => $editortext,
-                'edusignment' => $submission->edusignment
+                'edusignment' => $submission->edusignment,
             ]);
         }
     }
@@ -204,7 +203,7 @@ class provider implements
         }
 
         $fs = get_file_storage();
-        list($sql, $params) = $DB->get_in_or_equal($deletedata->get_submissionids(), SQL_PARAMS_NAMED);
+        [$sql, $params] = $DB->get_in_or_equal($deletedata->get_submissionids(), SQL_PARAMS_NAMED);
         $fs->delete_area_files_select(
             $deletedata->get_context()->id,
             'edusignsubmission_signing',

@@ -41,7 +41,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class assessable_uploaded extends \core\event\assessable_uploaded {
-
     /**
      * Returns description of what happened.
      *
@@ -95,7 +94,7 @@ class assessable_uploaded extends \core\event\assessable_uploaded {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/edusign/view.php', array('id' => $this->contextinstanceid));
+        return new \moodle_url('/mod/edusign/view.php', ['id' => $this->contextinstanceid]);
     }
 
     /**
@@ -109,6 +108,6 @@ class assessable_uploaded extends \core\event\assessable_uploaded {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'edusign_submission', 'restore' => 'submission');
+        return ['db' => 'edusign_submission', 'restore' => 'submission'];
     }
 }

@@ -36,16 +36,13 @@ $pagetitle = get_string('editoverride', 'edusign');
 
 $override = null;
 if ($overrideid) {
-
-    if (!$override = $DB->get_record('edusign_overrides', array('id' => $overrideid))) {
+    if (!$override = $DB->get_record('edusign_overrides', ['id' => $overrideid])) {
         print_error('invalidoverrideid', 'edusign');
     }
 
-    list($course, $cm) = get_course_and_cm_from_instance($override->edusignid, 'edusign');
-
+    [$course, $cm] = get_course_and_cm_from_instance($override->edusignid, 'edusign');
 } else if ($cmid) {
-    list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'edusign');
-
+    [$course, $cm] = get_course_and_cm_from_cmid($cmid, 'edusign');
 } else {
     print_error('invalidcoursemodule');
 }
@@ -90,7 +87,7 @@ if ($overrideid) {
 }
 
 // Merge edusign defaults with data.
-$keys = array('duedate', 'cutoffdate', 'allowsubmissionsfromdate');
+$keys = ['duedate', 'cutoffdate', 'allowsubmissionsfromdate'];
 foreach ($keys as $key) {
     if (!isset($data->{$key}) || $reset) {
         $data->{$key} = $edusigninstance->{$key};
@@ -109,7 +106,7 @@ if ($action === 'duplicate') {
     $pagetitle = get_string('duplicateoverride', 'edusign');
 }
 
-$overridelisturl = new moodle_url('/mod/edusign/overrides.php', array('cmid' => $cm->id));
+$overridelisturl = new moodle_url('/mod/edusign/overrides.php', ['cmid' => $cm->id]);
 if (!$groupmode) {
     $overridelisturl->param('mode', 'user');
 }
@@ -120,11 +117,9 @@ $mform->set_data($data);
 
 if ($mform->is_cancelled()) {
     redirect($overridelisturl);
-
 } else if (optional_param('resetbutton', 0, PARAM_ALPHA)) {
     $url->param('reset', true);
     redirect($url);
-
 } else if ($fromform = $mform->get_data()) {
     // Process the data.
     $fromform->edusignid = $edusigninstance->id;
@@ -147,10 +142,10 @@ if ($mform->is_cancelled()) {
     }
 
     if ($userorgroupchanged) {
-        $conditions = array(
+        $conditions = [
                 'edusignid' => $edusigninstance->id,
                 'userid' => empty($fromform->userid) ? null : $fromform->userid,
-                'groupid' => empty($fromform->groupid) ? null : $fromform->groupid);
+                'groupid' => empty($fromform->groupid) ? null : $fromform->groupid];
         if ($oldoverride = $DB->get_record('edusign_overrides', $conditions)) {
             // There is an old override, so we merge any new settings on top of
             // the older override.
@@ -165,12 +160,12 @@ if ($mform->is_cancelled()) {
     }
 
     // Set the common parameters for one of the events we may be triggering.
-    $params = array(
+    $params = [
             'context' => $context,
-            'other' => array(
-                    'edusignid' => $edusigninstance->id
-            )
-    );
+            'other' => [
+                    'edusignid' => $edusigninstance->id,
+            ],
+    ];
     if (!empty($override->id)) {
         $fromform->id = $override->id;
         $DB->update_record('edusign_overrides', $fromform);
@@ -193,14 +188,15 @@ if ($mform->is_cancelled()) {
         if ($groupmode) {
             $fromform->sortorder = 1;
 
-            $overridecountgroup = $DB->count_records('edusign_overrides',
-                    array('userid' => null, 'edusignid' => $edusigninstance->id));
-            $overridecountall = $DB->count_records('edusign_overrides', array('edusignid' => $edusigninstance->id));
+            $overridecountgroup = $DB->count_records(
+                'edusign_overrides',
+                ['userid' => null, 'edusignid' => $edusigninstance->id]
+            );
+            $overridecountall = $DB->count_records('edusign_overrides', ['edusignid' => $edusigninstance->id]);
             if ((!$overridecountgroup) && ($overridecountall)) { // No group overrides and there are user overrides.
                 $fromform->sortorder = 1;
             } else {
                 $fromform->sortorder = $overridecountgroup;
-
             }
 
             $DB->update_record('edusign_overrides', $fromform);
@@ -232,7 +228,6 @@ if ($mform->is_cancelled()) {
     $url->param('action', 'duplicate');
     $url->param('id', $fromform->id);
     redirect($url);
-
 }
 
 // Print the form.
@@ -241,7 +236,7 @@ $PAGE->set_pagelayout('admin');
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($edusigninstance->name, true, array('context' => $context)));
+echo $OUTPUT->heading(format_string($edusigninstance->name, true, ['context' => $context]));
 
 $mform->display();
 

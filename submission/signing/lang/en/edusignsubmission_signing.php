@@ -23,15 +23,15 @@
  */
 
 $string['allowsigningsubmissions'] = 'Enabled';
+$string['close'] = 'Close';
 $string['default'] = 'Enabled by default';
 $string['default_help'] = 'If set, this submission method will be enabled by default for all new edusignments.';
+$string['delete'] = 'delete signing';
+$string['delete:confirm'] = 'Do you really want to delete the signing?';
 $string['enabled'] = 'Online text';
 $string['enabled_help'] = 'If enabled, students are able to type rich text directly into an editor field for their submission.';
 $string['eventassessableuploaded'] = 'An online text has been uploaded.';
 $string['nosubmission'] = 'Nothing has been submitted for this edusignment';
-$string['signing'] = 'Signing Submission';
-$string['signingfilename'] = 'signing.html';
-$string['signingsubmission'] = 'Allow online text submission';
 $string['numwords'] = '({$a} words)';
 $string['numwordsforlog'] = 'Submission word count: {$a} words';
 $string['pluginname'] = 'signing submissions';
@@ -41,11 +41,11 @@ $string['privacy:metadata:submissionpurpose'] = 'The submission ID that links to
 $string['privacy:metadata:tablepurpose'] = 'Stores the text submission for each attempt.';
 $string['privacy:metadata:textpurpose'] = 'The actual text submitted for this attempt of the edusignment.';
 $string['privacy:path'] = 'Submission Text';
+$string['signing'] = 'Signing Submission';
+$string['signingfilename'] = 'signing.html';
+$string['signingsubmission'] = 'Allow online text submission';
 $string['wordlimit'] = 'Word limit';
 $string['wordlimit_help'] = 'If online text submissions are enabled, this is the maximum number ' .
         'of words that each student will be allowed to submit.';
 $string['wordlimitexceeded'] = 'The word limit for this edusignment is {$a->limit} words and you ' .
         'are attempting to submit {$a->count} words. Please review your submission and try again.';
-$string['close'] = 'Close';
-$string['delete'] = 'delete signing';
-$string['delete:confirm'] = 'Do you really want to delete the signing?';

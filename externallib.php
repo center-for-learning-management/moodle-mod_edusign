@@ -36,7 +36,6 @@ require_once("$CFG->dirroot/mod/edusign/locallib.php");
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_edusign_external extends external_api {
-
     /**
      * Generate a warning in a standard structure for a known failure.
      *
@@ -46,7 +45,7 @@ class mod_edusign_external extends external_api {
      * @return array - Warning structure containing item, itemid, warningcode, message
      */
     private static function generate_warning($edusignmentid, $warningcode, $detail) {
-        $warningmessages = array(
+        $warningmessages = [
                 'couldnotlock' => 'Could not lock the submission for this user.',
                 'couldnotunlock' => 'Could not unlock the submission for this user.',
                 'couldnotsubmitforgrading' => 'Could not submit edusignment for grading.',
@@ -55,18 +54,18 @@ class mod_edusign_external extends external_api {
                 'couldnotrevert' => 'Could not revert submission to draft.',
                 'invalidparameters' => 'Invalid parameters.',
                 'couldnotsavesubmission' => 'Could not save submission.',
-                'couldnotsavegrade' => 'Could not save grade.'
-        );
+                'couldnotsavegrade' => 'Could not save grade.',
+        ];
 
         $message = $warningmessages[$warningcode];
         if (empty($message)) {
             $message = 'Unknown warning type.';
         }
 
-        return array('item' => s($detail),
+        return ['item' => s($detail),
                 'itemid' => $edusignmentid,
                 'warningcode' => $warningcode,
-                'message' => $message);
+                'message' => $message];
     }
 
     /**
@@ -77,15 +76,18 @@ class mod_edusign_external extends external_api {
      */
     public static function get_grades_parameters() {
         return new external_function_parameters(
-                array(
+            [
                         'edusignmentids' => new external_multiple_structure(
-                                new external_value(PARAM_INT, 'edusignment id'),
-                                '1 or more edusignment ids',
-                                VALUE_REQUIRED),
-                        'since' => new external_value(PARAM_INT,
-                                'timestamp, only return records where timemodified >= since',
-                                VALUE_DEFAULT, 0)
-                )
+                            new external_value(PARAM_INT, 'edusignment id'),
+                            '1 or more edusignment ids',
+                            VALUE_REQUIRED
+                        ),
+                        'since' => new external_value(
+                            PARAM_INT,
+                            'timestamp, only return records where timemodified >= since',
+                            VALUE_DEFAULT, 0
+                        ),
+                ]
         );
     }
 
@@ -99,17 +101,19 @@ class mod_edusign_external extends external_api {
      */
     public static function get_grades($edusignmentids, $since = 0) {
         global $DB;
-        $params = self::validate_parameters(self::get_grades_parameters(),
-                array('edusignmentids' => $edusignmentids,
-                        'since' => $since));
+        $params = self::validate_parameters(
+            self::get_grades_parameters(),
+            ['edusignmentids' => $edusignmentids,
+            'since' => $since]
+        );
 
-        $edusignments = array();
-        $warnings = array();
+        $edusignments = [];
+        $warnings = [];
         $requestededusignmentids = $params['edusignmentids'];
 
         // Check the user is allowed to get the grades for the edusignments requested.
-        $placeholders = array();
-        list($sqledusignmentids, $placeholders) = $DB->get_in_or_equal($requestededusignmentids, SQL_PARAMS_NAMED);
+        $placeholders = [];
+        [$sqledusignmentids, $placeholders] = $DB->get_in_or_equal($requestededusignmentids, SQL_PARAMS_NAMED);
         $sql = "SELECT cm.id, cm.instance FROM {course_modules} cm JOIN {modules} md ON md.id = cm.module " .
                 "WHERE md.name = :modname AND cm.instance " . $sqledusignmentids;
         $placeholders['modname'] = 'edusign';
@@ -121,8 +125,8 @@ class mod_edusign_external extends external_api {
                 $edusign = new edusign($context, null, null);
                 $edusign->require_view_grades();
             } catch (Exception $e) {
-                $requestededusignmentids = array_diff($requestededusignmentids, array($cm->instance));
-                $warning = array();
+                $requestededusignmentids = array_diff($requestededusignmentids, [$cm->instance]);
+                $warning = [];
                 $warning['item'] = 'edusignment';
                 $warning['itemid'] = $cm->instance;
                 $warning['warningcode'] = '1';
@@ -133,8 +137,8 @@ class mod_edusign_external extends external_api {
 
         // Create the query and populate an array of grade records from the recordset results.
         if (count($requestededusignmentids) > 0) {
-            $placeholders = array();
-            list($inorequalsql, $placeholders) = $DB->get_in_or_equal($requestededusignmentids, SQL_PARAMS_NAMED);
+            $placeholders = [];
+            [$inorequalsql, $placeholders] = $DB->get_in_or_equal($requestededusignmentids, SQL_PARAMS_NAMED);
 
             $sql = "SELECT ag.id,
                            ag.edusignment,
@@ -158,7 +162,7 @@ class mod_edusign_external extends external_api {
             $currentedusignmentid = null;
             $edusignment = null;
             foreach ($rs as $rd) {
-                $grade = array();
+                $grade = [];
                 $grade['id'] = $rd->id;
                 $grade['userid'] = $rd->userid;
                 $grade['timecreated'] = $rd->timecreated;
@@ -171,10 +175,10 @@ class mod_edusign_external extends external_api {
                     if (!is_null($edusignment)) {
                         $edusignments[] = $edusignment;
                     }
-                    $edusignment = array();
+                    $edusignment = [];
                     $edusignment['edusignmentid'] = $rd->edusignment;
-                    $edusignment['grades'] = array();
-                    $requestededusignmentids = array_diff($requestededusignmentids, array($rd->edusignment));
+                    $edusignment['grades'] = [];
+                    $requestededusignmentids = array_diff($requestededusignmentids, [$rd->edusignment]);
                 }
                 $edusignment['grades'][] = $grade;
 
@@ -186,7 +190,7 @@ class mod_edusign_external extends external_api {
             $rs->close();
         }
         foreach ($requestededusignmentids as $edusignmentid) {
-            $warning = array();
+            $warning = [];
             $warning['item'] = 'edusignment';
             $warning['itemid'] = $edusignmentid;
             $warning['warningcode'] = '3';
@@ -194,7 +198,7 @@ class mod_edusign_external extends external_api {
             $warnings[] = $warning;
         }
 
-        $result = array();
+        $result = [];
         $result['edusignments'] = $edusignments;
         $result['warnings'] = $warnings;
         return $result;
@@ -208,7 +212,7 @@ class mod_edusign_external extends external_api {
      */
     private static function get_grade_structure($required = VALUE_REQUIRED) {
         return new external_single_structure(
-                array(
+            [
                         'id' => new external_value(PARAM_INT, 'grade id'),
                         'edusignment' => new external_value(PARAM_INT, 'edusignment id', VALUE_OPTIONAL),
                         'userid' => new external_value(PARAM_INT, 'student id'),
@@ -217,9 +221,11 @@ class mod_edusign_external extends external_api {
                         'timemodified' => new external_value(PARAM_INT, 'grade last modified time'),
                         'grader' => new external_value(PARAM_INT, 'grader'),
                         'grade' => new external_value(PARAM_TEXT, 'grade'),
-                        'gradefordisplay' => new external_value(PARAM_RAW, 'grade rendered into a format suitable for display',
-                                VALUE_OPTIONAL),
-                ), 'grade information', $required
+                        'gradefordisplay' => new external_value(
+                            PARAM_RAW, 'grade rendered into a format suitable for display',
+                            VALUE_OPTIONAL
+                        ),
+                ], 'grade information', $required
         );
     }
 
@@ -231,10 +237,10 @@ class mod_edusign_external extends external_api {
      */
     private static function edusign_grades() {
         return new external_single_structure(
-                array(
+            [
                         'edusignmentid' => new external_value(PARAM_INT, 'edusignment id'),
-                        'grades' => new external_multiple_structure(self::get_grade_structure())
-                )
+                        'grades' => new external_multiple_structure(self::get_grade_structure()),
+                ]
         );
     }
 
@@ -246,13 +252,17 @@ class mod_edusign_external extends external_api {
      */
     public static function get_grades_returns() {
         return new external_single_structure(
-                array(
-                        'edusignments' => new external_multiple_structure(self::edusign_grades(),
-                                'list of edusignment grade information'),
-                        'warnings' => new external_warnings('item is always \'edusignment\'',
-                                'when errorcode is 3 then itemid is an edusignment id. When errorcode is 1, itemid is a course module id',
-                                'errorcode can be 3 (no grades found) or 1 (no permission to get grades)')
-                )
+            [
+                        'edusignments' => new external_multiple_structure(
+                            self::edusign_grades(),
+                            'list of edusignment grade information'
+                        ),
+                        'warnings' => new external_warnings(
+                            'item is always \'edusignment\'',
+                            'when errorcode is 3 then itemid is an edusignment id. When errorcode is 1, itemid is a course module id',
+                            'errorcode can be 3 (no grades found) or 1 (no permission to get grades)'
+                        ),
+                ]
         );
     }
 
@@ -264,22 +274,24 @@ class mod_edusign_external extends external_api {
      */
     public static function get_edusignments_parameters() {
         return new external_function_parameters(
-                array(
+            [
                         'courseids' => new external_multiple_structure(
-                                new external_value(PARAM_INT,
-                                        'course id, empty for retrieving all the courses where the user is enroled in'),
-                                '0 or more course ids',
-                                VALUE_DEFAULT, array()
+                            new external_value(
+                                PARAM_INT,
+                                'course id, empty for retrieving all the courses where the user is enroled in'
+                            ),
+                            '0 or more course ids',
+                            VALUE_DEFAULT, []
                         ),
                         'capabilities' => new external_multiple_structure(
-                                new external_value(PARAM_CAPABILITY, 'capability'),
-                                'list of capabilities used to filter courses',
-                                VALUE_DEFAULT, array()
+                            new external_value(PARAM_CAPABILITY, 'capability'),
+                            'list of capabilities used to filter courses',
+                            VALUE_DEFAULT, []
                         ),
                         'includenotenrolledcourses' => new external_value(PARAM_BOOL, 'whether to return courses that the user can see
                                                                     even if is not enroled in. This requires the parameter courseids
-                                                                    to not be empty.', VALUE_DEFAULT, false)
-                )
+                                                                    to not be empty.', VALUE_DEFAULT, false),
+                ]
         );
     }
 
@@ -295,20 +307,20 @@ class mod_edusign_external extends external_api {
      * @return An array of courses and warnings.
      * @since  Moodle 2.4
      */
-    public static function get_edusignments($courseids = array(), $capabilities = array(), $includenotenrolledcourses = false) {
+    public static function get_edusignments($courseids = [], $capabilities = [], $includenotenrolledcourses = false) {
         global $USER, $DB, $CFG;
 
         $params = self::validate_parameters(
-                self::get_edusignments_parameters(),
-                array(
+            self::get_edusignments_parameters(),
+            [
                         'courseids' => $courseids,
                         'capabilities' => $capabilities,
-                        'includenotenrolledcourses' => $includenotenrolledcourses
-                )
+                        'includenotenrolledcourses' => $includenotenrolledcourses,
+                ]
         );
 
-        $warnings = array();
-        $courses = array();
+        $warnings = [];
+        $courses = [];
         $fields = 'sortorder,shortname,fullname,timemodified';
 
         // If the courseids list is empty, we return only the courses where the user is enrolled in.
@@ -326,12 +338,12 @@ class mod_edusign_external extends external_api {
             foreach ($params['courseids'] as $courseid) {
                 if (!in_array($courseid, $mycourseids)) {
                     unset($courses[$courseid]);
-                    $warnings[] = array(
+                    $warnings[] = [
                             'item' => 'course',
                             'itemid' => $courseid,
                             'warningcode' => '2',
-                            'message' => 'User is not enrolled or does not have requested capability'
-                    );
+                            'message' => 'User is not enrolled or does not have requested capability',
+                    ];
                 } else {
                     $courses[$courseid] = $mycourses[$courseid];
                 }
@@ -340,7 +352,6 @@ class mod_edusign_external extends external_api {
         }
 
         foreach ($courseids as $cid) {
-
             try {
                 $context = context_course::instance($cid);
                 self::validate_context($context);
@@ -352,12 +363,12 @@ class mod_edusign_external extends external_api {
                 $courses[$cid]->contextid = $context->id;
             } catch (Exception $e) {
                 unset($courses[$cid]);
-                $warnings[] = array(
+                $warnings[] = [
                         'item' => 'course',
                         'itemid' => $cid,
                         'warningcode' => '1',
-                        'message' => 'No access rights in course context ' . $e->getMessage()
-                );
+                        'message' => 'No access rights in course context ' . $e->getMessage(),
+                ];
                 continue;
             }
             if (count($params['capabilities']) > 0 && !has_all_capabilities($params['capabilities'], $context)) {
@@ -390,9 +401,9 @@ class mod_edusign_external extends external_api {
                 'm.preventsubmissionnotingroup, ' .
                 'm.intro, ' .
                 'm.introformat';
-        $coursearray = array();
+        $coursearray = [];
         foreach ($courses as $id => $course) {
-            $edusignmentarray = array();
+            $edusignmentarray = [];
             // Get a list of edusignments for the course.
             if ($modules = get_coursemodules_in_course('edusign', $courses[$id]->id, $extrafields)) {
                 foreach ($modules as $module) {
@@ -401,12 +412,12 @@ class mod_edusign_external extends external_api {
                         self::validate_context($context);
                         require_capability('mod/edusign:view', $context);
                     } catch (Exception $e) {
-                        $warnings[] = array(
+                        $warnings[] = [
                                 'item' => 'module',
                                 'itemid' => $module->id,
                                 'warningcode' => '1',
-                                'message' => 'No access rights in module context'
-                        );
+                                'message' => 'No access rights in module context',
+                        ];
                         continue;
                     }
 
@@ -418,22 +429,22 @@ class mod_edusign_external extends external_api {
                     $plugins = $edusign->get_submission_plugins();
                     $plugins = array_merge($plugins, $edusign->get_feedback_plugins());
 
-                    $configarray = array();
+                    $configarray = [];
                     foreach ($plugins as $plugin) {
                         if ($plugin->is_enabled() && $plugin->is_visible()) {
                             $configrecords = $plugin->get_config_for_external();
                             foreach ($configrecords as $name => $value) {
-                                $configarray[] = array(
+                                $configarray[] = [
                                         'plugin' => $plugin->get_type(),
                                         'subtype' => $plugin->get_subtype(),
                                         'name' => $name,
-                                        'value' => $value
-                                );
+                                        'value' => $value,
+                                ];
                             }
                         }
                     }
 
-                    $edusignment = array(
+                    $edusignment = [
                             'id' => $module->edusignmentid,
                             'cmid' => $module->id,
                             'course' => $module->course,
@@ -460,44 +471,50 @@ class mod_edusign_external extends external_api {
                             'markingallocation' => $module->markingallocation,
                             'requiresubmissionstatement' => $module->requiresubmissionstatement,
                             'preventsubmissionnotingroup' => $module->preventsubmissionnotingroup,
-                            'configs' => $configarray
-                    );
+                            'configs' => $configarray,
+                    ];
 
                     // Return or not intro and file attachments depending on the plugin settings.
                     if ($edusign->show_intro()) {
+                        [$edusignment['intro'], $edusignment['introformat']] = external_format_text(
+                            $module->intro,
+                            $module->introformat, $context->id, 'mod_edusign', 'intro', null
+                        );
+                        $edusignment['introfiles'] = external_util::get_area_files(
+                            $context->id, 'mod_edusign', 'intro', false,
+                            false
+                        );
 
-                        list($edusignment['intro'], $edusignment['introformat']) = external_format_text($module->intro,
-                                $module->introformat, $context->id, 'mod_edusign', 'intro', null);
-                        $edusignment['introfiles'] = external_util::get_area_files($context->id, 'mod_edusign', 'intro', false,
-                                false);
-
-                        $edusignment['introattachments'] = external_util::get_area_files($context->id, 'mod_edusign',
-                                EDUSIGN_INTROATTACHMENT_FILEAREA, 0);
+                        $edusignment['introattachments'] = external_util::get_area_files(
+                            $context->id, 'mod_edusign',
+                            EDUSIGN_INTROATTACHMENT_FILEAREA, 0
+                        );
                     }
 
                     if ($module->requiresubmissionstatement) {
                         // Submission statement is required, return the submission statement value.
                         $adminconfig = get_config('edusign');
-                        list($edusignment['submissionstatement'], $edusignment['submissionstatementformat']) = external_format_text(
-                                $adminconfig->submissionstatement, FORMAT_MOODLE, $context->id, 'mod_edusign', '', 0);
+                        [$edusignment['submissionstatement'], $edusignment['submissionstatementformat']] = external_format_text(
+                            $adminconfig->submissionstatement, FORMAT_MOODLE, $context->id, 'mod_edusign', '', 0
+                        );
                     }
 
                     $edusignmentarray[] = $edusignment;
                 }
             }
-            $coursearray[] = array(
+            $coursearray[] = [
                     'id' => $courses[$id]->id,
                     'fullname' => external_format_string($courses[$id]->fullname, $course->contextid),
                     'shortname' => external_format_string($courses[$id]->shortname, $course->contextid),
                     'timemodified' => $courses[$id]->timemodified,
-                    'edusignments' => $edusignmentarray
-            );
+                    'edusignments' => $edusignmentarray,
+            ];
         }
 
-        $result = array(
+        $result = [
                 'courses' => $coursearray,
-                'warnings' => $warnings
-        );
+                'warnings' => $warnings,
+        ];
         return $result;
     }
 
@@ -509,7 +526,7 @@ class mod_edusign_external extends external_api {
      */
     private static function get_edusignments_edusignment_structure() {
         return new external_single_structure(
-                array(
+            [
                         'id' => new external_value(PARAM_INT, 'edusignment id'),
                         'cmid' => new external_value(PARAM_INT, 'course module id'),
                         'course' => new external_value(PARAM_INT, 'course id'),
@@ -523,35 +540,50 @@ class mod_edusign_external extends external_api {
                         'allowsubmissionsfromdate' => new external_value(PARAM_INT, 'allow submissions from date'),
                         'grade' => new external_value(PARAM_INT, 'grade type'),
                         'timemodified' => new external_value(PARAM_INT, 'last time edusignment was modified'),
-                        'completionsubmit' => new external_value(PARAM_INT,
-                                'if enabled, set activity as complete following submission'),
-                        'cutoffdate' => new external_value(PARAM_INT,
-                                'date after which submission is not accepted without an extension'),
+                        'completionsubmit' => new external_value(
+                            PARAM_INT,
+                            'if enabled, set activity as complete following submission'
+                        ),
+                        'cutoffdate' => new external_value(
+                            PARAM_INT,
+                            'date after which submission is not accepted without an extension'
+                        ),
                         'teamsubmission' => new external_value(PARAM_INT, 'if enabled, students submit as a team'),
                         'requireallteammemberssubmit' => new external_value(PARAM_INT, 'if enabled, all team members must submit'),
-                        'teamsubmissiongroupingid' => new external_value(PARAM_INT,
-                                'the grouping id for the team submission groups'),
-                        'blindmarking' => new external_value(PARAM_INT,
-                                'if enabled, hide identities until reveal identities actioned'),
+                        'teamsubmissiongroupingid' => new external_value(
+                            PARAM_INT,
+                            'the grouping id for the team submission groups'
+                        ),
+                        'blindmarking' => new external_value(
+                            PARAM_INT,
+                            'if enabled, hide identities until reveal identities actioned'
+                        ),
                         'revealidentities' => new external_value(PARAM_INT, 'show identities for a blind marking edusignment'),
                         'attemptreopenmethod' => new external_value(PARAM_TEXT, 'method used to control opening new attempts'),
                         'maxattempts' => new external_value(PARAM_INT, 'maximum number of attempts allowed'),
                         'markingworkflow' => new external_value(PARAM_INT, 'enable marking workflow'),
                         'markingallocation' => new external_value(PARAM_INT, 'enable marking allocation'),
                         'requiresubmissionstatement' => new external_value(PARAM_INT, 'student must accept submission statement'),
-                        'preventsubmissionnotingroup' => new external_value(PARAM_INT, 'Prevent submission not in group',
-                                VALUE_OPTIONAL),
+                        'preventsubmissionnotingroup' => new external_value(
+                            PARAM_INT, 'Prevent submission not in group',
+                            VALUE_OPTIONAL
+                        ),
                         'submissionstatement' => new external_value(PARAM_RAW, 'Submission statement formatted.', VALUE_OPTIONAL),
                         'submissionstatementformat' => new external_format_value('submissionstatement', VALUE_OPTIONAL),
-                        'configs' => new external_multiple_structure(self::get_edusignments_config_structure(),
-                                'configuration settings'),
-                        'intro' => new external_value(PARAM_RAW,
-                                'edusignment intro, not allways returned because it deppends on the activity configuration',
-                                VALUE_OPTIONAL),
+                        'configs' => new external_multiple_structure(
+                            self::get_edusignments_config_structure(),
+                            'configuration settings'
+                        ),
+                        'intro' => new external_value(
+                            PARAM_RAW,
+                            'edusignment intro, not allways returned because it deppends on the activity configuration',
+                            VALUE_OPTIONAL
+                        ),
                         'introformat' => new external_format_value('intro', VALUE_OPTIONAL),
                         'introfiles' => new external_files('Files in the introduction text', VALUE_OPTIONAL),
                         'introattachments' => new external_files('intro attachments files', VALUE_OPTIONAL),
-                ), 'edusignment information object');
+            ], 'edusignment information object'
+        );
     }
 
     /**
@@ -562,14 +594,14 @@ class mod_edusign_external extends external_api {
      */
     private static function get_edusignments_config_structure() {
         return new external_single_structure(
-                array(
+            [
                         'id' => new external_value(PARAM_INT, 'edusign_plugin_config id', VALUE_OPTIONAL),
                         'edusignment' => new external_value(PARAM_INT, 'edusignment id', VALUE_OPTIONAL),
                         'plugin' => new external_value(PARAM_TEXT, 'plugin'),
                         'subtype' => new external_value(PARAM_TEXT, 'subtype'),
                         'name' => new external_value(PARAM_TEXT, 'name'),
-                        'value' => new external_value(PARAM_TEXT, 'value')
-                ), 'edusignment configuration object'
+                        'value' => new external_value(PARAM_TEXT, 'value'),
+                ], 'edusignment configuration object'
         );
     }
 
@@ -581,14 +613,16 @@ class mod_edusign_external extends external_api {
      */
     private static function get_edusignments_course_structure() {
         return new external_single_structure(
-                array(
+            [
                         'id' => new external_value(PARAM_INT, 'course id'),
                         'fullname' => new external_value(PARAM_TEXT, 'course full name'),
                         'shortname' => new external_value(PARAM_TEXT, 'course short name'),
                         'timemodified' => new external_value(PARAM_INT, 'last time modified'),
-                        'edusignments' => new external_multiple_structure(self::get_edusignments_edusignment_structure(),
-                                'edusignment info')
-                ), 'course information object'
+                        'edusignments' => new external_multiple_structure(
+                            self::get_edusignments_edusignment_structure(),
+                            'edusignment info'
+                        ),
+                ], 'course information object'
         );
     }
 
@@ -600,12 +634,14 @@ class mod_edusign_external extends external_api {
      */
     public static function get_edusignments_returns() {
         return new external_single_structure(
-                array(
+            [
                         'courses' => new external_multiple_structure(self::get_edusignments_course_structure(), 'list of courses'),
-                        'warnings' => new external_warnings('item can be \'course\' (errorcode 1 or 2) or \'module\' (errorcode 1)',
-                                'When item is a course then itemid is a course id. When the item is a module then itemid is a module id',
-                                'errorcode can be 1 (no access rights) or 2 (not enrolled or no permissions)')
-                )
+                        'warnings' => new external_warnings(
+                            'item can be \'course\' (errorcode 1 or 2) or \'module\' (errorcode 1)',
+                            'When item is a course then itemid is a course id. When the item is a module then itemid is a module id',
+                            'errorcode can be 1 (no access rights) or 2 (not enrolled or no permissions)'
+                        ),
+                ]
         );
     }
 
@@ -620,31 +656,30 @@ class mod_edusign_external extends external_api {
     private static function get_plugins_data($edusign, $edusignplugins, $item) {
         global $CFG;
 
-        $plugins = array();
+        $plugins = [];
         $fs = get_file_storage();
 
         foreach ($edusignplugins as $edusignplugin) {
-
             if (!$edusignplugin->is_enabled() or !$edusignplugin->is_visible()) {
                 continue;
             }
 
-            $plugin = array(
+            $plugin = [
                     'name' => $edusignplugin->get_name(),
-                    'type' => $edusignplugin->get_type()
-            );
+                    'type' => $edusignplugin->get_type(),
+            ];
             // Subtype is 'edusignsubmission', type is currently 'file' or 'onlinetext'.
             $component = $edusignplugin->get_subtype() . '_' . $edusignplugin->get_type();
 
             $fileareas = $edusignplugin->get_file_areas();
             foreach ($fileareas as $filearea => $name) {
-                $fileareainfo = array('area' => $filearea);
+                $fileareainfo = ['area' => $filearea];
 
                 $fileareainfo['files'] = external_util::get_area_files(
-                        $edusign->get_context()->id,
-                        $component,
-                        $filearea,
-                        $item->id
+                    $edusign->get_context()->id,
+                    $component,
+                    $filearea,
+                    $item->id
                 );
 
                 $plugin['fileareas'][] = $fileareainfo;
@@ -652,18 +687,19 @@ class mod_edusign_external extends external_api {
 
             $editorfields = $edusignplugin->get_editor_fields();
             foreach ($editorfields as $name => $description) {
-                $editorfieldinfo = array(
+                $editorfieldinfo = [
                         'name' => $name,
                         'description' => $description,
                         'text' => $edusignplugin->get_editor_text($name, $item->id),
-                        'format' => $edusignplugin->get_editor_format($name, $item->id)
-                );
+                        'format' => $edusignplugin->get_editor_format($name, $item->id),
+                ];
 
                 // Now format the text.
                 foreach ($fileareas as $filearea => $name) {
-                    list($editorfieldinfo['text'], $editorfieldinfo['format']) = external_format_text(
-                            $editorfieldinfo['text'], $editorfieldinfo['format'], $edusign->get_context()->id,
-                            $component, $filearea, $item->id);
+                    [$editorfieldinfo['text'], $editorfieldinfo['format']] = external_format_text(
+                        $editorfieldinfo['text'], $editorfieldinfo['format'], $edusign->get_context()->id,
+                        $component, $filearea, $item->id
+                    );
                 }
 
                 $plugin['editorfields'][] = $editorfieldinfo;
@@ -681,15 +717,16 @@ class mod_edusign_external extends external_api {
      */
     public static function get_submissions_parameters() {
         return new external_function_parameters(
-                array(
+            [
                         'edusignmentids' => new external_multiple_structure(
-                                new external_value(PARAM_INT, 'edusignment id'),
-                                '1 or more edusignment ids',
-                                VALUE_REQUIRED),
+                            new external_value(PARAM_INT, 'edusignment id'),
+                            '1 or more edusignment ids',
+                            VALUE_REQUIRED
+                        ),
                         'status' => new external_value(PARAM_ALPHA, 'status', VALUE_DEFAULT, ''),
                         'since' => new external_value(PARAM_INT, 'submitted since', VALUE_DEFAULT, 0),
-                        'before' => new external_value(PARAM_INT, 'submitted before', VALUE_DEFAULT, 0)
-                )
+                        'before' => new external_value(PARAM_INT, 'submitted before', VALUE_DEFAULT, 0),
+                ]
         );
     }
 
@@ -706,23 +743,25 @@ class mod_edusign_external extends external_api {
     public static function get_submissions($edusignmentids, $status = '', $since = 0, $before = 0) {
         global $DB, $CFG;
 
-        $params = self::validate_parameters(self::get_submissions_parameters(),
-                array('edusignmentids' => $edusignmentids,
+        $params = self::validate_parameters(
+            self::get_submissions_parameters(),
+            ['edusignmentids' => $edusignmentids,
                         'status' => $status,
                         'since' => $since,
-                        'before' => $before));
+            'before' => $before]
+        );
 
-        $warnings = array();
-        $edusignments = array();
+        $warnings = [];
+        $edusignments = [];
 
         // Check the user is allowed to get the submissions for the edusignments requested.
-        $placeholders = array();
-        list($inorequalsql, $placeholders) = $DB->get_in_or_equal($params['edusignmentids'], SQL_PARAMS_NAMED);
+        $placeholders = [];
+        [$inorequalsql, $placeholders] = $DB->get_in_or_equal($params['edusignmentids'], SQL_PARAMS_NAMED);
         $sql = "SELECT cm.id, cm.instance FROM {course_modules} cm JOIN {modules} md ON md.id = cm.module " .
                 "WHERE md.name = :modname AND cm.instance " . $inorequalsql;
         $placeholders['modname'] = 'edusign';
         $cms = $DB->get_records_sql($sql, $placeholders);
-        $edusigns = array();
+        $edusigns = [];
         foreach ($cms as $cm) {
             try {
                 $context = context_module::instance($cm->id);
@@ -731,19 +770,19 @@ class mod_edusign_external extends external_api {
                 $edusign->require_view_grades();
                 $edusigns[] = $edusign;
             } catch (Exception $e) {
-                $warnings[] = array(
+                $warnings[] = [
                         'item' => 'edusignment',
                         'itemid' => $cm->instance,
                         'warningcode' => '1',
-                        'message' => 'No access rights in module context'
-                );
+                        'message' => 'No access rights in module context',
+                ];
             }
         }
 
         foreach ($edusigns as $edusign) {
-            $submissions = array();
-            $placeholders = array('edusignid1' => $edusign->get_instance()->id,
-                    'edusignid2' => $edusign->get_instance()->id);
+            $submissions = [];
+            $placeholders = ['edusignid1' => $edusign->get_instance()->id,
+                    'edusignid2' => $edusign->get_instance()->id];
 
             $submissionmaxattempt = 'SELECT mxs.userid, MAX(mxs.attemptnumber) AS maxattempt
                                      FROM {edusign_submission} mxs
@@ -773,7 +812,7 @@ class mod_edusign_external extends external_api {
             if (!empty($submissionrecords)) {
                 $submissionplugins = $edusign->get_submission_plugins();
                 foreach ($submissionrecords as $submissionrecord) {
-                    $submission = array(
+                    $submission = [
                             'id' => $submissionrecord->id,
                             'userid' => $submissionrecord->userid,
                             'timecreated' => $submissionrecord->timecreated,
@@ -782,33 +821,32 @@ class mod_edusign_external extends external_api {
                             'attemptnumber' => $submissionrecord->attemptnumber,
                             'groupid' => $submissionrecord->groupid,
                             'plugins' => self::get_plugins_data($edusign, $submissionplugins, $submissionrecord),
-                            'gradingstatus' => $edusign->get_grading_status($submissionrecord->userid)
-                    );
+                            'gradingstatus' => $edusign->get_grading_status($submissionrecord->userid),
+                    ];
 
                     if ($edusign->can_view_submission($submissionrecord->userid)) {
                         $submissions[] = $submission;
                     }
                 }
             } else {
-                $warnings[] = array(
+                $warnings[] = [
                         'item' => 'module',
                         'itemid' => $edusign->get_instance()->id,
                         'warningcode' => '3',
-                        'message' => 'No submissions found'
-                );
+                        'message' => 'No submissions found',
+                ];
             }
 
-            $edusignments[] = array(
+            $edusignments[] = [
                     'edusignmentid' => $edusign->get_instance()->id,
-                    'submissions' => $submissions
-            );
-
+                    'submissions' => $submissions,
+            ];
         }
 
-        $result = array(
+        $result = [
                 'edusignments' => $edusignments,
-                'warnings' => $warnings
-        );
+                'warnings' => $warnings,
+        ];
         return $result;
     }
 
@@ -819,29 +857,28 @@ class mod_edusign_external extends external_api {
      */
     private static function get_plugin_structure() {
         return new external_single_structure(
-                array(
+            [
                         'type' => new external_value(PARAM_TEXT, 'submission plugin type'),
                         'name' => new external_value(PARAM_TEXT, 'submission plugin name'),
                         'fileareas' => new external_multiple_structure(
-                                new external_single_structure(
-                                        array(
-                                                'area' => new external_value (PARAM_TEXT, 'file area'),
+                            new external_single_structure(
+                                [
+                                                'area' => new external_value(PARAM_TEXT, 'file area'),
                                                 'files' => new external_files('files', VALUE_OPTIONAL),
-                                        )
-                                ), 'fileareas', VALUE_OPTIONAL
+                                        ]
+                            ), 'fileareas', VALUE_OPTIONAL
                         ),
                         'editorfields' => new external_multiple_structure(
-                                new external_single_structure(
-                                        array(
+                            new external_single_structure(
+                                [
                                                 'name' => new external_value(PARAM_TEXT, 'field name'),
                                                 'description' => new external_value(PARAM_RAW, 'field description'),
-                                                'text' => new external_value (PARAM_RAW, 'field value'),
-                                                'format' => new external_format_value ('text')
-                                        )
-                                )
-                                , 'editorfields', VALUE_OPTIONAL
-                        )
-                )
+                                                'text' => new external_value(PARAM_RAW, 'field value'),
+                                                'format' => new external_format_value('text'),
+                                        ]
+                            ), 'editorfields', VALUE_OPTIONAL
+                        ),
+                ]
         );
     }
 
@@ -852,7 +889,7 @@ class mod_edusign_external extends external_api {
      */
     private static function get_submission_structure($required = VALUE_REQUIRED) {
         return new external_single_structure(
-                array(
+            [
                         'id' => new external_value(PARAM_INT, 'submission id'),
                         'userid' => new external_value(PARAM_INT, 'student id'),
                         'attemptnumber' => new external_value(PARAM_INT, 'attempt number'),
@@ -864,7 +901,7 @@ class mod_edusign_external extends external_api {
                         'latest' => new external_value(PARAM_INT, 'latest attempt', VALUE_OPTIONAL),
                         'plugins' => new external_multiple_structure(self::get_plugin_structure(), 'plugins', VALUE_OPTIONAL),
                         'gradingstatus' => new external_value(PARAM_ALPHANUMEXT, 'Grading status.', VALUE_OPTIONAL),
-                ), 'submission info', $required
+                ], 'submission info', $required
         );
     }
 
@@ -876,10 +913,10 @@ class mod_edusign_external extends external_api {
      */
     private static function get_submissions_structure() {
         return new external_single_structure(
-                array(
+            [
                         'edusignmentid' => new external_value(PARAM_INT, 'edusignment id'),
-                        'submissions' => new external_multiple_structure(self::get_submission_structure())
-                )
+                        'submissions' => new external_multiple_structure(self::get_submission_structure()),
+                ]
         );
     }
 
@@ -891,11 +928,13 @@ class mod_edusign_external extends external_api {
      */
     public static function get_submissions_returns() {
         return new external_single_structure(
-                array(
-                        'edusignments' => new external_multiple_structure(self::get_submissions_structure(),
-                                'edusignment submissions'),
-                        'warnings' => new external_warnings()
-                )
+            [
+                        'edusignments' => new external_multiple_structure(
+                            self::get_submissions_structure(),
+                            'edusignment submissions'
+                        ),
+                        'warnings' => new external_warnings(),
+                ]
         );
     }
 
@@ -907,24 +946,30 @@ class mod_edusign_external extends external_api {
      */
     public static function set_user_flags_parameters() {
         return new external_function_parameters(
-                array(
+            [
                         'edusignmentid' => new external_value(PARAM_INT, 'edusignment id'),
                         'userflags' => new external_multiple_structure(
-                                new external_single_structure(
-                                        array(
+                            new external_single_structure(
+                                [
                                                 'userid' => new external_value(PARAM_INT, 'student id'),
                                                 'locked' => new external_value(PARAM_INT, 'locked', VALUE_OPTIONAL),
                                                 'mailed' => new external_value(PARAM_INT, 'mailed', VALUE_OPTIONAL),
-                                                'extensionduedate' => new external_value(PARAM_INT, 'extension due date',
-                                                        VALUE_OPTIONAL),
-                                                'workflowstate' => new external_value(PARAM_ALPHA, 'marking workflow state',
-                                                        VALUE_OPTIONAL),
-                                                'allocatedmarker' => new external_value(PARAM_INT, 'allocated marker',
-                                                        VALUE_OPTIONAL)
-                                        )
-                                )
-                        )
-                )
+                                                'extensionduedate' => new external_value(
+                                                    PARAM_INT, 'extension due date',
+                                                    VALUE_OPTIONAL
+                                                ),
+                                                'workflowstate' => new external_value(
+                                                    PARAM_ALPHA, 'marking workflow state',
+                                                    VALUE_OPTIONAL
+                                                ),
+                                                'allocatedmarker' => new external_value(
+                                                    PARAM_INT, 'allocated marker',
+                                                    VALUE_OPTIONAL
+                                                ),
+                                        ]
+                            )
+                        ),
+                ]
         );
     }
 
@@ -936,21 +981,23 @@ class mod_edusign_external extends external_api {
      * @return array containing success or failure information for each record
      * @since Moodle 2.6
      */
-    public static function set_user_flags($edusignmentid, $userflags = array()) {
+    public static function set_user_flags($edusignmentid, $userflags = []) {
         global $CFG, $DB;
 
-        $params = self::validate_parameters(self::set_user_flags_parameters(),
-                array('edusignmentid' => $edusignmentid,
-                        'userflags' => $userflags));
+        $params = self::validate_parameters(
+            self::set_user_flags_parameters(),
+            ['edusignmentid' => $edusignmentid,
+            'userflags' => $userflags]
+        );
 
         // Load edusignment if it exists and if the user has the capability.
-        list($edusign, $course, $cm, $context) = self::validate_edusign($params['edusignmentid']);
+        [$edusign, $course, $cm, $context] = self::validate_edusign($params['edusignmentid']);
         require_capability('mod/assign:grade', $context);
 
-        $results = array();
+        $results = [];
         foreach ($params['userflags'] as $userflag) {
             $success = true;
-            $result = array();
+            $result = [];
 
             $record = $edusign->get_user_flags($userflag['userid'], false);
             if ($record) {
@@ -1033,13 +1080,13 @@ class mod_edusign_external extends external_api {
      */
     public static function set_user_flags_returns() {
         return new external_multiple_structure(
-                new external_single_structure(
-                        array(
+            new external_single_structure(
+                [
                                 'id' => new external_value(PARAM_INT, 'id of record if successful, -1 for failure'),
                                 'userid' => new external_value(PARAM_INT, 'userid of record'),
-                                'errormessage' => new external_value(PARAM_TEXT, 'Failure error message', VALUE_OPTIONAL)
-                        )
-                )
+                                'errormessage' => new external_value(PARAM_TEXT, 'Failure error message', VALUE_OPTIONAL),
+                        ]
+            )
         );
     }
 
@@ -1051,12 +1098,13 @@ class mod_edusign_external extends external_api {
      */
     public static function get_user_flags_parameters() {
         return new external_function_parameters(
-                array(
+            [
                         'edusignmentids' => new external_multiple_structure(
-                                new external_value(PARAM_INT, 'edusignment id'),
-                                '1 or more edusignment ids',
-                                VALUE_REQUIRED)
-                )
+                            new external_value(PARAM_INT, 'edusignment id'),
+                            '1 or more edusignment ids',
+                            VALUE_REQUIRED
+                        ),
+                ]
         );
     }
 
@@ -1069,16 +1117,18 @@ class mod_edusign_external extends external_api {
      */
     public static function get_user_flags($edusignmentids) {
         global $DB;
-        $params = self::validate_parameters(self::get_user_flags_parameters(),
-                array('edusignmentids' => $edusignmentids));
+        $params = self::validate_parameters(
+            self::get_user_flags_parameters(),
+            ['edusignmentids' => $edusignmentids]
+        );
 
-        $edusignments = array();
-        $warnings = array();
+        $edusignments = [];
+        $warnings = [];
         $requestededusignmentids = $params['edusignmentids'];
 
         // Check the user is allowed to get the user flags for the edusignments requested.
-        $placeholders = array();
-        list($sqledusignmentids, $placeholders) = $DB->get_in_or_equal($requestededusignmentids, SQL_PARAMS_NAMED);
+        $placeholders = [];
+        [$sqledusignmentids, $placeholders] = $DB->get_in_or_equal($requestededusignmentids, SQL_PARAMS_NAMED);
         $sql = "SELECT cm.id, cm.instance FROM {course_modules} cm JOIN {modules} md ON md.id = cm.module " .
                 "WHERE md.name = :modname AND cm.instance " . $sqledusignmentids;
         $placeholders['modname'] = 'edusign';
@@ -1089,8 +1139,8 @@ class mod_edusign_external extends external_api {
                 self::validate_context($context);
                 require_capability('mod/assign:grade', $context);
             } catch (Exception $e) {
-                $requestededusignmentids = array_diff($requestededusignmentids, array($cm->instance));
-                $warning = array();
+                $requestededusignmentids = array_diff($requestededusignmentids, [$cm->instance]);
+                $warning = [];
                 $warning['item'] = 'edusignment';
                 $warning['itemid'] = $cm->instance;
                 $warning['warningcode'] = '1';
@@ -1101,8 +1151,8 @@ class mod_edusign_external extends external_api {
 
         // Create the query and populate an array of edusign_user_flags records from the recordset results.
         if (count($requestededusignmentids) > 0) {
-            $placeholders = array();
-            list($inorequalsql, $placeholders) = $DB->get_in_or_equal($requestededusignmentids, SQL_PARAMS_NAMED);
+            $placeholders = [];
+            [$inorequalsql, $placeholders] = $DB->get_in_or_equal($requestededusignmentids, SQL_PARAMS_NAMED);
 
             $sql = "SELECT auf.id,auf.edusignment,auf.userid,auf.locked,auf.mailed," .
                     "auf.extensionduedate,auf.workflowstate,auf.allocatedmarker " .
@@ -1114,7 +1164,7 @@ class mod_edusign_external extends external_api {
             $currentedusignmentid = null;
             $edusignment = null;
             foreach ($rs as $rd) {
-                $userflag = array();
+                $userflag = [];
                 $userflag['id'] = $rd->id;
                 $userflag['userid'] = $rd->userid;
                 $userflag['locked'] = $rd->locked;
@@ -1127,10 +1177,10 @@ class mod_edusign_external extends external_api {
                     if (!is_null($edusignment)) {
                         $edusignments[] = $edusignment;
                     }
-                    $edusignment = array();
+                    $edusignment = [];
                     $edusignment['edusignmentid'] = $rd->edusignment;
-                    $edusignment['userflags'] = array();
-                    $requestededusignmentids = array_diff($requestededusignmentids, array($rd->edusignment));
+                    $edusignment['userflags'] = [];
+                    $requestededusignmentids = array_diff($requestededusignmentids, [$rd->edusignment]);
                 }
                 $edusignment['userflags'][] = $userflag;
 
@@ -1140,11 +1190,10 @@ class mod_edusign_external extends external_api {
                 $edusignments[] = $edusignment;
             }
             $rs->close();
-
         }
 
         foreach ($requestededusignmentids as $edusignmentid) {
-            $warning = array();
+            $warning = [];
             $warning['item'] = 'edusignment';
             $warning['itemid'] = $edusignmentid;
             $warning['warningcode'] = '3';
@@ -1152,7 +1201,7 @@ class mod_edusign_external extends external_api {
             $warnings[] = $warning;
         }
 
-        $result = array();
+        $result = [];
         $result['edusignments'] = $edusignments;
         $result['warnings'] = $warnings;
         return $result;
@@ -1166,22 +1215,23 @@ class mod_edusign_external extends external_api {
      */
     private static function edusign_user_flags() {
         return new external_single_structure(
-                array(
+            [
                         'edusignmentid' => new external_value(PARAM_INT, 'edusignment id'),
                         'userflags' => new external_multiple_structure(new external_single_structure(
-                                        array(
+                            [
                                                 'id' => new external_value(PARAM_INT, 'user flag id'),
                                                 'userid' => new external_value(PARAM_INT, 'student id'),
                                                 'locked' => new external_value(PARAM_INT, 'locked'),
                                                 'mailed' => new external_value(PARAM_INT, 'mailed'),
                                                 'extensionduedate' => new external_value(PARAM_INT, 'extension due date'),
-                                                'workflowstate' => new external_value(PARAM_ALPHA, 'marking workflow state',
-                                                        VALUE_OPTIONAL),
-                                                'allocatedmarker' => new external_value(PARAM_INT, 'allocated marker')
-                                        )
-                                )
-                        )
-                )
+                                                'workflowstate' => new external_value(
+                                                    PARAM_ALPHA, 'marking workflow state',
+                                                    VALUE_OPTIONAL
+                                                ),
+                                                'allocatedmarker' => new external_value(PARAM_INT, 'allocated marker'),
+                                        ]
+                        )),
+                ]
         );
     }
 
@@ -1193,13 +1243,17 @@ class mod_edusign_external extends external_api {
      */
     public static function get_user_flags_returns() {
         return new external_single_structure(
-                array(
-                        'edusignments' => new external_multiple_structure(self::edusign_user_flags(),
-                                'list of edusign user flag information'),
-                        'warnings' => new external_warnings('item is always \'edusignment\'',
-                                'when errorcode is 3 then itemid is an edusignment id. When errorcode is 1, itemid is a course module id',
-                                'errorcode can be 3 (no user flags found) or 1 (no permission to get user flags)')
-                )
+            [
+                        'edusignments' => new external_multiple_structure(
+                            self::edusign_user_flags(),
+                            'list of edusign user flag information'
+                        ),
+                        'warnings' => new external_warnings(
+                            'item is always \'edusignment\'',
+                            'when errorcode is 3 then itemid is an edusignment id. When errorcode is 1, itemid is a course module id',
+                            'errorcode can be 3 (no user flags found) or 1 (no permission to get user flags)'
+                        ),
+                ]
         );
     }
 
@@ -1211,12 +1265,13 @@ class mod_edusign_external extends external_api {
      */
     public static function get_user_mappings_parameters() {
         return new external_function_parameters(
-                array(
+            [
                         'edusignmentids' => new external_multiple_structure(
-                                new external_value(PARAM_INT, 'edusignment id'),
-                                '1 or more edusignment ids',
-                                VALUE_REQUIRED)
-                )
+                            new external_value(PARAM_INT, 'edusignment id'),
+                            '1 or more edusignment ids',
+                            VALUE_REQUIRED
+                        ),
+                ]
         );
     }
 
@@ -1229,16 +1284,18 @@ class mod_edusign_external extends external_api {
      */
     public static function get_user_mappings($edusignmentids) {
         global $DB;
-        $params = self::validate_parameters(self::get_user_mappings_parameters(),
-                array('edusignmentids' => $edusignmentids));
+        $params = self::validate_parameters(
+            self::get_user_mappings_parameters(),
+            ['edusignmentids' => $edusignmentids]
+        );
 
-        $edusignments = array();
-        $warnings = array();
+        $edusignments = [];
+        $warnings = [];
         $requestededusignmentids = $params['edusignmentids'];
 
         // Check the user is allowed to get the mappings for the edusignments requested.
-        $placeholders = array();
-        list($sqledusignmentids, $placeholders) = $DB->get_in_or_equal($requestededusignmentids, SQL_PARAMS_NAMED);
+        $placeholders = [];
+        [$sqledusignmentids, $placeholders] = $DB->get_in_or_equal($requestededusignmentids, SQL_PARAMS_NAMED);
         $sql = "SELECT cm.id, cm.instance FROM {course_modules} cm JOIN {modules} md ON md.id = cm.module " .
                 "WHERE md.name = :modname AND cm.instance " . $sqledusignmentids;
         $placeholders['modname'] = 'edusign';
@@ -1249,8 +1306,8 @@ class mod_edusign_external extends external_api {
                 self::validate_context($context);
                 require_capability('mod/assign:revealidentities', $context);
             } catch (Exception $e) {
-                $requestededusignmentids = array_diff($requestededusignmentids, array($cm->instance));
-                $warning = array();
+                $requestededusignmentids = array_diff($requestededusignmentids, [$cm->instance]);
+                $warning = [];
                 $warning['item'] = 'edusignment';
                 $warning['itemid'] = $cm->instance;
                 $warning['warningcode'] = '1';
@@ -1261,8 +1318,8 @@ class mod_edusign_external extends external_api {
 
         // Create the query and populate an array of edusign_user_mapping records from the recordset results.
         if (count($requestededusignmentids) > 0) {
-            $placeholders = array();
-            list($inorequalsql, $placeholders) = $DB->get_in_or_equal($requestededusignmentids, SQL_PARAMS_NAMED);
+            $placeholders = [];
+            [$inorequalsql, $placeholders] = $DB->get_in_or_equal($requestededusignmentids, SQL_PARAMS_NAMED);
 
             $sql = "SELECT aum.id,aum.edusignment,aum.userid " .
                     "FROM {edusign_user_mapping} aum " .
@@ -1273,7 +1330,7 @@ class mod_edusign_external extends external_api {
             $currentedusignmentid = null;
             $edusignment = null;
             foreach ($rs as $rd) {
-                $mapping = array();
+                $mapping = [];
                 $mapping['id'] = $rd->id;
                 $mapping['userid'] = $rd->userid;
 
@@ -1281,10 +1338,10 @@ class mod_edusign_external extends external_api {
                     if (!is_null($edusignment)) {
                         $edusignments[] = $edusignment;
                     }
-                    $edusignment = array();
+                    $edusignment = [];
                     $edusignment['edusignmentid'] = $rd->edusignment;
-                    $edusignment['mappings'] = array();
-                    $requestededusignmentids = array_diff($requestededusignmentids, array($rd->edusignment));
+                    $edusignment['mappings'] = [];
+                    $requestededusignmentids = array_diff($requestededusignmentids, [$rd->edusignment]);
                 }
                 $edusignment['mappings'][] = $mapping;
 
@@ -1294,11 +1351,10 @@ class mod_edusign_external extends external_api {
                 $edusignments[] = $edusignment;
             }
             $rs->close();
-
         }
 
         foreach ($requestededusignmentids as $edusignmentid) {
-            $warning = array();
+            $warning = [];
             $warning['item'] = 'edusignment';
             $warning['itemid'] = $edusignmentid;
             $warning['warningcode'] = '3';
@@ -1306,7 +1362,7 @@ class mod_edusign_external extends external_api {
             $warnings[] = $warning;
         }
 
-        $result = array();
+        $result = [];
         $result['edusignments'] = $edusignments;
         $result['warnings'] = $warnings;
         return $result;
@@ -1320,16 +1376,15 @@ class mod_edusign_external extends external_api {
      */
     private static function edusign_user_mappings() {
         return new external_single_structure(
-                array(
+            [
                         'edusignmentid' => new external_value(PARAM_INT, 'edusignment id'),
                         'mappings' => new external_multiple_structure(new external_single_structure(
-                                        array(
+                            [
                                                 'id' => new external_value(PARAM_INT, 'user mapping id'),
-                                                'userid' => new external_value(PARAM_INT, 'student id')
-                                        )
-                                )
-                        )
-                )
+                                                'userid' => new external_value(PARAM_INT, 'student id'),
+                                        ]
+                        )),
+                ]
         );
     }
 
@@ -1341,13 +1396,17 @@ class mod_edusign_external extends external_api {
      */
     public static function get_user_mappings_returns() {
         return new external_single_structure(
-                array(
-                        'edusignments' => new external_multiple_structure(self::edusign_user_mappings(),
-                                'list of edusign user mapping data'),
-                        'warnings' => new external_warnings('item is always \'edusignment\'',
-                                'when errorcode is 3 then itemid is an edusignment id. When errorcode is 1, itemid is a course module id',
-                                'errorcode can be 3 (no user mappings found) or 1 (no permission to get user mappings)')
-                )
+            [
+                        'edusignments' => new external_multiple_structure(
+                            self::edusign_user_mappings(),
+                            'list of edusign user mapping data'
+                        ),
+                        'warnings' => new external_warnings(
+                            'item is always \'edusignment\'',
+                            'when errorcode is 3 then itemid is an edusignment id. When errorcode is 1, itemid is a course module id',
+                            'errorcode can be 3 (no user mappings found) or 1 (no permission to get user mappings)'
+                        ),
+                ]
         );
     }
 
@@ -1359,13 +1418,14 @@ class mod_edusign_external extends external_api {
      */
     public static function lock_submissions_parameters() {
         return new external_function_parameters(
-                array(
+            [
                         'edusignmentid' => new external_value(PARAM_INT, 'The edusignment id to operate on'),
                         'userids' => new external_multiple_structure(
-                                new external_value(PARAM_INT, 'user id'),
-                                '1 or more user ids',
-                                VALUE_REQUIRED),
-                )
+                            new external_value(PARAM_INT, 'user id'),
+                            '1 or more user ids',
+                            VALUE_REQUIRED
+                        ),
+                ]
         );
     }
 
@@ -1380,19 +1440,23 @@ class mod_edusign_external extends external_api {
     public static function lock_submissions($edusignmentid, $userids) {
         global $CFG;
 
-        $params = self::validate_parameters(self::lock_submissions_parameters(),
-                array('edusignmentid' => $edusignmentid,
-                        'userids' => $userids));
+        $params = self::validate_parameters(
+            self::lock_submissions_parameters(),
+            ['edusignmentid' => $edusignmentid,
+            'userids' => $userids]
+        );
 
-        list($edusignment, $course, $cm, $context) = self::validate_edusign($params['edusignmentid']);
+        [$edusignment, $course, $cm, $context] = self::validate_edusign($params['edusignmentid']);
 
-        $warnings = array();
+        $warnings = [];
         foreach ($params['userids'] as $userid) {
             if (!$edusignment->lock_submission($userid)) {
                 $detail = 'User id: ' . $userid . ', edusignment id: ' . $params['edusignmentid'];
-                $warnings[] = self::generate_warning($params['edusignmentid'],
-                        'couldnotlock',
-                        $detail);
+                $warnings[] = self::generate_warning(
+                    $params['edusignmentid'],
+                    'couldnotlock',
+                    $detail
+                );
             }
         }
 
@@ -1417,13 +1481,14 @@ class mod_edusign_external extends external_api {
      */
     public static function revert_submissions_to_draft_parameters() {
         return new external_function_parameters(
-                array(
+            [
                         'edusignmentid' => new external_value(PARAM_INT, 'The edusignment id to operate on'),
                         'userids' => new external_multiple_structure(
-                                new external_value(PARAM_INT, 'user id'),
-                                '1 or more user ids',
-                                VALUE_REQUIRED),
-                )
+                            new external_value(PARAM_INT, 'user id'),
+                            '1 or more user ids',
+                            VALUE_REQUIRED
+                        ),
+                ]
         );
     }
 
@@ -1438,19 +1503,23 @@ class mod_edusign_external extends external_api {
     public static function revert_submissions_to_draft($edusignmentid, $userids) {
         global $CFG;
 
-        $params = self::validate_parameters(self::revert_submissions_to_draft_parameters(),
-                array('edusignmentid' => $edusignmentid,
-                        'userids' => $userids));
+        $params = self::validate_parameters(
+            self::revert_submissions_to_draft_parameters(),
+            ['edusignmentid' => $edusignmentid,
+            'userids' => $userids]
+        );
 
-        list($edusignment, $course, $cm, $context) = self::validate_edusign($params['edusignmentid']);
+        [$edusignment, $course, $cm, $context] = self::validate_edusign($params['edusignmentid']);
 
-        $warnings = array();
+        $warnings = [];
         foreach ($params['userids'] as $userid) {
             if (!$edusignment->revert_to_draft($userid)) {
                 $detail = 'User id: ' . $userid . ', edusignment id: ' . $params['edusignmentid'];
-                $warnings[] = self::generate_warning($params['edusignmentid'],
-                        'couldnotrevert',
-                        $detail);
+                $warnings[] = self::generate_warning(
+                    $params['edusignmentid'],
+                    'couldnotrevert',
+                    $detail
+                );
             }
         }
 
@@ -1475,13 +1544,14 @@ class mod_edusign_external extends external_api {
      */
     public static function unlock_submissions_parameters() {
         return new external_function_parameters(
-                array(
+            [
                         'edusignmentid' => new external_value(PARAM_INT, 'The edusignment id to operate on'),
                         'userids' => new external_multiple_structure(
-                                new external_value(PARAM_INT, 'user id'),
-                                '1 or more user ids',
-                                VALUE_REQUIRED),
-                )
+                            new external_value(PARAM_INT, 'user id'),
+                            '1 or more user ids',
+                            VALUE_REQUIRED
+                        ),
+                ]
         );
     }
 
@@ -1496,19 +1566,23 @@ class mod_edusign_external extends external_api {
     public static function unlock_submissions($edusignmentid, $userids) {
         global $CFG;
 
-        $params = self::validate_parameters(self::unlock_submissions_parameters(),
-                array('edusignmentid' => $edusignmentid,
-                        'userids' => $userids));
+        $params = self::validate_parameters(
+            self::unlock_submissions_parameters(),
+            ['edusignmentid' => $edusignmentid,
+            'userids' => $userids]
+        );
 
-        list($edusignment, $course, $cm, $context) = self::validate_edusign($params['edusignmentid']);
+        [$edusignment, $course, $cm, $context] = self::validate_edusign($params['edusignmentid']);
 
-        $warnings = array();
+        $warnings = [];
         foreach ($params['userids'] as $userid) {
             if (!$edusignment->unlock_submission($userid)) {
                 $detail = 'User id: ' . $userid . ', edusignment id: ' . $params['edusignmentid'];
-                $warnings[] = self::generate_warning($params['edusignmentid'],
-                        'couldnotunlock',
-                        $detail);
+                $warnings[] = self::generate_warning(
+                    $params['edusignmentid'],
+                    'couldnotunlock',
+                    $detail
+                );
             }
         }
 
@@ -1533,11 +1607,11 @@ class mod_edusign_external extends external_api {
      */
     public static function submit_grading_form_parameters() {
         return new external_function_parameters(
-                array(
+            [
                         'edusignmentid' => new external_value(PARAM_INT, 'The edusignment id to operate on'),
                         'userid' => new external_value(PARAM_INT, 'The user id the submission belongs to'),
-                        'jsonformdata' => new external_value(PARAM_RAW, 'The data from the grading form, encoded as a json array')
-                )
+                        'jsonformdata' => new external_value(PARAM_RAW, 'The data from the grading form, encoded as a json array'),
+                ]
         );
     }
 
@@ -1556,28 +1630,30 @@ class mod_edusign_external extends external_api {
         require_once($CFG->dirroot . '/mod/edusign/locallib.php');
         require_once($CFG->dirroot . '/mod/edusign/gradeform.php');
 
-        $params = self::validate_parameters(self::submit_grading_form_parameters(),
-                array(
+        $params = self::validate_parameters(
+            self::submit_grading_form_parameters(),
+            [
                         'edusignmentid' => $edusignmentid,
                         'userid' => $userid,
-                        'jsonformdata' => $jsonformdata
-                ));
+                        'jsonformdata' => $jsonformdata,
+            ]
+        );
 
-        list($edusignment, $course, $cm, $context) = self::validate_edusign($params['edusignmentid']);
+        [$edusignment, $course, $cm, $context] = self::validate_edusign($params['edusignmentid']);
 
         $serialiseddata = json_decode($params['jsonformdata']);
 
-        $data = array();
+        $data = [];
         parse_str($serialiseddata, $data);
 
-        $warnings = array();
+        $warnings = [];
 
-        $options = array(
+        $options = [
                 'userid' => $params['userid'],
                 'attemptnumber' => $data['attemptnumber'],
                 'rownum' => 0,
-                'gradingpanel' => true
-        );
+                'gradingpanel' => true,
+        ];
 
         if (WS_SERVER) {
             // Assume form submission if coming from WS.
@@ -1586,7 +1662,7 @@ class mod_edusign_external extends external_api {
         }
 
         $customdata = (object) $data;
-        $formparams = array($edusignment, $customdata, $options);
+        $formparams = [$edusignment, $customdata, $options];
 
         // Data is injected into the form by the last param for the constructor.
         $mform = new mod_edusign_grade_form(null, $formparams, 'post', '', null, true, $data);
@@ -1595,9 +1671,11 @@ class mod_edusign_external extends external_api {
         if ($validateddata) {
             $edusignment->save_grade($params['userid'], $validateddata);
         } else {
-            $warnings[] = self::generate_warning($params['edusignmentid'],
-                    'couldnotsavegrade',
-                    'Form validation failed.');
+            $warnings[] = self::generate_warning(
+                $params['edusignmentid'],
+                'couldnotsavegrade',
+                'Form validation failed.'
+            );
         }
 
         return $warnings;
@@ -1621,10 +1699,10 @@ class mod_edusign_external extends external_api {
      */
     public static function submit_for_grading_parameters() {
         return new external_function_parameters(
-                array(
+            [
                         'edusignmentid' => new external_value(PARAM_INT, 'The edusignment id to operate on'),
-                        'acceptsubmissionstatement' => new external_value(PARAM_BOOL, 'Accept the edusignment submission statement')
-                )
+                        'acceptsubmissionstatement' => new external_value(PARAM_BOOL, 'Accept the edusignment submission statement'),
+                ]
         );
     }
 
@@ -1638,23 +1716,27 @@ class mod_edusign_external extends external_api {
     public static function submit_for_grading($edusignmentid, $acceptsubmissionstatement) {
         global $CFG, $USER;
 
-        $params = self::validate_parameters(self::submit_for_grading_parameters(),
-                array('edusignmentid' => $edusignmentid,
-                        'acceptsubmissionstatement' => $acceptsubmissionstatement));
+        $params = self::validate_parameters(
+            self::submit_for_grading_parameters(),
+            ['edusignmentid' => $edusignmentid,
+            'acceptsubmissionstatement' => $acceptsubmissionstatement]
+        );
 
-        list($edusignment, $course, $cm, $context) = self::validate_edusign($params['edusignmentid']);
+        [$edusignment, $course, $cm, $context] = self::validate_edusign($params['edusignmentid']);
 
-        $warnings = array();
+        $warnings = [];
         $data = new stdClass();
         $data->submissionstatement = $params['acceptsubmissionstatement'];
-        $notices = array();
+        $notices = [];
 
         if (!$edusignment->submit_for_grading($data, $notices)) {
             $detail = 'User id: ' . $USER->id . ', edusignment id: ' . $params['edusignmentid'] . ' Notices:' .
                     implode(', ', $notices);
-            $warnings[] = self::generate_warning($params['edusignmentid'],
-                    'couldnotsubmitforgrading',
-                    $detail);
+            $warnings[] = self::generate_warning(
+                $params['edusignmentid'],
+                'couldnotsubmitforgrading',
+                $detail
+            );
         }
 
         return $warnings;
@@ -1678,17 +1760,19 @@ class mod_edusign_external extends external_api {
      */
     public static function save_user_extensions_parameters() {
         return new external_function_parameters(
-                array(
+            [
                         'edusignmentid' => new external_value(PARAM_INT, 'The edusignment id to operate on'),
                         'userids' => new external_multiple_structure(
-                                new external_value(PARAM_INT, 'user id'),
-                                '1 or more user ids',
-                                VALUE_REQUIRED),
+                            new external_value(PARAM_INT, 'user id'),
+                            '1 or more user ids',
+                            VALUE_REQUIRED
+                        ),
                         'dates' => new external_multiple_structure(
-                                new external_value(PARAM_INT, 'dates'),
-                                '1 or more extension dates (timestamp)',
-                                VALUE_REQUIRED),
-                )
+                            new external_value(PARAM_INT, 'dates'),
+                            '1 or more extension dates (timestamp)',
+                            VALUE_REQUIRED
+                        ),
+                ]
         );
     }
 
@@ -1704,30 +1788,36 @@ class mod_edusign_external extends external_api {
     public static function save_user_extensions($edusignmentid, $userids, $dates) {
         global $CFG;
 
-        $params = self::validate_parameters(self::save_user_extensions_parameters(),
-                array('edusignmentid' => $edusignmentid,
+        $params = self::validate_parameters(
+            self::save_user_extensions_parameters(),
+            ['edusignmentid' => $edusignmentid,
                         'userids' => $userids,
-                        'dates' => $dates));
+            'dates' => $dates]
+        );
 
         if (count($params['userids']) != count($params['dates'])) {
             $detail = 'Length of userids and dates parameters differ.';
-            $warnings[] = self::generate_warning($params['edusignmentid'],
-                    'invalidparameters',
-                    $detail);
+            $warnings[] = self::generate_warning(
+                $params['edusignmentid'],
+                'invalidparameters',
+                $detail
+            );
 
             return $warnings;
         }
 
-        list($edusignment, $course, $cm, $context) = self::validate_edusign($params['edusignmentid']);
+        [$edusignment, $course, $cm, $context] = self::validate_edusign($params['edusignmentid']);
 
-        $warnings = array();
+        $warnings = [];
         foreach ($params['userids'] as $idx => $userid) {
             $duedate = $params['dates'][$idx];
             if (!$edusignment->save_user_extension($userid, $duedate)) {
                 $detail = 'User id: ' . $userid . ', edusignment id: ' . $params['edusignmentid'] . ', Extension date: ' . $duedate;
-                $warnings[] = self::generate_warning($params['edusignmentid'],
-                        'couldnotgrantextensions',
-                        $detail);
+                $warnings[] = self::generate_warning(
+                    $params['edusignmentid'],
+                    'couldnotgrantextensions',
+                    $detail
+                );
             }
         }
 
@@ -1752,9 +1842,9 @@ class mod_edusign_external extends external_api {
      */
     public static function reveal_identities_parameters() {
         return new external_function_parameters(
-                array(
-                        'edusignmentid' => new external_value(PARAM_INT, 'The edusignment id to operate on')
-                )
+            [
+                        'edusignmentid' => new external_value(PARAM_INT, 'The edusignment id to operate on'),
+                ]
         );
     }
 
@@ -1768,17 +1858,21 @@ class mod_edusign_external extends external_api {
     public static function reveal_identities($edusignmentid) {
         global $CFG, $USER;
 
-        $params = self::validate_parameters(self::reveal_identities_parameters(),
-                array('edusignmentid' => $edusignmentid));
+        $params = self::validate_parameters(
+            self::reveal_identities_parameters(),
+            ['edusignmentid' => $edusignmentid]
+        );
 
-        list($edusignment, $course, $cm, $context) = self::validate_edusign($params['edusignmentid']);
+        [$edusignment, $course, $cm, $context] = self::validate_edusign($params['edusignmentid']);
 
-        $warnings = array();
+        $warnings = [];
         if (!$edusignment->reveal_identities()) {
             $detail = 'User id: ' . $USER->id . ', edusignment id: ' . $params['edusignmentid'];
-            $warnings[] = self::generate_warning($params['edusignmentid'],
-                    'couldnotrevealidentities',
-                    $detail);
+            $warnings[] = self::generate_warning(
+                $params['edusignmentid'],
+                'couldnotrevealidentities',
+                $detail
+            );
         }
 
         return $warnings;
@@ -1803,7 +1897,7 @@ class mod_edusign_external extends external_api {
     public static function save_submission_parameters() {
         global $CFG;
         $instance = new edusign(null, null, null);
-        $pluginsubmissionparams = array();
+        $pluginsubmissionparams = [];
 
         foreach ($instance->get_submission_plugins() as $plugin) {
             if ($plugin->is_visible()) {
@@ -1815,12 +1909,12 @@ class mod_edusign_external extends external_api {
         }
 
         return new external_function_parameters(
-                array(
+            [
                         'edusignmentid' => new external_value(PARAM_INT, 'The edusignment id to operate on'),
                         'plugindata' => new external_single_structure(
-                                $pluginsubmissionparams
-                        )
-                )
+                            $pluginsubmissionparams
+                        ),
+                ]
         );
     }
 
@@ -1835,13 +1929,15 @@ class mod_edusign_external extends external_api {
     public static function save_submission($edusignmentid, $plugindata) {
         global $CFG, $USER;
 
-        $params = self::validate_parameters(self::save_submission_parameters(),
-                array('edusignmentid' => $edusignmentid,
-                        'plugindata' => $plugindata));
+        $params = self::validate_parameters(
+            self::save_submission_parameters(),
+            ['edusignmentid' => $edusignmentid,
+            'plugindata' => $plugindata]
+        );
 
-        list($edusignment, $course, $cm, $context) = self::validate_edusign($params['edusignmentid']);
+        [$edusignment, $course, $cm, $context] = self::validate_edusign($params['edusignmentid']);
 
-        $notices = array();
+        $notices = [];
 
         $edusignment->update_effective_access($USER->id);
         if (!$edusignment->submissions_open($USER->id)) {
@@ -1851,11 +1947,13 @@ class mod_edusign_external extends external_api {
             $edusignment->save_submission($submissiondata, $notices);
         }
 
-        $warnings = array();
+        $warnings = [];
         foreach ($notices as $notice) {
-            $warnings[] = self::generate_warning($params['edusignmentid'],
-                    'couldnotsavesubmission',
-                    $notice);
+            $warnings[] = self::generate_warning(
+                $params['edusignmentid'],
+                'couldnotsavesubmission',
+                $notice
+            );
         }
 
         return $warnings;
@@ -1881,7 +1979,7 @@ class mod_edusign_external extends external_api {
         global $CFG;
         require_once("$CFG->dirroot/grade/grading/lib.php");
         $instance = new edusign(null, null, null);
-        $pluginfeedbackparams = array();
+        $pluginfeedbackparams = [];
 
         foreach ($instance->get_feedback_plugins() as $plugin) {
             if ($plugin->is_visible()) {
@@ -1892,21 +1990,21 @@ class mod_edusign_external extends external_api {
             }
         }
 
-        $advancedgradingdata = array();
+        $advancedgradingdata = [];
         $methods = array_keys(grading_manager::available_methods(false));
         foreach ($methods as $method) {
             require_once($CFG->dirroot . '/grade/grading/form/' . $method . '/lib.php');
             $details = call_user_func('gradingform_' . $method . '_controller::get_external_instance_filling_details');
             if (!empty($details)) {
-                $items = array();
+                $items = [];
                 foreach ($details as $key => $value) {
                     $value->required = VALUE_OPTIONAL;
                     unset($value->content->keys['id']);
-                    $items[$key] = new external_multiple_structure (new external_single_structure(
-                            array(
+                    $items[$key] = new external_multiple_structure(new external_single_structure(
+                        [
                                     'criterionid' => new external_value(PARAM_INT, 'criterion id'),
-                                    'fillings' => $value
-                            )
+                                    'fillings' => $value,
+                            ]
                     ));
                 }
                 $advancedgradingdata[$method] = new external_single_structure($items, 'items', VALUE_OPTIONAL);
@@ -1914,21 +2012,25 @@ class mod_edusign_external extends external_api {
         }
 
         return new external_function_parameters(
-                array(
+            [
                         'edusignmentid' => new external_value(PARAM_INT, 'The edusignment id to operate on'),
                         'userid' => new external_value(PARAM_INT, 'The student id to operate on'),
                         'grade' => new external_value(PARAM_FLOAT, 'The new grade for this user. Ignored if advanced grading used'),
                         'attemptnumber' => new external_value(PARAM_INT, 'The attempt number (-1 means latest attempt)'),
-                        'addattempt' => new external_value(PARAM_BOOL,
-                                'Allow another attempt if the attempt reopen method is manual'),
+                        'addattempt' => new external_value(
+                            PARAM_BOOL,
+                            'Allow another attempt if the attempt reopen method is manual'
+                        ),
                         'workflowstate' => new external_value(PARAM_ALPHA, 'The next marking workflow state'),
                         'applytoall' => new external_value(PARAM_BOOL, 'If true, this grade will be applied ' .
                                 'to all members ' .
                                 'of the group (for group edusignments).'),
-                        'plugindata' => new external_single_structure($pluginfeedbackparams, 'plugin data', VALUE_DEFAULT, array()),
-                        'advancedgradingdata' => new external_single_structure($advancedgradingdata, 'advanced grading data',
-                                VALUE_DEFAULT, array())
-                )
+                        'plugindata' => new external_single_structure($pluginfeedbackparams, 'plugin data', VALUE_DEFAULT, []),
+                        'advancedgradingdata' => new external_single_structure(
+                            $advancedgradingdata, 'advanced grading data',
+                            VALUE_DEFAULT, []
+                        ),
+                ]
         );
     }
 
@@ -1947,19 +2049,22 @@ class mod_edusign_external extends external_api {
      * @return null
      * @since Moodle 2.6
      */
-    public static function save_grade($edusignmentid,
-            $userid,
-            $grade,
-            $attemptnumber,
-            $addattempt,
-            $workflowstate,
-            $applytoall,
-            $plugindata = array(),
-            $advancedgradingdata = array()) {
+    public static function save_grade(
+        $edusignmentid,
+        $userid,
+        $grade,
+        $attemptnumber,
+        $addattempt,
+        $workflowstate,
+        $applytoall,
+        $plugindata = [],
+        $advancedgradingdata = []
+    ) {
         global $CFG, $USER;
 
-        $params = self::validate_parameters(self::save_grade_parameters(),
-                array('edusignmentid' => $edusignmentid,
+        $params = self::validate_parameters(
+            self::save_grade_parameters(),
+            ['edusignmentid' => $edusignmentid,
                         'userid' => $userid,
                         'grade' => $grade,
                         'attemptnumber' => $attemptnumber,
@@ -1967,9 +2072,10 @@ class mod_edusign_external extends external_api {
                         'addattempt' => $addattempt,
                         'applytoall' => $applytoall,
                         'plugindata' => $plugindata,
-                        'advancedgradingdata' => $advancedgradingdata));
+            'advancedgradingdata' => $advancedgradingdata]
+        );
 
-        list($edusignment, $course, $cm, $context) = self::validate_edusign($params['edusignmentid']);
+        [$edusignment, $course, $cm, $context] = self::validate_edusign($params['edusignmentid']);
 
         $gradedata = (object) $params['plugindata'];
 
@@ -1980,10 +2086,10 @@ class mod_edusign_external extends external_api {
         $gradedata->grade = $params['grade'];
 
         if (!empty($params['advancedgradingdata'])) {
-            $advancedgrading = array();
+            $advancedgrading = [];
             $criteria = reset($params['advancedgradingdata']);
             foreach ($criteria as $key => $criterion) {
-                $details = array();
+                $details = [];
                 foreach ($criterion as $value) {
                     foreach ($value['fillings'] as $filling) {
                         $details[$value['criterionid']] = $filling;
@@ -2019,7 +2125,7 @@ class mod_edusign_external extends external_api {
         global $CFG;
         require_once("$CFG->dirroot/grade/grading/lib.php");
         $instance = new edusign(null, null, null);
-        $pluginfeedbackparams = array();
+        $pluginfeedbackparams = [];
 
         foreach ($instance->get_feedback_plugins() as $plugin) {
             if ($plugin->is_visible()) {
@@ -2030,21 +2136,21 @@ class mod_edusign_external extends external_api {
             }
         }
 
-        $advancedgradingdata = array();
+        $advancedgradingdata = [];
         $methods = array_keys(grading_manager::available_methods(false));
         foreach ($methods as $method) {
             require_once($CFG->dirroot . '/grade/grading/form/' . $method . '/lib.php');
             $details = call_user_func('gradingform_' . $method . '_controller::get_external_instance_filling_details');
             if (!empty($details)) {
-                $items = array();
+                $items = [];
                 foreach ($details as $key => $value) {
                     $value->required = VALUE_OPTIONAL;
                     unset($value->content->keys['id']);
-                    $items[$key] = new external_multiple_structure (new external_single_structure(
-                            array(
+                    $items[$key] = new external_multiple_structure(new external_single_structure(
+                        [
                                     'criterionid' => new external_value(PARAM_INT, 'criterion id'),
-                                    'fillings' => $value
-                            )
+                                    'fillings' => $value,
+                            ]
                     ));
                 }
                 $advancedgradingdata[$method] = new external_single_structure($items, 'items', VALUE_OPTIONAL);
@@ -2052,32 +2158,42 @@ class mod_edusign_external extends external_api {
         }
 
         return new external_function_parameters(
-                array(
+            [
                         'edusignmentid' => new external_value(PARAM_INT, 'The edusignment id to operate on'),
                         'applytoall' => new external_value(PARAM_BOOL, 'If true, this grade will be applied ' .
                                 'to all members ' .
                                 'of the group (for group edusignments).'),
                         'grades' => new external_multiple_structure(
-                                new external_single_structure(
-                                        array(
+                            new external_single_structure(
+                                [
                                                 'userid' => new external_value(PARAM_INT, 'The student id to operate on'),
                                                 'grade' => new external_value(PARAM_FLOAT, 'The new grade for this user. ' .
                                                         'Ignored if advanced grading used'),
-                                                'attemptnumber' => new external_value(PARAM_INT,
-                                                        'The attempt number (-1 means latest attempt)'),
-                                                'addattempt' => new external_value(PARAM_BOOL,
-                                                        'Allow another attempt if manual attempt reopen method'),
-                                                'workflowstate' => new external_value(PARAM_ALPHA,
-                                                        'The next marking workflow state'),
-                                                'plugindata' => new external_single_structure($pluginfeedbackparams, 'plugin data',
-                                                        VALUE_DEFAULT, array()),
-                                                'advancedgradingdata' => new external_single_structure($advancedgradingdata,
-                                                        'advanced grading data',
-                                                        VALUE_DEFAULT, array())
-                                        )
-                                )
-                        )
-                )
+                                                'attemptnumber' => new external_value(
+                                                    PARAM_INT,
+                                                    'The attempt number (-1 means latest attempt)'
+                                                ),
+                                                'addattempt' => new external_value(
+                                                    PARAM_BOOL,
+                                                    'Allow another attempt if manual attempt reopen method'
+                                                ),
+                                                'workflowstate' => new external_value(
+                                                    PARAM_ALPHA,
+                                                    'The next marking workflow state'
+                                                ),
+                                                'plugindata' => new external_single_structure(
+                                                    $pluginfeedbackparams, 'plugin data',
+                                                    VALUE_DEFAULT, []
+                                                ),
+                                                'advancedgradingdata' => new external_single_structure(
+                                                    $advancedgradingdata,
+                                                    'advanced grading data',
+                                                    VALUE_DEFAULT, []
+                                                ),
+                                        ]
+                            )
+                        ),
+                ]
         );
     }
 
@@ -2103,16 +2219,18 @@ class mod_edusign_external extends external_api {
     public static function save_grades($edusignmentid, $applytoall = false, $grades) {
         global $CFG, $USER;
 
-        $params = self::validate_parameters(self::save_grades_parameters(),
-                array('edusignmentid' => $edusignmentid,
+        $params = self::validate_parameters(
+            self::save_grades_parameters(),
+            ['edusignmentid' => $edusignmentid,
                         'applytoall' => $applytoall,
-                        'grades' => $grades));
+            'grades' => $grades]
+        );
 
-        list($edusignment, $course, $cm, $context) = self::validate_edusign($params['edusignmentid']);
+        [$edusignment, $course, $cm, $context] = self::validate_edusign($params['edusignmentid']);
 
         if ($edusignment->get_instance()->teamsubmission && $params['applytoall']) {
             // Check that only 1 user per submission group is provided.
-            $groupids = array();
+            $groupids = [];
             foreach ($params['grades'] as $gradeinfo) {
                 $group = $edusignment->get_submission_group($gradeinfo['userid']);
                 if (in_array($group->id, $groupids)) {
@@ -2133,10 +2251,10 @@ class mod_edusign_external extends external_api {
             $gradedata->grade = $gradeinfo['grade'];
 
             if (!empty($gradeinfo['advancedgradingdata'])) {
-                $advancedgrading = array();
+                $advancedgrading = [];
                 $criteria = reset($gradeinfo['advancedgradingdata']);
                 foreach ($criteria as $key => $criterion) {
-                    $details = array();
+                    $details = [];
                     foreach ($criterion as $value) {
                         foreach ($value['fillings'] as $filling) {
                             $details[$value['criterionid']] = $filling;
@@ -2170,9 +2288,9 @@ class mod_edusign_external extends external_api {
      */
     public static function copy_previous_attempt_parameters() {
         return new external_function_parameters(
-                array(
+            [
                         'edusignmentid' => new external_value(PARAM_INT, 'The edusignment id to operate on'),
-                )
+                ]
         );
     }
 
@@ -2185,20 +2303,24 @@ class mod_edusign_external extends external_api {
      */
     public static function copy_previous_attempt($edusignmentid) {
 
-        $params = self::validate_parameters(self::copy_previous_attempt_parameters(),
-                array('edusignmentid' => $edusignmentid));
+        $params = self::validate_parameters(
+            self::copy_previous_attempt_parameters(),
+            ['edusignmentid' => $edusignmentid]
+        );
 
-        list($edusignment, $course, $cm, $context) = self::validate_edusign($params['edusignmentid']);
+        [$edusignment, $course, $cm, $context] = self::validate_edusign($params['edusignmentid']);
 
-        $notices = array();
+        $notices = [];
 
         $edusignment->copy_previous_attempt($notices);
 
-        $warnings = array();
+        $warnings = [];
         foreach ($notices as $notice) {
-            $warnings[] = self::generate_warning($edusignmentid,
-                    'couldnotcopyprevioussubmission',
-                    $notice);
+            $warnings[] = self::generate_warning(
+                $edusignmentid,
+                'couldnotcopyprevioussubmission',
+                $notice
+            );
         }
 
         return $warnings;
@@ -2222,9 +2344,9 @@ class mod_edusign_external extends external_api {
      */
     public static function view_grading_table_parameters() {
         return new external_function_parameters(
-                array(
-                        'edusignid' => new external_value(PARAM_INT, 'edusign instance id')
-                )
+            [
+                        'edusignid' => new external_value(PARAM_INT, 'edusign instance id'),
+                ]
         );
     }
 
@@ -2238,18 +2360,20 @@ class mod_edusign_external extends external_api {
      */
     public static function view_grading_table($edusignid) {
 
-        $params = self::validate_parameters(self::view_grading_table_parameters(),
-                array(
-                        'edusignid' => $edusignid
-                ));
-        $warnings = array();
+        $params = self::validate_parameters(
+            self::view_grading_table_parameters(),
+            [
+                        'edusignid' => $edusignid,
+            ]
+        );
+        $warnings = [];
 
-        list($edusign, $course, $cm, $context) = self::validate_edusign($params['edusignid']);
+        [$edusign, $course, $cm, $context] = self::validate_edusign($params['edusignid']);
 
         $edusign->require_view_grades();
         \mod_edusign\event\grading_table_viewed::create_from_edusign($edusign)->trigger();
 
-        $result = array();
+        $result = [];
         $result['status'] = true;
         $result['warnings'] = $warnings;
         return $result;
@@ -2263,10 +2387,10 @@ class mod_edusign_external extends external_api {
      */
     public static function view_grading_table_returns() {
         return new external_single_structure(
-                array(
+            [
                         'status' => new external_value(PARAM_BOOL, 'status: true if success'),
-                        'warnings' => new external_warnings()
-                )
+                        'warnings' => new external_warnings(),
+                ]
         );
     }
 
@@ -2277,10 +2401,10 @@ class mod_edusign_external extends external_api {
      * @since Moodle 3.1
      */
     public static function view_submission_status_parameters() {
-        return new external_function_parameters (
-                array(
+        return new external_function_parameters(
+            [
                         'edusignid' => new external_value(PARAM_INT, 'edusign instance id'),
-                )
+                ]
         );
     }
 
@@ -2293,17 +2417,17 @@ class mod_edusign_external extends external_api {
      */
     public static function view_submission_status($edusignid) {
 
-        $warnings = array();
-        $params = array(
+        $warnings = [];
+        $params = [
                 'edusignid' => $edusignid,
-        );
+        ];
         $params = self::validate_parameters(self::view_submission_status_parameters(), $params);
 
-        list($edusign, $course, $cm, $context) = self::validate_edusign($params['edusignid']);
+        [$edusign, $course, $cm, $context] = self::validate_edusign($params['edusignid']);
 
         \mod_edusign\event\submission_status_viewed::create_from_edusign($edusign)->trigger();
 
-        $result = array();
+        $result = [];
         $result['status'] = true;
         $result['warnings'] = $warnings;
         return $result;
@@ -2317,10 +2441,10 @@ class mod_edusign_external extends external_api {
      */
     public static function view_submission_status_returns() {
         return new external_single_structure(
-                array(
+            [
                         'status' => new external_value(PARAM_BOOL, 'status: true if success'),
                         'warnings' => new external_warnings(),
-                )
+                ]
         );
     }
 
@@ -2331,13 +2455,13 @@ class mod_edusign_external extends external_api {
      * @since Moodle 3.1
      */
     public static function get_submission_status_parameters() {
-        return new external_function_parameters (
-                array(
+        return new external_function_parameters(
+            [
                         'edusignid' => new external_value(PARAM_INT, 'edusignment instance id'),
                         'userid' => new external_value(PARAM_INT, 'user id (empty for current user)', VALUE_DEFAULT, 0),
                         'groupid' => new external_value(PARAM_INT, 'filter by users in group (used for generating the grading summary).
                     Empty or 0 for all groups information.', VALUE_DEFAULT, 0),
-                )
+                ]
         );
     }
 
@@ -2354,16 +2478,16 @@ class mod_edusign_external extends external_api {
     public static function get_submission_status($edusignid, $userid = 0, $groupid = 0) {
         global $USER;
 
-        $warnings = array();
+        $warnings = [];
 
-        $params = array(
+        $params = [
                 'edusignid' => $edusignid,
                 'userid' => $userid,
                 'groupid' => $groupid,
-        );
+        ];
         $params = self::validate_parameters(self::get_submission_status_parameters(), $params);
 
-        list($edusign, $course, $cm, $context) = self::validate_edusign($params['edusignid']);
+        [$edusign, $course, $cm, $context] = self::validate_edusign($params['edusignid']);
 
         // Default value for userid.
         if (empty($params['userid'])) {
@@ -2403,7 +2527,7 @@ class mod_edusign_external extends external_api {
         $previousattempts = $edusign->get_edusign_attempt_history_renderable($user);
 
         // Now, build the result.
-        $result = array();
+        $result = [];
 
         // First of all, grading summary, this is suitable for teachers/managers.
         if ($gradingsummary) {
@@ -2423,8 +2547,10 @@ class mod_edusign_external extends external_api {
             if (empty($lastattempt->teamsubmission)) {
                 unset($lastattempt->teamsubmission);
             } else {
-                $lastattempt->teamsubmission->plugins = self::get_plugins_data($edusign, $submissionplugins,
-                        $lastattempt->teamsubmission);
+                $lastattempt->teamsubmission->plugins = self::get_plugins_data(
+                    $edusign, $submissionplugins,
+                    $lastattempt->teamsubmission
+                );
             }
 
             // We need to change the type of some of the structures retrieved from the renderable.
@@ -2440,10 +2566,11 @@ class mod_edusign_external extends external_api {
             // We cannot use array_keys here.
             if (!empty($lastattempt->submissiongroupmemberswhoneedtosubmit)) {
                 $lastattempt->submissiongroupmemberswhoneedtosubmit = array_map(
-                        function($e) {
-                            return $e->id;
-                        },
-                        $lastattempt->submissiongroupmemberswhoneedtosubmit);
+                    function($e) {
+                        return $e->id;
+                    },
+                    $lastattempt->submissiongroupmemberswhoneedtosubmit
+                );
             }
 
             // Can edit its own submission?
@@ -2474,7 +2601,7 @@ class mod_edusign_external extends external_api {
             $previousattempts->submissions = array_reverse($previousattempts->submissions);
 
             foreach ($previousattempts->submissions as $i => $submission) {
-                $attempt = array();
+                $attempt = [];
 
                 $grade = null;
                 foreach ($previousattempts->grades as $onegrade) {
@@ -2515,77 +2642,101 @@ class mod_edusign_external extends external_api {
      */
     public static function get_submission_status_returns() {
         return new external_single_structure(
-                array(
+            [
                         'gradingsummary' => new external_single_structure(
-                                array(
+                            [
                                         'participantcount' => new external_value(PARAM_INT, 'Number of users who can submit.'),
-                                        'submissiondraftscount' => new external_value(PARAM_INT,
-                                                'Number of submissions in draft status.'),
-                                        'submissiondraftscount' => new external_value(PARAM_INT,
-                                                'Number of submissions in draft status.'),
-                                        'submissionsenabled' => new external_value(PARAM_BOOL,
-                                                'Whether submissions are enabled or not.'),
-                                        'submissionssubmittedcount' => new external_value(PARAM_INT,
-                                                'Number of submissions in submitted status.'),
-                                        'submissionsneedgradingcount' => new external_value(PARAM_INT,
-                                                'Number of submissions that need grading.'),
+                                        'submissiondraftscount' => new external_value(
+                                            PARAM_INT,
+                                            'Number of submissions in draft status.'
+                                        ),
+                                        'submissiondraftscount' => new external_value(
+                                            PARAM_INT,
+                                            'Number of submissions in draft status.'
+                                        ),
+                                        'submissionsenabled' => new external_value(
+                                            PARAM_BOOL,
+                                            'Whether submissions are enabled or not.'
+                                        ),
+                                        'submissionssubmittedcount' => new external_value(
+                                            PARAM_INT,
+                                            'Number of submissions in submitted status.'
+                                        ),
+                                        'submissionsneedgradingcount' => new external_value(
+                                            PARAM_INT,
+                                            'Number of submissions that need grading.'
+                                        ),
                                         'warnofungroupedusers' => new external_value(PARAM_BOOL, 'Whether we need to warn people that there
                                                                         are users without groups.'),
-                                ), 'Grading information.', VALUE_OPTIONAL
+                                ], 'Grading information.', VALUE_OPTIONAL
                         ),
                         'lastattempt' => new external_single_structure(
-                                array(
+                            [
                                         'submission' => self::get_submission_structure(VALUE_OPTIONAL),
                                         'teamsubmission' => self::get_submission_structure(VALUE_OPTIONAL),
-                                        'submissiongroup' => new external_value(PARAM_INT,
-                                                'The submission group id (for group submissions only).',
-                                                VALUE_OPTIONAL),
-                                        'submissiongroupmemberswhoneedtosubmit' => new external_multiple_structure(
-                                                new external_value(PARAM_INT, 'USER id.'),
-                                                'List of users who still need to submit (for group submissions only).',
-                                                VALUE_OPTIONAL
+                                        'submissiongroup' => new external_value(
+                                            PARAM_INT,
+                                            'The submission group id (for group submissions only).',
+                                            VALUE_OPTIONAL
                                         ),
-                                        'submissionsenabled' => new external_value(PARAM_BOOL,
-                                                'Whether submissions are enabled or not.'),
+                                        'submissiongroupmemberswhoneedtosubmit' => new external_multiple_structure(
+                                            new external_value(PARAM_INT, 'USER id.'),
+                                            'List of users who still need to submit (for group submissions only).',
+                                            VALUE_OPTIONAL
+                                        ),
+                                        'submissionsenabled' => new external_value(
+                                            PARAM_BOOL,
+                                            'Whether submissions are enabled or not.'
+                                        ),
                                         'locked' => new external_value(PARAM_BOOL, 'Whether new submissions are locked.'),
                                         'graded' => new external_value(PARAM_BOOL, 'Whether the submission is graded.'),
-                                        'canedit' => new external_value(PARAM_BOOL,
-                                                'Whether the user can edit the current submission.'),
-                                        'caneditowner' => new external_value(PARAM_BOOL,
-                                                'Whether the owner of the submission can edit it.'),
+                                        'canedit' => new external_value(
+                                            PARAM_BOOL,
+                                            'Whether the user can edit the current submission.'
+                                        ),
+                                        'caneditowner' => new external_value(
+                                            PARAM_BOOL,
+                                            'Whether the owner of the submission can edit it.'
+                                        ),
                                         'cansubmit' => new external_value(PARAM_BOOL, 'Whether the user can submit.'),
                                         'extensionduedate' => new external_value(PARAM_INT, 'Extension due date.'),
                                         'blindmarking' => new external_value(PARAM_BOOL, 'Whether blind marking is enabled.'),
                                         'gradingstatus' => new external_value(PARAM_ALPHANUMEXT, 'Grading status.'),
                                         'usergroups' => new external_multiple_structure(
-                                                new external_value(PARAM_INT, 'Group id.'), 'User groups in the course.'
+                                            new external_value(PARAM_INT, 'Group id.'), 'User groups in the course.'
                                         ),
-                                ), 'Last attempt information.', VALUE_OPTIONAL
+                                ], 'Last attempt information.', VALUE_OPTIONAL
                         ),
                         'feedback' => new external_single_structure(
-                                array(
+                            [
                                         'grade' => self::get_grade_structure(VALUE_OPTIONAL),
-                                        'gradefordisplay' => new external_value(PARAM_RAW,
-                                                'Grade rendered into a format suitable for display.'),
+                                        'gradefordisplay' => new external_value(
+                                            PARAM_RAW,
+                                            'Grade rendered into a format suitable for display.'
+                                        ),
                                         'gradeddate' => new external_value(PARAM_INT, 'The date the user was graded.'),
-                                        'plugins' => new external_multiple_structure(self::get_plugin_structure(), 'Plugins info.',
-                                                VALUE_OPTIONAL),
-                                ), 'Feedback for the last attempt.', VALUE_OPTIONAL
+                                        'plugins' => new external_multiple_structure(
+                                            self::get_plugin_structure(), 'Plugins info.',
+                                            VALUE_OPTIONAL
+                                        ),
+                                ], 'Feedback for the last attempt.', VALUE_OPTIONAL
                         ),
                         'previousattempts' => new external_multiple_structure(
-                                new external_single_structure(
-                                        array(
+                            new external_single_structure(
+                                [
                                                 'attemptnumber' => new external_value(PARAM_INT, 'Attempt number.'),
                                                 'submission' => self::get_submission_structure(VALUE_OPTIONAL),
                                                 'grade' => self::get_grade_structure(VALUE_OPTIONAL),
-                                                'feedbackplugins' => new external_multiple_structure(self::get_plugin_structure(),
-                                                        'Feedback info.',
-                                                        VALUE_OPTIONAL),
-                                        )
-                                ), 'List all the previous attempts did by the user.', VALUE_OPTIONAL
+                                                'feedbackplugins' => new external_multiple_structure(
+                                                    self::get_plugin_structure(),
+                                                    'Feedback info.',
+                                                    VALUE_OPTIONAL
+                                                ),
+                                        ]
+                            ), 'List all the previous attempts did by the user.', VALUE_OPTIONAL
                         ),
                         'warnings' => new external_warnings(),
-                )
+                ]
         );
     }
 
@@ -2597,16 +2748,18 @@ class mod_edusign_external extends external_api {
      */
     public static function list_participants_parameters() {
         return new external_function_parameters(
-                array(
+            [
                         'edusignid' => new external_value(PARAM_INT, 'edusign instance id'),
                         'groupid' => new external_value(PARAM_INT, 'group id'),
                         'filter' => new external_value(PARAM_RAW, 'search string to filter the results'),
                         'skip' => new external_value(PARAM_INT, 'number of records to skip', VALUE_DEFAULT, 0),
                         'limit' => new external_value(PARAM_INT, 'maximum number of records to return', VALUE_DEFAULT, 0),
                         'onlyids' => new external_value(PARAM_BOOL, 'Do not return all user fields', VALUE_DEFAULT, false),
-                        'includeenrolments' => new external_value(PARAM_BOOL, 'Do return courses where the user is enrolled',
-                                VALUE_DEFAULT, true)
-                )
+                        'includeenrolments' => new external_value(
+                            PARAM_BOOL, 'Do return courses where the user is enrolled',
+                            VALUE_DEFAULT, true
+                        ),
+                ]
         );
     }
 
@@ -2629,25 +2782,27 @@ class mod_edusign_external extends external_api {
         require_once($CFG->dirroot . "/mod/edusign/locallib.php");
         require_once($CFG->dirroot . "/user/lib.php");
 
-        $params = self::validate_parameters(self::list_participants_parameters(),
-                array(
+        $params = self::validate_parameters(
+            self::list_participants_parameters(),
+            [
                         'edusignid' => $edusignid,
                         'groupid' => $groupid,
                         'filter' => $filter,
                         'skip' => $skip,
                         'limit' => $limit,
                         'onlyids' => $onlyids,
-                        'includeenrolments' => $includeenrolments
-                ));
-        $warnings = array();
+                        'includeenrolments' => $includeenrolments,
+            ]
+        );
+        $warnings = [];
 
-        list($edusign, $course, $cm, $context) = self::validate_edusign($params['edusignid']);
+        [$edusign, $course, $cm, $context] = self::validate_edusign($params['edusignid']);
 
         require_capability('mod/edusign:view', $context);
 
         $edusign->require_view_grades();
 
-        $participants = array();
+        $participants = [];
         if (groups_group_visible($params['groupid'], $course, $cm)) {
             $participants = $edusign->list_participants_with_filter_status_and_group($params['groupid']);
         }
@@ -2663,7 +2818,7 @@ class mod_edusign_external extends external_api {
             }
         }
 
-        $result = array();
+        $result = [];
         $index = 0;
         foreach ($participants as $record) {
             // Preserve the fullname set by the edusignment.
@@ -2691,7 +2846,7 @@ class mod_edusign_external extends external_api {
                 if (!$edusign->is_blind_marking() && !$params['onlyids']) {
                     $userdetails = user_get_user_details($record, $course, $userfields);
                 } else {
-                    $userdetails = array('id' => $record->id);
+                    $userdetails = ['id' => $record->id];
                 }
                 $userdetails['fullname'] = $fullname;
                 $userdetails['submitted'] = $record->submitted;
@@ -2721,7 +2876,7 @@ class mod_edusign_external extends external_api {
         $userdesc = core_user_external::user_description();
         // List unneeded properties.
         $unneededproperties = [
-                'auth', 'confirmed', 'lang', 'calendartype', 'theme', 'timezone', 'mailformat'
+                'auth', 'confirmed', 'lang', 'calendartype', 'theme', 'timezone', 'mailformat',
         ];
         // Remove unneeded properties for consistency with the previous version.
         foreach ($unneededproperties as $prop) {
@@ -2738,32 +2893,32 @@ class mod_edusign_external extends external_api {
         // Define other keys.
         $otherkeys = [
                 'groups' => new external_multiple_structure(
-                        new external_single_structure(
-                                [
+                    new external_single_structure(
+                        [
                                         'id' => new external_value(PARAM_INT, 'group id'),
                                         'name' => new external_value(PARAM_RAW, 'group name'),
                                         'description' => new external_value(PARAM_RAW, 'group description'),
                                 ]
-                        ), 'user groups', VALUE_OPTIONAL
+                    ), 'user groups', VALUE_OPTIONAL
                 ),
                 'roles' => new external_multiple_structure(
-                        new external_single_structure(
-                                [
+                    new external_single_structure(
+                        [
                                         'roleid' => new external_value(PARAM_INT, 'role id'),
                                         'name' => new external_value(PARAM_RAW, 'role name'),
                                         'shortname' => new external_value(PARAM_ALPHANUMEXT, 'role shortname'),
-                                        'sortorder' => new external_value(PARAM_INT, 'role sortorder')
+                                        'sortorder' => new external_value(PARAM_INT, 'role sortorder'),
                                 ]
-                        ), 'user roles', VALUE_OPTIONAL
+                    ), 'user roles', VALUE_OPTIONAL
                 ),
                 'enrolledcourses' => new external_multiple_structure(
-                        new external_single_structure(
-                                [
+                    new external_single_structure(
+                        [
                                         'id' => new external_value(PARAM_INT, 'Id of the course'),
                                         'fullname' => new external_value(PARAM_RAW, 'Fullname of the course'),
-                                        'shortname' => new external_value(PARAM_RAW, 'Shortname of the course')
+                                        'shortname' => new external_value(PARAM_RAW, 'Shortname of the course'),
                                 ]
-                        ), 'Courses where the user is enrolled - limited by which courses the user is able to see', VALUE_OPTIONAL
+                    ), 'Courses where the user is enrolled - limited by which courses the user is able to see', VALUE_OPTIONAL
                 ),
                 'submitted' => new external_value(PARAM_BOOL, 'have they submitted their edusignment'),
                 'requiregrading' => new external_value(PARAM_BOOL, 'is their submission waiting for grading'),
@@ -2785,11 +2940,11 @@ class mod_edusign_external extends external_api {
      */
     public static function get_participant_parameters() {
         return new external_function_parameters(
-                array(
+            [
                         'edusignid' => new external_value(PARAM_INT, 'edusign instance id'),
                         'userid' => new external_value(PARAM_INT, 'user id'),
                         'embeduser' => new external_value(PARAM_BOOL, 'user id', VALUE_DEFAULT, false),
-                )
+                ]
         );
     }
 
@@ -2809,13 +2964,13 @@ class mod_edusign_external extends external_api {
         require_once($CFG->dirroot . "/mod/edusign/locallib.php");
         require_once($CFG->dirroot . "/user/lib.php");
 
-        $params = self::validate_parameters(self::get_participant_parameters(), array(
+        $params = self::validate_parameters(self::get_participant_parameters(), [
                 'edusignid' => $edusignid,
                 'userid' => $userid,
-                'embeduser' => $embeduser
-        ));
+                'embeduser' => $embeduser,
+        ]);
 
-        list($edusign, $course, $cm, $context) = self::validate_edusign($params['edusignid']);
+        [$edusign, $course, $cm, $context] = self::validate_edusign($params['edusignid']);
         $edusign->require_view_grades();
 
         $participant = $edusign->get_participant($params['userid']);
@@ -2828,7 +2983,7 @@ class mod_edusign_external extends external_api {
             throw new moodle_exception('usernotincourse');
         }
 
-        $return = array(
+        $return = [
                 'id' => $participant->id,
                 'fullname' => $participant->fullname,
                 'submitted' => $participant->submitted,
@@ -2839,7 +2994,7 @@ class mod_edusign_external extends external_api {
                 'duedate' => $edusign->get_instance()->duedate,
                 'cutoffdate' => $edusign->get_instance()->cutoffdate,
                 'duedatestr' => userdate($edusign->get_instance()->duedate, get_string('strftimedatetime', 'langconfig')),
-        );
+        ];
 
         if (!empty($participant->groupid)) {
             $return['groupid'] = $participant->groupid;
@@ -2870,7 +3025,7 @@ class mod_edusign_external extends external_api {
         $userdescription->default = [];
         $userdescription->required = VALUE_OPTIONAL;
 
-        return new external_single_structure(array(
+        return new external_single_structure([
                 'id' => new external_value(PARAM_INT, 'ID of the user'),
                 'fullname' => new external_value(PARAM_NOTAGS, 'The fullname of the user'),
                 'submitted' => new external_value(PARAM_BOOL, 'have they submitted their edusignment'),
@@ -2884,7 +3039,7 @@ class mod_edusign_external extends external_api {
                 'groupid' => new external_value(PARAM_INT, 'for group edusignments this is the group id', VALUE_OPTIONAL),
                 'groupname' => new external_value(PARAM_NOTAGS, 'for group edusignments this is the group name', VALUE_OPTIONAL),
                 'user' => $userdescription,
-        ));
+        ]);
     }
 
     /**
@@ -2898,15 +3053,15 @@ class mod_edusign_external extends external_api {
         global $DB;
 
         // Request and permission validation.
-        $edusign = $DB->get_record('edusign', array('id' => $edusignid), 'id', MUST_EXIST);
-        list($course, $cm) = get_course_and_cm_from_instance($edusign, 'edusign');
+        $edusign = $DB->get_record('edusign', ['id' => $edusignid], 'id', MUST_EXIST);
+        [$course, $cm] = get_course_and_cm_from_instance($edusign, 'edusign');
 
         $context = context_module::instance($cm->id);
         // Please, note that is not required to check mod/edusign:view because is done by validate_context->require_login.
         self::validate_context($context);
         $edusign = new edusign($context, $cm, $course);
 
-        return array($edusign, $course, $cm, $context);
+        return [$edusign, $course, $cm, $context];
     }
 
     /**
@@ -2916,10 +3071,10 @@ class mod_edusign_external extends external_api {
      * @since Moodle 3.2
      */
     public static function view_edusign_parameters() {
-        return new external_function_parameters (
-                array(
+        return new external_function_parameters(
+            [
                         'edusignid' => new external_value(PARAM_INT, 'edusign instance id'),
-                )
+                ]
         );
     }
 
@@ -2931,17 +3086,17 @@ class mod_edusign_external extends external_api {
      * @since Moodle 3.2
      */
     public static function view_edusign($edusignid) {
-        $warnings = array();
-        $params = array(
+        $warnings = [];
+        $params = [
                 'edusignid' => $edusignid,
-        );
+        ];
         $params = self::validate_parameters(self::view_edusign_parameters(), $params);
 
-        list($edusign, $course, $cm, $context) = self::validate_edusign($params['edusignid']);
+        [$edusign, $course, $cm, $context] = self::validate_edusign($params['edusignid']);
 
         $edusign->set_module_viewed();
 
-        $result = array();
+        $result = [];
         $result['status'] = true;
         $result['warnings'] = $warnings;
         return $result;
@@ -2955,10 +3110,10 @@ class mod_edusign_external extends external_api {
      */
     public static function view_edusign_returns() {
         return new external_single_structure(
-                array(
+            [
                         'status' => new external_value(PARAM_BOOL, 'status: true if success'),
                         'warnings' => new external_warnings(),
-                )
+                ]
         );
     }
 }

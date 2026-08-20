@@ -30,9 +30,8 @@ namespace mod_edusign\privacy;
 defined('MOODLE_INTERNAL') || die();
 
 interface edusignfeedback_user_provider extends
-        \core_privacy\local\request\plugin\subplugin_provider,
-        \core_privacy\local\request\shared_userlist_provider {
-
+    \core_privacy\local\request\plugin\subplugin_provider,
+    \core_privacy\local\request\shared_userlist_provider {
     /**
      * If you have tables that contain userids and you can generate entries in your tables without creating an
      * entry in the edusign_grades table then please fill in this method.
@@ -52,5 +51,4 @@ interface edusignfeedback_user_provider extends
      * @param edusign_plugin_request_data $deletedata A class that contains the relevant information required for deletion.
      */
     public static function delete_feedback_for_grades(edusign_plugin_request_data $deletedata);
-
 }

@@ -49,14 +49,14 @@ class submission_viewed extends base {
      * @return submission_viewed
      */
     public static function create_from_submission(\edusign $edusign, \stdClass $submission) {
-        $data = array(
+        $data = [
                 'objectid' => $submission->id,
                 'relateduserid' => $submission->userid,
                 'context' => $edusign->get_context(),
-                'other' => array(
+                'other' => [
                         'edusignid' => $edusign->get_instance()->id,
-                ),
-        );
+                ],
+        ];
         /** @var submission_viewed $event */
         $event = self::create($data);
         $event->set_edusign($edusign);
@@ -110,12 +110,12 @@ class submission_viewed extends base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'edusign_submission', 'restore' => 'submission');
+        return ['db' => 'edusign_submission', 'restore' => 'submission'];
     }
 
     public static function get_other_mapping() {
-        $othermapped = array();
-        $othermapped['edusignid'] = array('db' => 'edusign', 'restore' => 'edusign');
+        $othermapped = [];
+        $othermapped['edusignid'] = ['db' => 'edusign', 'restore' => 'edusign'];
 
         return $othermapped;
     }

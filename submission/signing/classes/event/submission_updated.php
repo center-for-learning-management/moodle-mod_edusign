@@ -41,7 +41,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class submission_updated extends \mod_edusign\event\submission_updated {
-
     /**
      * Init method.
      */
@@ -83,6 +82,6 @@ class submission_updated extends \mod_edusign\event\submission_updated {
 
     public static function get_objectid_mapping() {
         // No mapping available for 'edusignsubmission_signing'.
-        return array('db' => 'edusignsubmission_signing', 'restore' => \core\event\base::NOT_MAPPED);
+        return ['db' => 'edusignsubmission_signing', 'restore' => \core\event\base::NOT_MAPPED];
     }
 }

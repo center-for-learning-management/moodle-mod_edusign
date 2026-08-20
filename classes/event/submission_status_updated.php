@@ -51,14 +51,14 @@ class submission_status_updated extends base {
      *
      */
     public static function create_from_submission(\edusign $edusign, \stdClass $submission) {
-        $data = array(
+        $data = [
                 'context' => $edusign->get_context(),
                 'objectid' => $submission->id,
                 'relateduserid' => ($edusign->get_instance()->teamsubmission) ? null : $submission->userid,
-                'other' => array(
-                        'newstatus' => $submission->status
-                )
-        );
+                'other' => [
+                        'newstatus' => $submission->status,
+                ],
+        ];
         /** @var submission_status_updated $event */
         $event = self::create($data);
         $event->set_edusign($edusign);
@@ -110,7 +110,7 @@ class submission_status_updated extends base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'edusign_submission', 'restore' => 'submission');
+        return ['db' => 'edusign_submission', 'restore' => 'submission'];
     }
 
     public static function get_other_mapping() {

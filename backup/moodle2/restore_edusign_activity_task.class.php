@@ -34,7 +34,6 @@ require_once($CFG->dirroot . '/mod/edusign/backup/moodle2/restore_edusign_stepsl
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_edusign_activity_task extends restore_activity_task {
-
     /**
      * Define (add) particular settings this activity can have.
      */
@@ -56,10 +55,10 @@ class restore_edusign_activity_task extends restore_activity_task {
      *
      * @return array
      */
-    static public function define_decode_contents() {
-        $contents = array();
+    public static function define_decode_contents() {
+        $contents = [];
 
-        $contents[] = new restore_decode_content('edusign', array('intro'), 'edusign');
+        $contents[] = new restore_decode_content('edusign', ['intro'], 'edusign');
 
         return $contents;
     }
@@ -70,18 +69,21 @@ class restore_edusign_activity_task extends restore_activity_task {
      *
      * @return array of restore_decode_rule
      */
-    static public function define_decode_rules() {
-        $rules = array();
+    public static function define_decode_rules() {
+        $rules = [];
 
-        $rules[] = new restore_decode_rule('EDUSIGNVIEWBYID',
-                '/mod/edusign/view.php?id=$1',
-                'course_module');
-        $rules[] = new restore_decode_rule('EDUSIGNINDEX',
-                '/mod/edusign/index.php?id=$1',
-                'course_module');
+        $rules[] = new restore_decode_rule(
+            'EDUSIGNVIEWBYID',
+            '/mod/edusign/view.php?id=$1',
+            'course_module'
+        );
+        $rules[] = new restore_decode_rule(
+            'EDUSIGNINDEX',
+            '/mod/edusign/index.php?id=$1',
+            'course_module'
+        );
 
         return $rules;
-
     }
 
     /**
@@ -92,8 +94,8 @@ class restore_edusign_activity_task extends restore_activity_task {
      *
      * @return array of restore_log_rule
      */
-    static public function define_restore_log_rules() {
-        $rules = array();
+    public static function define_restore_log_rules() {
+        $rules = [];
 
         $rules[] = new restore_log_rule('edusign', 'add', 'view.php?id={course_module}', '{edusign}');
         $rules[] = new restore_log_rule('edusign', 'update', 'view.php?id={course_module}', '{edusign}');
@@ -114,8 +116,8 @@ class restore_edusign_activity_task extends restore_activity_task {
      *
      * @return array
      */
-    static public function define_restore_log_rules_for_course() {
-        $rules = array();
+    public static function define_restore_log_rules_for_course() {
+        $rules = [];
 
         return $rules;
     }

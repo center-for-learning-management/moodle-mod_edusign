@@ -27,9 +27,9 @@ defined('MOODLE_INTERNAL') || die();
 $string['activityoverview'] = 'Sie haben eine Unterschrift, die Ihre Bearbeitung erfordern.';
 $string['addattempt'] = 'Weiteren Versuch zulassen';
 $string['addnewattempt'] = 'Neuen Versuch hinzufügen';
+$string['addnewattempt_help'] = 'Dies erzeugt eine neue leere Lösung, die Sie bearbeiten können.';
 $string['addnewattemptfromprevious'] = 'Neuen Versuch auf Grundlage der vorherigen Lösung abgeben';
 $string['addnewattemptfromprevious_help'] = 'Hiermit kopieren Sie den Inhalt Ihrer vorherigen Lösung, um eine neue Lösung zu erstellen.';
-$string['addnewattempt_help'] = 'Dies erzeugt eine neue leere Lösung, die Sie bearbeiten können.';
 $string['addnewgroupoverride'] = 'Verfügbarkeitsänderungen für Gruppen anlegen';
 $string['addnewuseroverride'] = 'Verfügbarkeitsänderung für Nutzer anlegen';
 $string['addsubmission'] = 'unterschreiben';
@@ -45,49 +45,6 @@ $string['allowsubmissionsshort'] = 'Abgabeänderung erlauben';
 $string['alwaysshowdescription'] = 'Beschreibung immer anzeigen';
 $string['alwaysshowdescription_help'] = 'Wenn diese Option deaktiviert ist, wird die Aufgabenbeschreibung für Teilnehmer/innen nur ab dem Abgabebeginn angezeigt.';
 $string['applytoteam'] = 'Bewertungen und Feedback der gesamten Gruppe zuweisen.';
-$string['edusignment:addinstance'] = 'Neue Aufgabe hinzufügen';
-$string['edusignment:editothersubmission'] = 'Weitere Teilnehmerlösung bearbeiten';
-$string['edusignment:exportownsubmission'] = 'Eigene Lösung exportieren';
-$string['edusignmentfeedback'] = 'Feedback Plugin';
-$string['edusignmentfeedbackpluginname'] = 'Feedback Plugin';
-$string['edusignment:grade'] = 'Aufgabe bewerten';
-$string['edusignment:grantextension'] = 'Erweiterung zulassen';
-$string['edusignment:manageallocations'] = 'Bewerter/innen verwalten, die dieser Abgabe zugeordnet sind';
-$string['edusignment:managegrades'] = 'Bewertungen überprüfen und veröffentlichen';
-$string['edusignment:manageoverrides'] = 'Verfügbarkeitsänderungen für Aufgaben verwalten';
-$string['edusignmentisdue'] = 'Es sind leider keine Unterschriften mehr möglich!';
-$string['edusignmentmail'] = 'Guten Tag,
-
-{$a->grader} hat Ihnen eine Rückmeldung zur Ihrer Unterschrift für  \'{$a->edusignment}\' bereitgestellt.
-
-Mit dem folgenden Link können Sie direkt darauf zugreifen:
-
-{$a->url}
-
-Ihr E-Learning-Team';
-$string['edusignmentmailhtml'] = 'Guten Tag,
-
-<p>{$a->grader} hat Ihnen eine Rückmeldung zur Ihrer Unterschift für \'<i>{$a->edusignment}</i>\' bereitgestellt.</p> <p>Mit dem folgenden Link können Sie direkt darauf zugreifen: <a href="{$a->url}">Link zu Ihrer Unterschrift und zum Feedback</a>.</p>
-
-Ihr E-Learning-Team';
-$string['edusignmentmailsmall'] = 'Guten Tag,
-
-{$a->grader} hat Ihnen eine Rückmeldung zur Ihrer Unterschrift für  \'{$a->edusignment}\' bereitgestellt. Mit dem folgenden Link können Sie direkt darauf zugreifen: {$a->url}
-
-Ihr E-Learning-Team';
-$string['edusignmentname'] = 'Titel';
-$string['edusignmentplugins'] = 'Aufgabentypen';
-$string['edusignmentsperpage'] = 'Unterschriften pro Seite';
-$string['edusignment:receivegradernotifications'] = 'Systemnachrichten zur Bewertungsabgabe empfangen';
-$string['edusignment:releasegrades'] = 'Bewertung veröffentlichen';
-$string['edusignment:revealidentities'] = 'Teilnehmeridentität anzeigen';
-$string['edusignment:reviewgrades'] = 'Bewertungen prüfen';
-$string['edusignmentsubmission'] = 'Abgabetyp';
-$string['edusignmentsubmissionpluginname'] = 'Abgabetyp';
-$string['edusignment:submit'] = 'Aufgabe unterschrieben';
-$string['edusignment:view'] = 'Unterschrift ansehen';
-$string['edusignment:viewblinddetails'] = 'Teilnehmeridentität anzeigen, obwohl anonyme Bewertung eingeschaltet ist';
-$string['edusignment:viewgrades'] = 'Bewertungen anzeigen';
 $string['attemptheading'] = 'Versuch {$a->attemptnumber}: {$a->submissionsummary}';
 $string['attempthistory'] = 'Vorherige Versuche';
 $string['attemptnumber'] = 'Nummer';
@@ -114,8 +71,8 @@ $string['batchoperationunlock'] = 'Abgaben freigeben';
 $string['batchsetallocatedmarker'] = 'Bewerter für {$a} ausgewählte Nutzer festlegen.';
 $string['batchsetmarkingworkflowstateforusers'] = 'Bewertungsworkflow-Status für {$a} ausgewählte Nutzer festlegen.';
 $string['blindmarking'] = 'Anonyme Bewertung';
-$string['blindmarkingenabledwarning'] = 'Anonyme Bewertungen sind für diese Aktivität aktiviert.';
 $string['blindmarking_help'] = 'Die anonyme Bewertung verbirgt die Teilnehmeridentität während der Bewertung. Die Option kann nicht mehr geändert werden, nachdem die erste Lösung eingereicht oder Bewertung vorgenommen wurde.';
+$string['blindmarkingenabledwarning'] = 'Anonyme Bewertungen sind für diese Aktivität aktiviert.';
 $string['calendardue'] = '{$a} ist fällig.';
 $string['changefilters'] = 'Filter wechseln';
 $string['changegradewarning'] = 'In dieser Aufgabe sind bereits Lösungen bewertet worden. Bei einer Änderung der Bewertungsskala sind Neuberechnungen der Bewertungen erforderlich. Sie müssen ggfs. die Neuberechnung gesondert starten.';
@@ -124,6 +81,7 @@ $string['choosegradingaction'] = 'Bewertungsvorgang';
 $string['choosemarker'] = 'Auswählen...';
 $string['chooseoperation'] = 'Operation wählen';
 $string['clickexpandreviewpanel'] = 'Klicken, um die Überprüfungsansicht aufzuklappen';
+$string['close'] = 'Schließen';
 $string['collapsegradepanel'] = 'Bewertungsansicht einklappen';
 $string['collapsereviewpanel'] = 'Überprüfungsansicht einklappen';
 $string['comment'] = 'Kommentar';
@@ -142,15 +100,16 @@ $string['currentattempt'] = 'Dies ist Versuch {$a}.';
 $string['currentattemptof'] = 'Versuch {$a->attemptnumber} (mögliche Versuche {$a->maxattempts})';
 $string['currentgrade'] = 'Aktuelle Bewertung in Bewertungen';
 $string['cutoffdate'] = 'Letzte Abgabemöglichkeit';
+$string['cutoffdate_help'] = 'Diese Funktion sperrt die Abgabe von Lösungen ab diesem Termin, sofern keine individuellen Verlängerungen zugelassen wurden.';
 $string['cutoffdatecolon'] = 'Letzte Abgabemöglichkeit: {$a}';
 $string['cutoffdatefromdatevalidation'] = 'Der Termin der letzten Abgabemöglichkeit kann nicht früher liegen als der erlaubte Abgabebeginn.';
-$string['cutoffdate_help'] = 'Diese Funktion sperrt die Abgabe von Lösungen ab diesem Termin, sofern keine individuellen Verlängerungen zugelassen wurden.';
 $string['cutoffdatevalidation'] = 'Der Termin der letzten Abgabemöglichkeit kann nicht früher liegen als das Fälligkeitsdatum.';
 $string['defaultlayout'] = 'Standardlayout wiederherstellen';
 $string['defaultsettings'] = 'Standardmäßige Voreinstellungen';
 $string['defaultsettings_help'] = 'Diese Einstellungen legen Vorgaben für alle neuen Aufgaben fest.';
 $string['defaultteam'] = 'Standard-Gruppe';
 $string['delete'] = 'Löschen';
+$string['delete:confirm'] = 'Wollen Sie wirklich die Unterschrift löschen?';
 $string['deleteallsubmissions'] = 'Alle Unterschriften löschen';
 $string['description'] = 'Beschreibung';
 $string['disabled'] = 'Deaktiviert';
@@ -159,8 +118,8 @@ $string['downloadasfolders'] = 'Unterschriften in Verzeichnissen herunterladen';
 $string['downloadasfolders_help'] = 'Bei Aktivierung werden die heruntergeladenen Dateien in separaten Ordnern platziert und Dateien werden nicht umbenannt.';
 $string['downloadselectedsubmissions'] = 'Ausgewählte Abgaben herunterladen';
 $string['duedate'] = 'Fälligkeitsdatum';
-$string['duedatecolon'] = 'Fälligkeitsdatum: {$a}';
 $string['duedate_help'] = 'Zum Abgabeende wird die Aufgabe fällig. Spätere Abgaben sind auch danach noch möglich, werden dann aber als verspätet markiert. Um eine Abgabe nach einem bestimmten Datum zu verhindern, kann ein Termin der letzten Abgabemöglichkeit gesetzt werden.';
+$string['duedatecolon'] = 'Fälligkeitsdatum: {$a}';
 $string['duedateno'] = 'Kein Fälligkeitsdatum';
 $string['duedatereached'] = 'Das Fälligkeitsdatum für diese Aufgabe ist vorbei.';
 $string['duedatevalidation'] = 'Das Fälligkeitsdatum kann nicht früher liegen als der erlaubte Abgabebeginn.';
@@ -174,6 +133,49 @@ $string['editoverride'] = 'Überschreibung bearbeiten';
 $string['editsubmission'] = 'Unterschrift bearbeiten';
 $string['editsubmission_help'] = 'Sie können Ihre Unterschrift noch verändern.';
 $string['editsubmissionother'] = 'Unterschrift bearbeiten für {$a}';
+$string['edusignment:addinstance'] = 'Neue Aufgabe hinzufügen';
+$string['edusignment:editothersubmission'] = 'Weitere Teilnehmerlösung bearbeiten';
+$string['edusignment:exportownsubmission'] = 'Eigene Lösung exportieren';
+$string['edusignment:grade'] = 'Aufgabe bewerten';
+$string['edusignment:grantextension'] = 'Erweiterung zulassen';
+$string['edusignment:manageallocations'] = 'Bewerter/innen verwalten, die dieser Abgabe zugeordnet sind';
+$string['edusignment:managegrades'] = 'Bewertungen überprüfen und veröffentlichen';
+$string['edusignment:manageoverrides'] = 'Verfügbarkeitsänderungen für Aufgaben verwalten';
+$string['edusignment:receivegradernotifications'] = 'Systemnachrichten zur Bewertungsabgabe empfangen';
+$string['edusignment:releasegrades'] = 'Bewertung veröffentlichen';
+$string['edusignment:revealidentities'] = 'Teilnehmeridentität anzeigen';
+$string['edusignment:reviewgrades'] = 'Bewertungen prüfen';
+$string['edusignment:submit'] = 'Aufgabe unterschrieben';
+$string['edusignment:view'] = 'Unterschrift ansehen';
+$string['edusignment:viewblinddetails'] = 'Teilnehmeridentität anzeigen, obwohl anonyme Bewertung eingeschaltet ist';
+$string['edusignment:viewgrades'] = 'Bewertungen anzeigen';
+$string['edusignmentfeedback'] = 'Feedback Plugin';
+$string['edusignmentfeedbackpluginname'] = 'Feedback Plugin';
+$string['edusignmentisdue'] = 'Es sind leider keine Unterschriften mehr möglich!';
+$string['edusignmentmail'] = 'Guten Tag,
+
+{$a->grader} hat Ihnen eine Rückmeldung zur Ihrer Unterschrift für  \'{$a->edusignment}\' bereitgestellt.
+
+Mit dem folgenden Link können Sie direkt darauf zugreifen:
+
+{$a->url}
+
+Ihr E-Learning-Team';
+$string['edusignmentmailhtml'] = 'Guten Tag,
+
+<p>{$a->grader} hat Ihnen eine Rückmeldung zur Ihrer Unterschift für \'<i>{$a->edusignment}</i>\' bereitgestellt.</p> <p>Mit dem folgenden Link können Sie direkt darauf zugreifen: <a href="{$a->url}">Link zu Ihrer Unterschrift und zum Feedback</a>.</p>
+
+Ihr E-Learning-Team';
+$string['edusignmentmailsmall'] = 'Guten Tag,
+
+{$a->grader} hat Ihnen eine Rückmeldung zur Ihrer Unterschrift für  \'{$a->edusignment}\' bereitgestellt. Mit dem folgenden Link können Sie direkt darauf zugreifen: {$a->url}
+
+Ihr E-Learning-Team';
+$string['edusignmentname'] = 'Titel';
+$string['edusignmentplugins'] = 'Aufgabentypen';
+$string['edusignmentsperpage'] = 'Unterschriften pro Seite';
+$string['edusignmentsubmission'] = 'Abgabetyp';
+$string['edusignmentsubmissionpluginname'] = 'Abgabetyp';
 $string['enabled'] = 'Aktiviert';
 $string['errornosubmissions'] = 'Keine Abgaben zum Herunterladen verfügbar';
 $string['errorquickgradingvsadvancedgrading'] = 'Die Aufgabe verwendet das erweiterte Bewertungsschema. Daher werden diese Bewertungen nun nicht abgespeichert.';
@@ -381,8 +383,8 @@ $string['privacy:metadata:edusignmentdownloadasfolders'] = 'Nutzerpräferenz, ob
 $string['privacy:metadata:edusignmentfeedbackpluginsummary'] = 'Feedbackeinträge für die Aufgabe';
 $string['privacy:metadata:edusignmentfilter'] = 'Filteroptionen wie \'Eingereicht\', \'Nicht eingereicht\', \'Erfordert Bewertung\' und \'Verlängerung bewilligt\'.';
 $string['privacy:metadata:edusignmentgrades'] = 'Speichert Bewertungen des Nutzers für die Aufgabe';
-$string['privacy:metadata:edusignmentmarkerfilter'] = 'Aufgabenzusammenfassung gefiltert anhand des zugewiesenen Kennzeichens';
 $string['privacy:metadata:edusignmentid'] = 'Aufgaben-ID';
+$string['privacy:metadata:edusignmentmarkerfilter'] = 'Aufgabenzusammenfassung gefiltert anhand des zugewiesenen Kennzeichens';
 $string['privacy:metadata:edusignmentmessageexplanation'] = 'Mitteilungen an den Nutzer über das Mitteilungssystem';
 $string['privacy:metadata:edusignmentoverrides'] = 'Speichert überschriebene Informationen für die Aufgabe';
 $string['privacy:metadata:edusignmentperpage'] = 'Anzahl der Aufgabenlösungen auf einer Seite';
@@ -402,8 +404,8 @@ $string['privacy:metadata:userid'] = 'Nutzer-ID';
 $string['privacy:studentpath'] = 'Abgaben von Teilnehmern';
 $string['privacy:submissionpath'] = 'Abgabe';
 $string['quickgrading'] = 'Schnellbewertung';
-$string['quickgradingchangessaved'] = 'Die Änderungen in der Bewertung wurden gespeichert';
 $string['quickgrading_help'] = 'Die Schnellbewertung ermöglicht Ihnen direkt in der Übersichtstabelle Bewertungen vorzunehmen. Diese Möglichkeit steht nicht bei erweiterten Bewertungsmethoden zur Verfügung.';
+$string['quickgradingchangessaved'] = 'Die Änderungen in der Bewertung wurden gespeichert';
 $string['quickgradingresult'] = 'Schnellbewertung';
 $string['recordid'] = 'ID';
 $string['removeallgroupoverrides'] = 'Alle Verfügbarkeitsänderungen für Gruppen löschen';
@@ -438,9 +440,9 @@ $string['sendlatenotifications_help'] = 'Mit der Aktivierung werden die Bewerter
 $string['sendnotifications'] = 'Mitteilungen an Lehrerende senden';
 $string['sendnotifications_help'] = 'Mit der Aktivierung werden die Bewerter (meist die Trainer/innen) benachrichtigt wenn eine Lösung zeitgerecht oder verspätet abgegeben wird. Die Zustellung der Benachrichtigung ist individuell einstellbar.';
 $string['sendstudentnotifications'] = 'Teilnehmer/innen benachrichtigen';
+$string['sendstudentnotifications_help'] = 'Wenn aktiviert, dan erhalten Teilnehmer/innen eine Benachrichtigung über aktualisierte Bewertungen oder Feedbacks.';
 $string['sendstudentnotificationsdefault'] = 'Standardeinstellung für Teilnehmer&shy;benachrichtigung';
 $string['sendstudentnotificationsdefault_help'] = 'Den Standardwert für Auswahlfeld "Teilnehmer/innen benachrichtigen"  im Bewertungsformular festlegen.';
-$string['sendstudentnotifications_help'] = 'Wenn aktiviert, dan erhalten Teilnehmer/innen eine Benachrichtigung über aktualisierte Bewertungen oder Feedbacks.';
 $string['sendsubmissionreceipts'] = 'Abgabebestätigung an Teilnehmer/innen versenden';
 $string['sendsubmissionreceipts_help'] = 'Diese Option aktiviert Bestätigungen, die bei der Abgabe von Aufgabenlösungen an die Teilnehmer/innen gesendet werden.';
 $string['setmarkerallocationforlog'] = 'Bewertungszuordnung gesetzt auf: (id={$a->id}, Name={$a->fullname}, Bewerter={$a->marker}).';
@@ -493,17 +495,17 @@ $string['submissionslocked'] = 'Derzeit kann nicht unterschrieben werden';
 $string['submissionslockedshort'] = 'Unterschriftänderung sind nicht erlaubt';
 $string['submissionsnotgraded'] = 'Nicht unterschrieben: {$a}';
 $string['submissionstatement'] = 'Erklärung zur Eigenständigkeit';
+$string['submissionstatement_help'] = 'Erklärung zur Eigenständigkeit';
 $string['submissionstatementacceptedlog'] = 'Erklärung zur Eigenständigkeit wurde akzeptiert von {$a}';
 $string['submissionstatementdefault'] = 'Diese Arbeit ist meine persönliche Leistung. Sofern ich irgendwo fremde Quellen verwendet habe, sind diese Stellen entsprechend gekennzeichnet.';
-$string['submissionstatement_help'] = 'Erklärung zur Eigenständigkeit';
 $string['submissionstatus'] = 'Status';
 $string['submissionstatus_'] = 'Keine Unterschrift';
 $string['submissionstatus_draft'] = 'Entwurf (nicht abgegeben)';
-$string['submissionstatusheading'] = 'Unterschriftstatus';
 $string['submissionstatus_marked'] = 'Unterschrieben';
 $string['submissionstatus_new'] = 'Keine Unterschrift';
 $string['submissionstatus_reopened'] = 'Erneut geöffnet';
 $string['submissionstatus_submitted'] = 'Unterschrieben';
+$string['submissionstatusheading'] = 'Unterschriftstatus';
 $string['submissionsummary'] = '{$a->status}. Letzte Änderung {$a->timemodified}';
 $string['submissionteam'] = 'Gruppe';
 $string['submissiontypes'] = 'Abgabetypen';
@@ -521,9 +523,9 @@ $string['subplugintype_edusignmentsubmission'] = 'Unterschriften Plugin';
 $string['subplugintype_edusignmentsubmission_plural'] = 'Unterschriften Plugins';
 $string['teamname'] = 'Team: {$a}';
 $string['teamsubmission'] = 'Teilnehmer/innen geben in Gruppen ab';
+$string['teamsubmission_help'] = 'Mit der Aktivierung werden die Teilnehmer/innen in ihren Gruppen der Aufgabe zugeordnet. Eine Gruppenlösung steht allen Gruppenmitgliedern zur Verfügung. Änderungen können von allen eingesehen werden.';
 $string['teamsubmissiongroupingid'] = 'Berücksichtigte Gruppierung';
 $string['teamsubmissiongroupingid_help'] = 'Gruppen, die zu der gewählten Gruppierung gehören, werden zur Bearbeitung der Aufgabe genutzt. Wird keine Gruppierung ausgewählt, werden alle vorhandenen Gruppen verwendet.';
-$string['teamsubmission_help'] = 'Mit der Aktivierung werden die Teilnehmer/innen in ihren Gruppen der Aufgabe zugeordnet. Eine Gruppenlösung steht allen Gruppenmitgliedern zur Verfügung. Änderungen können von allen eingesehen werden.';
 $string['textinstructions'] = 'Aufgabenstellung';
 $string['timemodified'] = 'Zuletzt geändert';
 $string['timeremaining'] = 'Verbleibende Zeit';
@@ -567,6 +569,4 @@ $string['viewsubmissiongradingtable'] = 'Unterschriften zur Abgabe anzeigen';
 $string['viewsummary'] = 'Zusammenfassung anzeigen';
 $string['workflowfilter'] = 'Workflow-Filter';
 $string['xofy'] = '{$a->x} von {$a->y}';
-$string['close'] = 'Schließen';
 $string['delete'] = 'Unterschrift löschen';
-$string['delete:confirm'] = 'Wollen Sie wirklich die Unterschrift löschen?';

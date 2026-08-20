@@ -41,7 +41,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_override_deleted extends \core\event\base {
-
     /**
      * Init method.
      */
@@ -76,7 +75,7 @@ class user_override_deleted extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/edusign/overrides.php', array('cmid' => $this->contextinstanceid));
+        return new \moodle_url('/mod/edusign/overrides.php', ['cmid' => $this->contextinstanceid]);
     }
 
     /**
@@ -101,15 +100,15 @@ class user_override_deleted extends \core\event\base {
      * Get objectid mapping
      */
     public static function get_objectid_mapping() {
-        return array('db' => 'edusign_overrides', 'restore' => 'edusign_override');
+        return ['db' => 'edusign_overrides', 'restore' => 'edusign_override'];
     }
 
     /**
      * Get other mapping
      */
     public static function get_other_mapping() {
-        $othermapped = array();
-        $othermapped['edusignid'] = array('db' => 'edusign', 'restore' => 'edusign');
+        $othermapped = [];
+        $othermapped['edusignid'] = ['db' => 'edusign', 'restore' => 'edusign'];
 
         return $othermapped;
     }

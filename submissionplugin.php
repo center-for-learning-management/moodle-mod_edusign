@@ -36,13 +36,12 @@ require_once($CFG->dirroot . '/mod/edusign/edusignmentplugin.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class edusign_submission_plugin extends edusign_plugin {
-
     /**
      * return subtype name of the plugin
      *
      * @return string
      */
-    public final function get_subtype() {
+    final public function get_subtype() {
         return 'edusignsubmission';
     }
 

@@ -52,10 +52,10 @@ class submission_duplicated extends base {
      *
      */
     public static function create_from_submission(\edusign $edusign, \stdClass $submission) {
-        $data = array(
+        $data = [
                 'objectid' => $submission->id,
                 'context' => $edusign->get_context(),
-        );
+        ];
         self::$preventcreatecall = false;
         /** @var submission_duplicated $event */
         $event = self::create($data);
@@ -109,6 +109,6 @@ class submission_duplicated extends base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'edusign_submission', 'restore' => 'submission');
+        return ['db' => 'edusign_submission', 'restore' => 'submission'];
     }
 }

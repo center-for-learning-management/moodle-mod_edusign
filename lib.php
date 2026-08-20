@@ -70,18 +70,18 @@ function edusign_reset_userdata($data) {
     global $CFG, $DB;
     require_once($CFG->dirroot . '/mod/edusign/locallib.php');
 
-    $status = array();
-    $params = array('courseid' => $data->courseid);
+    $status = [];
+    $params = ['courseid' => $data->courseid];
     $sql = "SELECT a.id FROM {edusign} a WHERE a.course=:courseid";
-    $course = $DB->get_record('course', array('id' => $data->courseid), '*', MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $data->courseid], '*', MUST_EXIST);
     if ($edusigns = $DB->get_records_sql($sql, $params)) {
         foreach ($edusigns as $edusign) {
             $cm = get_coursemodule_from_instance(
-                    'edusign',
-                    $edusign->id,
-                    $data->courseid,
-                    false,
-                    MUST_EXIST
+                'edusign',
+                $edusign->id,
+                $data->courseid,
+                false,
+                MUST_EXIST
             );
             $context = context_module::instance($cm->id);
             $edusignment = new edusign($context, $cm, $course);
@@ -109,7 +109,7 @@ function edusign_refresh_events($courseid = 0, $instance = null, $cm = null) {
     // If we have instance information then we can just update the one event instead of updating all events.
     if (isset($instance)) {
         if (!is_object($instance)) {
-            $instance = $DB->get_record('edusign', array('id' => $instance), '*', MUST_EXIST);
+            $instance = $DB->get_record('edusign', ['id' => $instance], '*', MUST_EXIST);
         }
         if (isset($cm)) {
             if (!is_object($cm)) {
@@ -128,11 +128,11 @@ function edusign_refresh_events($courseid = 0, $instance = null, $cm = null) {
         if (!is_numeric($courseid)) {
             return false;
         }
-        if (!$edusigns = $DB->get_records('edusign', array('course' => $courseid))) {
+        if (!$edusigns = $DB->get_records('edusign', ['course' => $courseid])) {
             return false;
         }
         // Get course from courseid parameter.
-        if (!$course = $DB->get_record('course', array('id' => $courseid), '*')) {
+        if (!$course = $DB->get_record('course', ['id' => $courseid], '*')) {
             return false;
         }
     } else {
@@ -158,7 +158,7 @@ function edusign_prepare_update_events($edusign, $course = null, $cm = null) {
     global $DB;
     if (!isset($course)) {
         // Get course and course module for the edusignment.
-        list($course, $cm) = get_course_and_cm_from_instance($edusign->id, 'edusign', $edusign->course);
+        [$course, $cm] = get_course_and_cm_from_instance($edusign->id, 'edusign', $edusign->course);
     }
     // Refresh the edusignment's calendar events.
     $context = context_module::instance($cm->id);
@@ -166,10 +166,10 @@ function edusign_prepare_update_events($edusign, $course = null, $cm = null) {
     $edusignment->update_calendar($cm->id);
     // Refresh the calendar events also for the edusignment overrides.
     $overrides = $DB->get_records(
-            'edusign_overrides',
-            ['edusignid' => $edusign->id],
-            '',
-            'id, groupid, userid, duedate, sortorder'
+        'edusign_overrides',
+        ['edusignid' => $edusign->id],
+        '',
+        'id, groupid, userid, duedate, sortorder'
     );
     foreach ($overrides as $override) {
         if (empty($override->userid)) {
@@ -191,7 +191,7 @@ function edusign_prepare_update_events($edusign, $course = null, $cm = null) {
 function edusign_reset_gradebook($courseid, $type = '') {
     global $CFG, $DB;
 
-    $params = array('moduletype' => 'edusign', 'courseid' => $courseid);
+    $params = ['moduletype' => 'edusign', 'courseid' => $courseid];
     $sql = 'SELECT a.*, cm.idnumber as cmidnumber, a.course as courseid
             FROM {edusign} a, {course_modules} cm, {modules} m
             WHERE m.name=:moduletype AND m.id=cm.module AND cm.instance=a.id AND a.course=:courseid';
@@ -214,14 +214,14 @@ function edusign_reset_course_form_definition(&$mform) {
     $name = get_string('deleteallsubmissions', 'edusign');
     $mform->addElement('advcheckbox', 'reset_edusign_submissions', $name);
     $mform->addElement(
-            'advcheckbox',
-            'reset_edusign_user_overrides',
-            get_string('removealluseroverrides', 'edusign')
+        'advcheckbox',
+        'reset_edusign_user_overrides',
+        get_string('removealluseroverrides', 'edusign')
     );
     $mform->addElement(
-            'advcheckbox',
-            'reset_edusign_group_overrides',
-            get_string('removeallgroupoverrides', 'edusign')
+        'advcheckbox',
+        'reset_edusign_group_overrides',
+        get_string('removeallgroupoverrides', 'edusign')
     );
 }
 
@@ -232,9 +232,9 @@ function edusign_reset_course_form_definition(&$mform) {
  * @return array
  */
 function edusign_reset_course_form_defaults($course) {
-    return array('reset_edusign_submissions' => 1,
+    return ['reset_edusign_submissions' => 1,
             'reset_edusign_group_overrides' => 1,
-            'reset_edusign_user_overrides' => 1);
+            'reset_edusign_user_overrides' => 1];
 }
 
 /**
@@ -270,7 +270,7 @@ function edusign_update_events($edusign, $override = null) {
     $edusigninstance = $edusign->get_instance();
 
     // Load the old events relating to this edusign.
-    $conds = array('modulename' => 'edusign', 'instance' => $edusigninstance->id);
+    $conds = ['modulename' => 'edusign', 'instance' => $edusigninstance->id];
     if (!empty($override)) {
         // Only load events for this override.
         if (isset($override->userid)) {
@@ -287,7 +287,7 @@ function edusign_update_events($edusign, $override = null) {
     // Now make a to-do list of all that needs to be updated.
     if (empty($override)) {
         // We are updating the primary settings for the edusignment, so we need to add all the overrides.
-        $overrides = $DB->get_records('edusign_overrides', array('edusignid' => $edusigninstance->id), 'id ASC');
+        $overrides = $DB->get_records('edusign_overrides', ['edusignid' => $edusigninstance->id], 'id ASC');
         // It is necessary to add an empty stdClass to the beginning of the array as the $oldevents
         // list contains the original (non-override) event for the module. If this is not included
         // the logic below will end up updating the wrong row when we try to reconcile this $overrides
@@ -295,7 +295,7 @@ function edusign_update_events($edusign, $override = null) {
         array_unshift($overrides, new stdClass());
     } else {
         // Just do the one override.
-        $overrides = array($override);
+        $overrides = [$override];
     }
 
     if (!empty($edusign->get_course_module())) {
@@ -417,7 +417,7 @@ function edusign_supports($feature) {
  * @return array('string'=>'string') An array with area names as keys and descriptions as values
  */
 function edusign_grading_areas_list() {
-    return array('submissions' => get_string('submissions', 'edusign'));
+    return ['submissions' => get_string('submissions', 'edusign')];
 }
 
 /**
@@ -454,49 +454,51 @@ function edusign_extend_settings_navigation(settings_navigation $settings, navig
     }
 
     if (has_capability('mod/assign:manageoverrides', $PAGE->cm->context)) {
-        $url = new moodle_url('/mod/edusign/overrides.php', array('cmid' => $PAGE->cm->id));
+        $url = new moodle_url('/mod/edusign/overrides.php', ['cmid' => $PAGE->cm->id]);
         $node = navigation_node::create(
-                get_string('groupoverrides', 'edusign'),
-                new moodle_url($url, array('mode' => 'group')),
-                navigation_node::TYPE_SETTING,
-                null,
-                'mod_edusign_groupoverrides'
+            get_string('groupoverrides', 'edusign'),
+            new moodle_url($url, ['mode' => 'group']),
+            navigation_node::TYPE_SETTING,
+            null,
+            'mod_edusign_groupoverrides'
         );
         $navref->add_node($node, $beforekey);
 
         $node = navigation_node::create(
-                get_string('useroverrides', 'edusign'),
-                new moodle_url($url, array('mode' => 'user')),
-                navigation_node::TYPE_SETTING,
-                null,
-                'mod_edusign_useroverrides'
+            get_string('useroverrides', 'edusign'),
+            new moodle_url($url, ['mode' => 'user']),
+            navigation_node::TYPE_SETTING,
+            null,
+            'mod_edusign_useroverrides'
         );
         $navref->add_node($node, $beforekey);
     }
 
     // Link to gradebook.
-    if (has_capability('gradereport/grader:view', $cm->context) &&
-            has_capability('moodle/grade:viewall', $cm->context)) {
-        $link = new moodle_url('/grade/report/grader/index.php', array('id' => $course->id));
+    if (
+        has_capability('gradereport/grader:view', $cm->context) &&
+            has_capability('moodle/grade:viewall', $cm->context)
+    ) {
+        $link = new moodle_url('/grade/report/grader/index.php', ['id' => $course->id]);
         $linkname = get_string('viewgradebook', 'edusign');
         $node = $navref->add($linkname, $link, navigation_node::TYPE_SETTING);
     }
 
     // Link to download all submissions.
-    if (has_any_capability(array('mod/assign:grade', 'mod/edusign:viewsignings'), $context)) {
-        $link = new moodle_url('/mod/edusign/view.php', array('id' => $cm->id, 'action' => 'grading'));
+    if (has_any_capability(['mod/assign:grade', 'mod/edusign:viewsignings'], $context)) {
+        $link = new moodle_url('/mod/edusign/view.php', ['id' => $cm->id, 'action' => 'grading']);
         $node = $navref->add(get_string('viewgrading', 'edusign'), $link, navigation_node::TYPE_SETTING);
 
-        $link = new moodle_url('/mod/edusign/view.php', array('id' => $cm->id, 'action' => 'downloadall'));
+        $link = new moodle_url('/mod/edusign/view.php', ['id' => $cm->id, 'action' => 'downloadall']);
         $node = $navref->add(get_string('downloadall', 'edusign'), $link, navigation_node::TYPE_SETTING);
     }
 
     if (has_capability('mod/assign:revealidentities', $context)) {
-        $dbparams = array('id' => $cm->instance);
+        $dbparams = ['id' => $cm->instance];
         $edusignment = $DB->get_record('edusign', $dbparams, 'blindmarking, revealidentities');
 
         if ($edusignment && $edusignment->blindmarking && !$edusignment->revealidentities) {
-            $urlparams = array('id' => $cm->id, 'action' => 'revealidentities');
+            $urlparams = ['id' => $cm->id, 'action' => 'revealidentities'];
             $url = new moodle_url('/mod/edusign/view.php', $urlparams);
             $linkname = get_string('revealidentities', 'edusign');
             $node = $navref->add($linkname, $url, navigation_node::TYPE_SETTING);
@@ -518,7 +520,7 @@ function edusign_extend_settings_navigation(settings_navigation $settings, navig
 function edusign_get_coursemodule_info($coursemodule) {
     global $CFG, $DB;
 
-    $dbparams = array('id' => $coursemodule->instance);
+    $dbparams = ['id' => $coursemodule->instance];
     $fields = 'id, name, alwaysshowdescription, allowsubmissionsfromdate, intro, introformat, completionsubmit';
     if (!$edusignment = $DB->get_record('edusign', $dbparams, $fields)) {
         return false;
@@ -549,8 +551,10 @@ function edusign_get_coursemodule_info($coursemodule) {
  */
 function mod_edusign_get_completion_active_rule_descriptions($cm) {
     // Values will be present in cm_info, and we assume these are up to date.
-    if (empty($cm->customdata['customcompletionrules'])
-            || $cm->completion != COMPLETION_TRACKING_AUTOMATIC) {
+    if (
+        empty($cm->customdata['customcompletionrules'])
+            || $cm->completion != COMPLETION_TRACKING_AUTOMATIC
+    ) {
         return [];
     }
 
@@ -577,10 +581,10 @@ function mod_edusign_get_completion_active_rule_descriptions($cm) {
  * @param stdClass $currentcontext Current context of block
  */
 function edusign_page_type_list($pagetype, $parentcontext, $currentcontext) {
-    $modulepagetype = array(
+    $modulepagetype = [
             'mod-edusign-*' => get_string('page-mod-edusign-x', 'edusign'),
             'mod-edusign-view' => get_string('page-mod-edusign-view', 'edusign'),
-    );
+    ];
     return $modulepagetype;
 }
 
@@ -607,7 +611,7 @@ function edusign_print_overview($courses, &$htmlarray) {
         return true;
     }
 
-    $edusignmentids = array();
+    $edusignmentids = [];
 
     // Do edusignment_base::isopen() here without loading the whole thing for speed.
     foreach ($edusignments as $key => $edusignment) {
@@ -644,7 +648,7 @@ function edusign_print_overview($courses, &$htmlarray) {
     $stredusignment = get_string('modulename', 'edusign');
 
     // We do all possible database work here *outside* of the loop to ensure this scales.
-    list($sqledusignmentids, $edusignmentidparams) = $DB->get_in_or_equal($edusignmentids);
+    [$sqledusignmentids, $edusignmentidparams] = $DB->get_in_or_equal($edusignmentids);
 
     $mysubmissions = null;
     $unmarkedsubmissions = null;
@@ -661,10 +665,10 @@ function edusign_print_overview($courses, &$htmlarray) {
         if (has_capability('mod/assign:submit', $context, null, false)) {
             // Does the submission status of the edusignment require notification?
             $submitdetails = edusign_get_mysubmission_details_for_print_overview(
-                    $mysubmissions,
-                    $sqledusignmentids,
-                    $edusignmentidparams,
-                    $edusignment
+                $mysubmissions,
+                $sqledusignmentids,
+                $edusignmentidparams,
+                $edusignment
             );
         } else {
             $submitdetails = false;
@@ -673,11 +677,11 @@ function edusign_print_overview($courses, &$htmlarray) {
         if (has_capability('mod/assign:grade', $context, null, false)) {
             // Does the grading status of the edusignment require notification ?
             $gradedetails = edusign_get_grade_details_for_print_overview(
-                    $unmarkedsubmissions,
-                    $sqledusignmentids,
-                    $edusignmentidparams,
-                    $edusignment,
-                    $context
+                $unmarkedsubmissions,
+                $sqledusignmentids,
+                $edusignmentidparams,
+                $edusignment,
+                $context
             );
         } else {
             $gradedetails = false;
@@ -750,10 +754,10 @@ function edusign_print_overview($courses, &$htmlarray) {
  * @todo The final deprecation of this function will take place in Moodle 3.7 - see MDL-57487.
  */
 function edusign_get_mysubmission_details_for_print_overview(
-        &$mysubmissions,
-        $sqledusignmentids,
-        $edusignmentidparams,
-        $edusignment
+    &$mysubmissions,
+    $sqledusignmentids,
+    $edusignmentidparams,
+    $edusignment
 ) {
     global $USER, $DB;
 
@@ -768,7 +772,7 @@ function edusign_get_mysubmission_details_for_print_overview(
 
     if (!isset($mysubmissions)) {
         // Get all user submissions, indexed by edusignment id.
-        $dbparams = array_merge(array($USER->id), $edusignmentidparams, array($USER->id));
+        $dbparams = array_merge([$USER->id], $edusignmentidparams, [$USER->id]);
         $mysubmissions = $DB->get_records_sql('SELECT a.id AS edusignment,
                                                       a.nosubmissions AS nosubmissions,
                                                       g.timemodified AS timemarked,
@@ -801,7 +805,8 @@ function edusign_get_mysubmission_details_for_print_overview(
     }
 
     // We need to show details only if a valid submission doesn't exist.
-    if (!$submission ||
+    if (
+        !$submission ||
             !$submission->status ||
             $submission->status == EDUSIGN_SUBMISSION_STATUS_DRAFT ||
             $submission->status == EDUSIGN_SUBMISSION_STATUS_NEW
@@ -811,8 +816,8 @@ function edusign_get_mysubmission_details_for_print_overview(
         $submitdetails .= get_string('submissionstatus_' . $submission->status, 'edusign');
     }
     if ($edusignment->markingworkflow) {
-        $workflowstate = $DB->get_field('edusign_user_flags', 'workflowstate', array('edusignment' => $edusignment->id,
-            'userid' => $USER->id));
+        $workflowstate = $DB->get_field('edusign_user_flags', 'workflowstate', ['edusignment' => $edusignment->id,
+            'userid' => $USER->id]);
         if ($workflowstate) {
             $gradingstatus = 'markingworkflowstate' . $workflowstate;
         } else {
@@ -844,11 +849,11 @@ function edusign_get_mysubmission_details_for_print_overview(
  * @deprecated since 3.3
  */
 function edusign_get_grade_details_for_print_overview(
-        &$unmarkedsubmissions,
-        $sqledusignmentids,
-        $edusignmentidparams,
-        $edusignment,
-        $context
+    &$unmarkedsubmissions,
+    $sqledusignmentids,
+    $edusignmentidparams,
+    $edusignment,
+    $context
 ) {
     global $DB;
 
@@ -857,7 +862,7 @@ function edusign_get_grade_details_for_print_overview(
     if (!isset($unmarkedsubmissions)) {
         // Build up and array of unmarked submissions indexed by edusignment id/ userid
         // for use where the user has grading rights on edusignment.
-        $dbparams = array_merge(array(EDUSIGN_SUBMISSION_STATUS_SUBMITTED), $edusignmentidparams);
+        $dbparams = array_merge([EDUSIGN_SUBMISSION_STATUS_SUBMITTED], $edusignmentidparams);
         $rs = $DB->get_recordset_sql('SELECT s.edusignment as edusignment,
                                              s.userid as userid,
                                              s.id as id,
@@ -881,7 +886,7 @@ function edusign_get_grade_details_for_print_overview(
                                              s.latest = 1 AND
                                              s.edusignment ' . $sqledusignmentids, $dbparams);
 
-        $unmarkedsubmissions = array();
+        $unmarkedsubmissions = [];
         foreach ($rs as $rd) {
             $unmarkedsubmissions[$rd->edusignment][$rd->userid] = $rd->id;
         }
@@ -899,7 +904,7 @@ function edusign_get_grade_details_for_print_overview(
     }
 
     if ($submissions) {
-        $urlparams = array('id' => $edusignment->coursemodule, 'action' => 'grading');
+        $urlparams = ['id' => $edusignment->coursemodule, 'action' => 'grading'];
         $url = new moodle_url('/mod/edusign/view.php', $urlparams);
         $gradedetails = '<div class="details">' .
                 '<a href="' . $url . '">' .
@@ -927,9 +932,10 @@ function edusign_print_recent_activity($course, $viewfullnames, $timestart) {
 
     // Do not use log table if possible, it may be huge.
 
-    $dbparams = array($timestart, $course->id, 'edusign', EDUSIGN_SUBMISSION_STATUS_SUBMITTED);
+    $dbparams = [$timestart, $course->id, 'edusign', EDUSIGN_SUBMISSION_STATUS_SUBMITTED];
     $namefields = user_picture::fields('u', null, 'userid');
-    if (!$submissions = $DB->get_records_sql("SELECT asb.id, asb.timemodified, cm.id AS cmid, um.id as recordid,
+    if (
+        !$submissions = $DB->get_records_sql("SELECT asb.id, asb.timemodified, cm.id AS cmid, um.id as recordid,
                                                      $namefields
                                                 FROM {edusign_submission} asb
                                                      JOIN {edusign} a      ON a.id = asb.edusignment
@@ -942,13 +948,14 @@ function edusign_print_recent_activity($course, $viewfullnames, $timestart) {
                                                      a.course = ? AND
                                                      md.name = ? AND
                                                      asb.status = ?
-                                            ORDER BY asb.timemodified ASC", $dbparams)) {
+                                            ORDER BY asb.timemodified ASC", $dbparams)
+    ) {
         return false;
     }
 
     $modinfo = get_fast_modinfo($course);
-    $show = array();
-    $grader = array();
+    $show = [];
+    $grader = [];
 
     $showrecentsubmissions = get_config('edusign', 'showrecentsubmissions');
 
@@ -979,8 +986,10 @@ function edusign_print_recent_activity($course, $viewfullnames, $timestart) {
 
         $groupmode = groups_get_activity_groupmode($cm, $course);
 
-        if ($groupmode == SEPARATEGROUPS &&
-                !has_capability('moodle/site:accessallgroups', $context)) {
+        if (
+            $groupmode == SEPARATEGROUPS &&
+                !has_capability('moodle/site:accessallgroups', $context)
+        ) {
             if (isguestuser()) {
                 // Shortcut - guest user does not belong into any group.
                 continue;
@@ -1022,12 +1031,12 @@ function edusign_print_recent_activity($course, $viewfullnames, $timestart) {
             $submission->lastname = $submission->recordid;
         }
         print_recent_activity_note(
-                $submission->timemodified,
-                $submission,
-                $cm->name,
-                $link,
-                false,
-                $viewfullnames
+            $submission->timemodified,
+            $submission,
+            $cm->name,
+            $link,
+            false,
+            $viewfullnames
         );
     }
 
@@ -1047,13 +1056,13 @@ function edusign_print_recent_activity($course, $viewfullnames, $timestart) {
  * @return void
  */
 function edusign_get_recent_mod_activity(
-        &$activities,
-        &$index,
-        $timestart,
-        $courseid,
-        $cmid,
-        $userid = 0,
-        $groupid = 0
+    &$activities,
+    &$index,
+    $timestart,
+    $courseid,
+    $cmid,
+    $userid = 0,
+    $groupid = 0
 ) {
     global $CFG, $COURSE, $USER, $DB;
 
@@ -1062,13 +1071,13 @@ function edusign_get_recent_mod_activity(
     if ($COURSE->id == $courseid) {
         $course = $COURSE;
     } else {
-        $course = $DB->get_record('course', array('id' => $courseid));
+        $course = $DB->get_record('course', ['id' => $courseid]);
     }
 
     $modinfo = get_fast_modinfo($course);
 
     $cm = $modinfo->get_cm($cmid);
-    $params = array();
+    $params = [];
     if ($userid) {
         $userselect = 'AND u.id = :userid';
         $params['userid'] = $userid;
@@ -1091,7 +1100,8 @@ function edusign_get_recent_mod_activity(
 
     $userfields = user_picture::fields('u', null, 'userid');
 
-    if (!$submissions = $DB->get_records_sql('SELECT asb.id, asb.timemodified, ' .
+    if (
+        !$submissions = $DB->get_records_sql('SELECT asb.id, asb.timemodified, ' .
             $userfields .
             '  FROM {edusign_submission} asb
                                                 JOIN {edusign} a ON a.id = asb.edusignment
@@ -1101,7 +1111,8 @@ function edusign_get_recent_mod_activity(
                                                      asb.status = :submitted AND
                                                      a.id = :cminstance
                                                      ' . $userselect . ' ' . $groupselect .
-            ' ORDER BY asb.timemodified ASC', $params)) {
+            ' ORDER BY asb.timemodified ASC', $params)
+    ) {
         return;
     }
 
@@ -1112,7 +1123,7 @@ function edusign_get_recent_mod_activity(
     $viewfullnames = has_capability('moodle/site:viewfullnames', $cmcontext);
 
     $showrecentsubmissions = get_config('edusign', 'showrecentsubmissions');
-    $show = array();
+    $show = [];
     foreach ($submissions as $submission) {
         if ($submission->userid == $USER->id) {
             $show[] = $submission;
@@ -1154,7 +1165,7 @@ function edusign_get_recent_mod_activity(
 
     if ($grader) {
         require_once($CFG->libdir . '/gradelib.php');
-        $userids = array();
+        $userids = [];
         foreach ($show as $id => $submission) {
             $userids[] = $submission->userid;
         }
@@ -1249,7 +1260,7 @@ function edusign_scale_used($edusignmentid, $scaleid) {
     global $DB;
 
     $return = false;
-    $rec = $DB->get_record('edusign', array('id' => $edusignmentid, 'grade' => -$scaleid));
+    $rec = $DB->get_record('edusign', ['id' => $edusignmentid, 'grade' => -$scaleid]);
 
     if (!empty($rec) && !empty($scaleid)) {
         $return = true;
@@ -1269,7 +1280,7 @@ function edusign_scale_used($edusignmentid, $scaleid) {
 function edusign_scale_used_anywhere($scaleid) {
     global $DB;
 
-    if ($scaleid and $DB->record_exists('edusign', array('grade' => -$scaleid))) {
+    if ($scaleid and $DB->record_exists('edusign', ['grade' => -$scaleid])) {
         return true;
     } else {
         return false;
@@ -1287,7 +1298,7 @@ function edusign_scale_used_anywhere($scaleid) {
  * @return array
  */
 function edusign_get_view_actions() {
-    return array('view submission', 'view feedback');
+    return ['view submission', 'view feedback'];
 }
 
 /**
@@ -1301,7 +1312,7 @@ function edusign_get_view_actions() {
  * @return array
  */
 function edusign_get_post_actions() {
-    return array('upload', 'submit', 'submit for grading');
+    return ['upload', 'submit', 'submit for grading'];
 }
 
 
@@ -1433,7 +1444,7 @@ function edusign_get_file_areas($course, $cm, $context) {
     global $CFG;
     require_once($CFG->dirroot . '/mod/edusign/locallib.php');
 
-    $areas = array(EDUSIGN_INTROATTACHMENT_FILEAREA => get_string('introattachments', 'mod_edusign'));
+    $areas = [EDUSIGN_INTROATTACHMENT_FILEAREA => get_string('introattachments', 'mod_edusign')];
 
     $edusignment = new edusign($context, $cm, $course);
     foreach ($edusignment->get_submission_plugins() as $plugin) {
@@ -1473,15 +1484,15 @@ function edusign_get_file_areas($course, $cm, $context) {
  * @return object file_info instance or null if not found
  */
 function edusign_get_file_info(
-        $browser,
-        $areas,
-        $course,
-        $cm,
-        $context,
-        $filearea,
-        $itemid,
-        $filepath,
-        $filename
+    $browser,
+    $areas,
+    $course,
+    $cm,
+    $context,
+    $filearea,
+    $itemid,
+    $filepath,
+    $filename
 ) {
     global $CFG;
     require_once($CFG->dirroot . '/mod/edusign/locallib.php');
@@ -1502,26 +1513,28 @@ function edusign_get_file_info(
             // Students can not peak here!
             return null;
         }
-        if (!($storedfile = $fs->get_file(
+        if (
+            !($storedfile = $fs->get_file(
                 $edusignment->get_context()->id,
                 'mod_edusign',
                 $filearea,
                 0,
                 $filepath,
                 $filename
-        ))) {
+            ))
+        ) {
             return null;
         }
         return new file_info_stored(
-                $browser,
-                $edusignment->get_context(),
-                $storedfile,
-                $urlbase,
-                $filearea,
-                $itemid,
-                true,
-                true,
-                false
+            $browser,
+            $edusignment->get_context(),
+            $storedfile,
+            $urlbase,
+            $filearea,
+            $itemid,
+            true,
+            true,
+            false
         );
     }
 
@@ -1601,12 +1614,12 @@ function edusign_rescale_activity_grades($course, $cm, $oldmin, $oldmax, $newmin
         return false;
     }
 
-    $params = array(
+    $params = [
             'p1' => $oldmin,
             'p2' => $scale,
             'p3' => $newmin,
-            'a' => $cm->instance
-    );
+            'a' => $cm->instance,
+    ];
 
     // Only rescale grades that are greater than or equal to 0. Anything else is a special value.
     $sql = 'UPDATE {edusign_grades} set grade = (((grade - :p1) * :p2) + :p3) where edusignment = :a and grade >= 0';
@@ -1616,7 +1629,7 @@ function edusign_rescale_activity_grades($course, $cm, $oldmin, $oldmax, $newmin
     }
 
     // Now re-push all grades to the gradebook.
-    $dbparams = array('id' => $cm->instance);
+    $dbparams = ['id' => $cm->instance];
     $edusign = $DB->get_record('edusign', $dbparams);
     $edusign->cmidnumber = $cm->idnumber;
 
@@ -1639,11 +1652,11 @@ function edusign_user_outline($course, $user, $coursemodule, $edusignment) {
     require_once($CFG->dirroot . '/grade/grading/lib.php');
 
     $gradinginfo = grade_get_grades(
-            $course->id,
-            'mod',
-            'edusign',
-            $edusignment->id,
-            $user->id
+        $course->id,
+        'mod',
+        'edusign',
+        $edusignment->id,
+        $user->id
     );
 
     $gradingitem = $gradinginfo->items[0];
@@ -1706,13 +1719,13 @@ function edusign_get_completion_state($course, $cm, $userid, $type) {
  * @return bool false if file not found, does not return if found - just send the file
  */
 function edusign_pluginfile(
-        $course,
-        $cm,
-        context $context,
-        $filearea,
-        $args,
-        $forcedownload,
-        array $options = array()
+    $course,
+    $cm,
+    context $context,
+    $filearea,
+    $args,
+    $forcedownload,
+    array $options = []
 ) {
     global $CFG;
 
@@ -1770,16 +1783,16 @@ function mod_edusign_output_fragment_gradingpanel($args) {
 
     $userid = clean_param($args['userid'], PARAM_INT);
     $attemptnumber = clean_param($args['attemptnumber'], PARAM_INT);
-    $formdata = array();
+    $formdata = [];
     if (!empty($args['jsonformdata'])) {
         $serialiseddata = json_decode($args['jsonformdata']);
         parse_str($serialiseddata, $formdata);
     }
-    $viewargs = array(
+    $viewargs = [
             'userid' => $userid,
             'attemptnumber' => $attemptnumber,
-            'formdata' => $formdata
-    );
+            'formdata' => $formdata,
+    ];
 
     return $edusign->view('gradingpanel', $viewargs);
 }
@@ -1793,24 +1806,24 @@ function mod_edusign_output_fragment_gradingpanel($args) {
  * @return stdClass an object with the different type of areas indicating if they were updated or not
  * @since Moodle 3.2
  */
-function edusign_check_updates_since(cm_info $cm, $from, $filter = array()) {
+function edusign_check_updates_since(cm_info $cm, $from, $filter = []) {
     global $DB, $USER, $CFG;
     require_once($CFG->dirroot . '/mod/edusign/locallib.php');
 
     $updates = new stdClass();
-    $updates = course_check_module_updates_since($cm, $from, array(EDUSIGN_INTROATTACHMENT_FILEAREA), $filter);
+    $updates = course_check_module_updates_since($cm, $from, [EDUSIGN_INTROATTACHMENT_FILEAREA], $filter);
 
     // Check if there is a new submission by the user or new grades.
     $select = 'edusignment = :id AND userid = :userid AND (timecreated > :since1 OR timemodified > :since2)';
-    $params = array('id' => $cm->instance, 'userid' => $USER->id, 'since1' => $from, 'since2' => $from);
-    $updates->submissions = (object) array('updated' => false);
+    $params = ['id' => $cm->instance, 'userid' => $USER->id, 'since1' => $from, 'since2' => $from];
+    $updates->submissions = (object) ['updated' => false];
     $submissions = $DB->get_records_select('edusign_submission', $select, $params, '', 'id');
     if (!empty($submissions)) {
         $updates->submissions->updated = true;
         $updates->submissions->itemids = array_keys($submissions);
     }
 
-    $updates->grades = (object) array('updated' => false);
+    $updates->grades = (object) ['updated' => false];
     $grades = $DB->get_records_select('edusign_grades', $select, $params, '', 'id');
     if (!empty($grades)) {
         $updates->grades->updated = true;
@@ -1819,7 +1832,7 @@ function edusign_check_updates_since(cm_info $cm, $from, $filter = array()) {
 
     // Now, teachers should see other students updates.
     if (has_capability('mod/edusign:viewsignings', $cm->context)) {
-        $params = array('id' => $cm->instance, 'since1' => $from, 'since2' => $from);
+        $params = ['id' => $cm->instance, 'since1' => $from, 'since2' => $from];
         $select = 'edusignment = :id AND (timecreated > :since1 OR timemodified > :since2)';
 
         if (groups_get_activity_groupmode($cm) == SEPARATEGROUPS) {
@@ -1827,19 +1840,19 @@ function edusign_check_updates_since(cm_info $cm, $from, $filter = array()) {
             if (empty($groupusers)) {
                 return $updates;
             }
-            list($insql, $inparams) = $DB->get_in_or_equal($groupusers, SQL_PARAMS_NAMED);
+            [$insql, $inparams] = $DB->get_in_or_equal($groupusers, SQL_PARAMS_NAMED);
             $select .= ' AND userid ' . $insql;
             $params = array_merge($params, $inparams);
         }
 
-        $updates->usersubmissions = (object) array('updated' => false);
+        $updates->usersubmissions = (object) ['updated' => false];
         $submissions = $DB->get_records_select('edusign_submission', $select, $params, '', 'id');
         if (!empty($submissions)) {
             $updates->usersubmissions->updated = true;
             $updates->usersubmissions->itemids = array_keys($submissions);
         }
 
-        $updates->usergrades = (object) array('updated' => false);
+        $updates->usergrades = (object) ['updated' => false];
         $grades = $DB->get_records_select('edusign_grades', $select, $params, '', 'id');
         if (!empty($grades)) {
             $updates->usergrades->updated = true;
@@ -1887,8 +1900,11 @@ function mod_edusign_core_calendar_is_event_visible(calendar_event $event, $user
  * @param int $userid User id to use for all capability checks, etc. Set to 0 for current user (default).
  * @return \core_calendar\local\event\entities\action_interface|null
  */
-function mod_edusign_core_calendar_provide_event_action(calendar_event $event, \core_calendar\action_factory $factory,
-    $userid = 0) {
+function mod_edusign_core_calendar_provide_event_action(
+    calendar_event $event,
+    \core_calendar\action_factory $factory,
+    $userid = 0
+) {
 
     global $CFG, $USER;
 
@@ -1924,7 +1940,7 @@ function mod_edusign_core_calendar_provide_event_action(calendar_event $event, \
     $name = get_string('addsubmission', 'edusign');
     $url = new \moodle_url('/mod/edusign/view.php', [
         'id' => $cm->id,
-        'action' => 'editsubmission'
+        'action' => 'editsubmission',
     ]);
     $itemcount = 1;
     $actionable = $edusign->is_any_submission_plugin_enabled() && $edusign->can_edit_submission($userid, $userid);

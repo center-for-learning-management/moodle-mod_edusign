@@ -28,15 +28,15 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/edusign/locallib.php');
 
-use \core_privacy\local\metadata\collection;
-use \core_privacy\local\request\contextlist;
-use \core_privacy\local\request\writer;
-use \core_privacy\local\request\approved_contextlist;
-use \core_privacy\local\request\transform;
-use \core_privacy\local\request\helper;
-use \core_privacy\local\request\userlist;
-use \core_privacy\local\request\approved_userlist;
-use \core_privacy\manager;
+use core_privacy\local\metadata\collection;
+use core_privacy\local\request\contextlist;
+use core_privacy\local\request\writer;
+use core_privacy\local\request\approved_contextlist;
+use core_privacy\local\request\transform;
+use core_privacy\local\request\helper;
+use core_privacy\local\request\userlist;
+use core_privacy\local\request\approved_userlist;
+use core_privacy\manager;
 
 /**
  * Privacy class for requesting user data.
@@ -45,12 +45,7 @@ use \core_privacy\manager;
  * @copyright  2018 Adrian Greeve <adrian@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements
-        \core_privacy\local\metadata\provider,
-        \core_privacy\local\request\plugin\provider,
-        \core_privacy\local\request\user_preference_provider,
-        \core_privacy\local\request\core_userlist_provider {
-
+class provider implements \core_privacy\local\metadata\provider, \core_privacy\local\request\core_userlist_provider, \core_privacy\local\request\plugin\provider, \core_privacy\local\request\user_preference_provider {
     /** Interface for all edusign submission sub-plugins. */
     const EDUSIGNSUBMISSION_INTERFACE = 'mod_edusign\privacy\edusignsubmission_provider';
 
@@ -76,14 +71,14 @@ class provider implements
                 'timemodified' => 'timemodified',
                 'grader' => 'privacy:metadata:grader',
                 'grade' => 'privacy:metadata:grade',
-                'attemptnumber' => 'attemptnumber'
+                'attemptnumber' => 'attemptnumber',
         ];
         $edusignoverrides = [
                 'groupid' => 'privacy:metadata:groupid',
                 'userid' => 'privacy:metadata:userid',
                 'allowsubmissionsfromdate' => 'allowsubmissionsfromdate',
                 'duedate' => 'duedate',
-                'cutoffdate' => 'cutoffdate'
+                'cutoffdate' => 'cutoffdate',
         ];
         $edusignsubmission = [
                 'userid' => 'privacy:metadata:userid',
@@ -92,7 +87,7 @@ class provider implements
                 'status' => 'gradingstatus',
                 'groupid' => 'privacy:metadata:groupid',
                 'attemptnumber' => 'attemptnumber',
-                'latest' => 'privacy:metadata:latest'
+                'latest' => 'privacy:metadata:latest',
         ];
         $edusignuserflags = [
                 'userid' => 'privacy:metadata:userid',
@@ -101,11 +96,11 @@ class provider implements
                 'mailed' => 'privacy:metadata:mailed',
                 'extensionduedate' => 'extensionduedate',
                 'workflowstate' => 'markingworkflowstate',
-                'allocatedmarker' => 'allocatedmarker'
+                'allocatedmarker' => 'allocatedmarker',
         ];
         $edusignusermapping = [
                 'edusignment' => 'privacy:metadata:edusignmentid',
-                'userid' => 'privacy:metadata:userid'
+                'userid' => 'privacy:metadata:userid',
         ];
         $collection->add_database_table('edusign_grades', $edusigngrades, 'privacy:metadata:edusigngrades');
         $collection->add_database_table('edusign_overrides', $edusignoverrides, 'privacy:metadata:edusignoverrides');
@@ -194,16 +189,16 @@ class provider implements
         $contextlist->add_from_sql($sql, $params);
 
         manager::plugintype_class_callback(
-                'edusignfeedback',
-                self::EDUSIGNFEEDBACK_INTERFACE,
-                'get_context_for_userid_within_feedback',
-                [$userid, $contextlist]
+            'edusignfeedback',
+            self::EDUSIGNFEEDBACK_INTERFACE,
+            'get_context_for_userid_within_feedback',
+            [$userid, $contextlist]
         );
         manager::plugintype_class_callback(
-                'edusignsubmission',
-                self::EDUSIGNSUBMISSION_INTERFACE,
-                'get_context_for_userid_within_submission',
-                [$userid, $contextlist]
+            'edusignsubmission',
+            self::EDUSIGNSUBMISSION_INTERFACE,
+            'get_context_for_userid_within_submission',
+            [$userid, $contextlist]
         );
 
         return $contextlist;
@@ -224,7 +219,7 @@ class provider implements
         $params = [
                 'modulename' => 'edusign',
                 'contextid' => $context->id,
-                'contextlevel' => CONTEXT_MODULE
+                'contextlevel' => CONTEXT_MODULE,
         ];
 
         $sql = "SELECT g.userid, g.grader
@@ -274,16 +269,16 @@ class provider implements
         $userlist->add_from_sql('userid', $sql, $params);
 
         manager::plugintype_class_callback(
-                'edusignsubmission',
-                self::EDUSIGNSUBMISSION_USER_INTERFACE,
-                'get_userids_from_context',
-                [$userlist]
+            'edusignsubmission',
+            self::EDUSIGNSUBMISSION_USER_INTERFACE,
+            'get_userids_from_context',
+            [$userlist]
         );
         manager::plugintype_class_callback(
-                'edusignfeedback',
-                self::EDUSIGNFEEDBACK_USER_INTERFACE,
-                'get_userids_from_context',
-                [$userlist]
+            'edusignfeedback',
+            self::EDUSIGNFEEDBACK_USER_INTERFACE,
+            'get_userids_from_context',
+            [$userlist]
         );
     }
 
@@ -323,11 +318,11 @@ class provider implements
                 $uniqueid = $edusign->get_uniqueid_for_user_static($edusign->get_instance()->id, $contextlist->get_user()->id);
                 if ($uniqueid) {
                     writer::with_context($context)->export_metadata(
-                                    [get_string('blindmarking', 'mod_edusign')],
-                                    'blindmarkingid',
-                                    $uniqueid,
-                                    get_string('privacy:blindmarkingidentifier', 'mod_edusign')
-                            );
+                        [get_string('blindmarking', 'mod_edusign')],
+                        'blindmarkingid',
+                        $uniqueid,
+                        get_string('privacy:blindmarkingidentifier', 'mod_edusign')
+                    );
                 }
             }
         }
@@ -349,17 +344,17 @@ class provider implements
                 // What to do first... Get sub plugins to delete their stuff.
                 $requestdata = new edusign_plugin_request_data($context, $edusign);
                 manager::plugintype_class_callback(
-                        'edusignsubmission',
-                        self::EDUSIGNSUBMISSION_INTERFACE,
-                        'delete_submission_for_context',
-                        [$requestdata]
+                    'edusignsubmission',
+                    self::EDUSIGNSUBMISSION_INTERFACE,
+                    'delete_submission_for_context',
+                    [$requestdata]
                 );
                 $requestdata = new edusign_plugin_request_data($context, $edusign);
                 manager::plugintype_class_callback(
-                        'edusignfeedback',
-                        self::EDUSIGNFEEDBACK_INTERFACE,
-                        'delete_feedback_for_context',
-                        [$requestdata]
+                    'edusignfeedback',
+                    self::EDUSIGNFEEDBACK_INTERFACE,
+                    'delete_feedback_for_context',
+                    [$requestdata]
                 );
                 $DB->delete_records('edusign_grades', ['edusignment' => $edusign->get_instance()->id]);
 
@@ -401,10 +396,10 @@ class provider implements
             foreach ($submissions as $submission) {
                 $requestdata = new edusign_plugin_request_data($context, $edusign, $submission, [], $user);
                 manager::plugintype_class_callback(
-                        'edusignsubmission',
-                        self::EDUSIGNSUBMISSION_INTERFACE,
-                        'delete_submission_for_userid',
-                        [$requestdata]
+                    'edusignsubmission',
+                    self::EDUSIGNSUBMISSION_INTERFACE,
+                    'delete_submission_for_userid',
+                    [$requestdata]
                 );
             }
 
@@ -414,10 +409,10 @@ class provider implements
             foreach ($grades as $grade) {
                 $requestdata = new edusign_plugin_request_data($context, $edusign, $grade, [], $user);
                 manager::plugintype_class_callback(
-                        'edusignfeedback',
-                        self::EDUSIGNFEEDBACK_INTERFACE,
-                        'delete_feedback_for_grade',
-                        [$requestdata]
+                    'edusignfeedback',
+                    self::EDUSIGNFEEDBACK_INTERFACE,
+                    'delete_feedback_for_grade',
+                    [$requestdata]
                 );
                 // Delete advanced grading information.
                 if (isset($controller)) {
@@ -454,16 +449,16 @@ class provider implements
         $requestdata->set_userids($userids);
         $requestdata->populate_submissions_and_grades();
         manager::plugintype_class_callback(
-                'edusignsubmission',
-                self::EDUSIGNSUBMISSION_USER_INTERFACE,
-                'delete_submissions',
-                [$requestdata]
+            'edusignsubmission',
+            self::EDUSIGNSUBMISSION_USER_INTERFACE,
+            'delete_submissions',
+            [$requestdata]
         );
         manager::plugintype_class_callback(
-                'edusignfeedback',
-                self::EDUSIGNFEEDBACK_USER_INTERFACE,
-                'delete_feedback_for_grades',
-                [$requestdata]
+            'edusignfeedback',
+            self::EDUSIGNFEEDBACK_USER_INTERFACE,
+            'delete_feedback_for_grades',
+            [$requestdata]
         );
 
         // Update this function to delete advanced grading information.
@@ -478,7 +473,7 @@ class provider implements
         }
 
         static::delete_overrides_for_users($edusign, $userids);
-        list($sql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        [$sql, $params] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
         $params['edusignment'] = $edusignid;
         $DB->delete_records_select('edusign_user_flags', "edusignment = :edusignment AND userid $sql", $params);
         $DB->delete_records_select('edusign_user_mapping', "edusignment = :edusignment AND userid $sql", $params);
@@ -499,7 +494,7 @@ class provider implements
         $usersql = '';
         $params = ['edusignid' => $edusignid];
         if (!empty($userids)) {
-            list($usersql, $userparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+            [$usersql, $userparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
             $params = array_merge($params, $userparams);
             $overrides = $DB->get_records_select('edusign_overrides', "edusignid = :edusignid AND userid $usersql", $params);
         } else {
@@ -510,9 +505,9 @@ class provider implements
             if (!empty($userids)) {
                 $params = array_merge($params, $userparams);
                 $DB->delete_records_select(
-                        'event',
-                        "modulename = :modulename AND instance = :instance AND userid $usersql",
-                        $params
+                    'event',
+                    "modulename = :modulename AND instance = :instance AND userid $usersql",
+                    $params
                 );
                 // Setting up for the next query.
                 $params = $userparams;
@@ -522,7 +517,7 @@ class provider implements
                 // Setting up for the next query.
                 $params = [];
             }
-            list($overridesql, $overrideparams) = $DB->get_in_or_equal(array_keys($overrides), SQL_PARAMS_NAMED);
+            [$overridesql, $overrideparams] = $DB->get_in_or_equal(array_keys($overrides), SQL_PARAMS_NAMED);
             $params = array_merge($params, $overrideparams);
             $DB->delete_records_select('edusign_overrides', "id $overridesql $usersql", $params);
         }
@@ -547,13 +542,15 @@ class provider implements
 
         // Call sub-plugins to see if they have information not already collected.
         manager::plugintype_class_callback(
-                'edusignsubmission',
-                self::EDUSIGNSUBMISSION_INTERFACE,
-                'get_student_user_ids',
-                [$useridlist]
+            'edusignsubmission',
+            self::EDUSIGNSUBMISSION_INTERFACE,
+            'get_student_user_ids',
+            [$useridlist]
         );
-        manager::plugintype_class_callback('edusignfeedback', self::EDUSIGNFEEDBACK_INTERFACE, 'get_student_user_ids',
-                [$useridlist]);
+        manager::plugintype_class_callback(
+            'edusignfeedback', self::EDUSIGNFEEDBACK_INTERFACE, 'get_student_user_ids',
+            [$useridlist]
+        );
 
         $userids = $useridlist->get_userids();
         return ($userids) ? $userids : false;
@@ -600,10 +597,12 @@ class provider implements
                 'timemodified' => transform::datetime($grade->timemodified),
                 'grader' => transform::user($grade->grader),
                 'grade' => $grade->grade,
-                'attemptnumber' => ($grade->attemptnumber + 1)
+                'attemptnumber' => ($grade->attemptnumber + 1),
         ];
-        writer::with_context($context)->export_data(array_merge($currentpath, [get_string('privacy:gradepath',
-            'mod_edusign')]), $gradedata);
+        writer::with_context($context)->export_data(array_merge($currentpath, [get_string(
+            'privacy:gradepath',
+            'mod_edusign'
+        )]), $gradedata);
     }
 
     /**
@@ -620,10 +619,12 @@ class provider implements
                 'status' => get_string('submissionstatus_' . $submission->status, 'mod_edusign'),
                 'groupid' => $submission->groupid,
                 'attemptnumber' => ($submission->attemptnumber + 1),
-                'latest' => transform::yesno($submission->latest)
+                'latest' => transform::yesno($submission->latest),
         ];
-        writer::with_context($context)->export_data(array_merge($currentpath, [get_string('privacy:submissionpath',
-            'mod_edusign')]), $submissiondata);
+        writer::with_context($context)->export_data(array_merge($currentpath, [get_string(
+            'privacy:submissionpath',
+            'mod_edusign'
+        )]), $submissiondata);
     }
 
     /**
@@ -643,7 +644,7 @@ class provider implements
                 'edusign_quickgrading' => ['string' => get_string('privacy:metadata:edusignquickgrading', 'mod_edusign'),
                         'bool' => true],
                 'edusign_downloadasfolders' => ['string' => get_string('privacy:metadata:edusigndownloadasfolders', 'mod_edusign'),
-                        'bool' => true]
+                        'bool' => true],
         ];
         foreach ($edusignpreferences as $key => $preference) {
             $value = get_user_preferences($key, null, $userid);
@@ -694,11 +695,11 @@ class provider implements
      * @param bool|boolean $exportforteacher A flag for if this is exporting data as a teacher.
      */
     protected static function export_submission(
-            \edusign $edusign,
-            \stdClass $user,
-            \context_module $context,
-            array $path,
-            bool $exportforteacher = false
+        \edusign $edusign,
+        \stdClass $user,
+        \context_module $context,
+        array $path,
+        bool $exportforteacher = false
     ) {
         $submissions = $edusign->get_all_submissions($user->id);
         $teacher = ($exportforteacher) ? $user : null;
@@ -708,16 +709,16 @@ class provider implements
             // Attempt numbers start at zero, which is fine for programming, but doesn't make as much sense
             // for users.
             $submissionpath = array_merge(
-                    $path,
-                    [get_string('privacy:attemptpath', 'mod_edusign', ($submission->attemptnumber + 1))]
+                $path,
+                [get_string('privacy:attemptpath', 'mod_edusign', ($submission->attemptnumber + 1))]
             );
 
             $params = new edusign_plugin_request_data($context, $edusign, $submission, $submissionpath, $teacher);
             manager::plugintype_class_callback(
-                    'edusignsubmission',
-                    self::EDUSIGNSUBMISSION_INTERFACE,
-                    'export_submission_user_data',
-                    [$params]
+                'edusignsubmission',
+                self::EDUSIGNSUBMISSION_INTERFACE,
+                'export_submission_user_data',
+                [$params]
             );
             if (!isset($teacher)) {
                 self::export_submission_data($submission, $context, $submissionpath);
@@ -726,10 +727,10 @@ class provider implements
             if ($grade) {
                 $params = new edusign_plugin_request_data($context, $edusign, $grade, $submissionpath, $teacher);
                 manager::plugintype_class_callback(
-                        'edusignfeedback',
-                        self::EDUSIGNFEEDBACK_INTERFACE,
-                        'export_feedback_user_data',
-                        [$params]
+                    'edusignfeedback',
+                    self::EDUSIGNFEEDBACK_INTERFACE,
+                    'export_feedback_user_data',
+                    [$params]
                 );
 
                 self::export_grade_data($grade, $context, $submissionpath);

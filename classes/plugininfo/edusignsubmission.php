@@ -39,24 +39,24 @@ class edusignsubmission extends base {
 
         $plugins = core_plugin_manager::instance()->get_installed_plugins('edusignsubmission');
         if (!$plugins) {
-            return array();
+            return [];
         }
-        $installed = array();
+        $installed = [];
         foreach ($plugins as $plugin => $version) {
             $installed[] = 'edusignsubmission_' . $plugin;
         }
 
-        list($installed, $params) = $DB->get_in_or_equal($installed, SQL_PARAMS_NAMED);
+        [$installed, $params] = $DB->get_in_or_equal($installed, SQL_PARAMS_NAMED);
         $disabled = $DB->get_records_select('config_plugins', "plugin $installed AND name = 'disabled'", $params, 'plugin ASC');
         foreach ($disabled as $conf) {
             if (empty($conf->value)) {
                 continue;
             }
-            list($type, $name) = explode('_', $conf->plugin, 2);
+            [$type, $name] = explode('_', $conf->plugin, 2);
             unset($plugins[$name]);
         }
 
-        $enabled = array();
+        $enabled = [];
         foreach ($plugins as $plugin => $version) {
             $enabled[$plugin] = $plugin;
         }
@@ -74,7 +74,7 @@ class edusignsubmission extends base {
      * @return moodle_url
      */
     public static function get_manage_url() {
-        return new moodle_url('/mod/edusign/adminmanageplugins.php', array('subtype' => 'edusignsubmission'));
+        return new moodle_url('/mod/edusign/adminmanageplugins.php', ['subtype' => 'edusignsubmission']);
     }
 
     /**
@@ -85,7 +85,7 @@ class edusignsubmission extends base {
     public function uninstall_cleanup() {
         global $DB;
 
-        $DB->delete_records('edusign_plugin_config', array('plugin' => $this->name, 'subtype' => 'edusignsubmission'));
+        $DB->delete_records('edusign_plugin_config', ['plugin' => $this->name, 'subtype' => 'edusignsubmission']);
 
         parent::uninstall_cleanup();
     }

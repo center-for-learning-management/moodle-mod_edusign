@@ -28,11 +28,11 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/edusign/locallib.php');
 
-use \core_privacy\local\metadata\collection;
-use \core_privacy\local\request\writer;
-use \core_privacy\local\request\contextlist;
-use \mod_edusign\privacy\edusign_plugin_request_data;
-use \mod_edusign\privacy\useridlist;
+use core_privacy\local\metadata\collection;
+use core_privacy\local\request\writer;
+use core_privacy\local\request\contextlist;
+use mod_edusign\privacy\edusign_plugin_request_data;
+use mod_edusign\privacy\useridlist;
 
 /**
  * Privacy class for requesting user data.
@@ -42,10 +42,9 @@ use \mod_edusign\privacy\useridlist;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements
-        \core_privacy\local\metadata\provider,
-        \mod_edusign\privacy\edusignfeedback_provider,
-        \mod_edusign\privacy\edusignfeedback_user_provider {
-
+    \core_privacy\local\metadata\provider,
+    \mod_edusign\privacy\edusignfeedback_provider,
+    \mod_edusign\privacy\edusignfeedback_user_provider {
     /**
      * Return meta data about this plugin.
      *
@@ -56,7 +55,7 @@ class provider implements
         $data = [
                 'edusignment' => 'privacy:metadata:edusignmentid',
                 'grade' => 'privacy:metadata:gradepurpose',
-                'commenttext' => 'privacy:metadata:commentpurpose'
+                'commenttext' => 'privacy:metadata:commentpurpose',
         ];
         $collection->add_database_table('edusignfeedback_comments', $data, 'privacy:metadata:tablesummary');
         return $collection;
@@ -104,11 +103,15 @@ class provider implements
         $plugin = $edusign->get_plugin_by_type('edusignfeedback', 'comments');
         $comments = $plugin->get_feedback_comments($exportdata->get_pluginobject()->id);
         if ($comments && !empty($comments->commenttext)) {
-            $data = (object) ['commenttext' => format_text($comments->commenttext, $comments->commentformat,
-                    ['context' => $exportdata->get_context()])];
+            $data = (object) ['commenttext' => format_text(
+                $comments->commenttext, $comments->commentformat,
+                ['context' => $exportdata->get_context()]
+            )];
             writer::with_context($exportdata->get_context())
-                    ->export_data(array_merge($exportdata->get_subcontext(),
-                            [get_string('privacy:commentpath', 'edusignfeedback_comments')]), $data);
+                    ->export_data(array_merge(
+                        $exportdata->get_subcontext(),
+                        [get_string('privacy:commentpath', 'edusignfeedback_comments')]
+                    ), $data);
         }
     }
 
@@ -149,7 +152,7 @@ class provider implements
         if (empty($deletedata->get_gradeids())) {
             return;
         }
-        list($sql, $params) = $DB->get_in_or_equal($deletedata->get_gradeids(), SQL_PARAMS_NAMED);
+        [$sql, $params] = $DB->get_in_or_equal($deletedata->get_gradeids(), SQL_PARAMS_NAMED);
         $params['edusignment'] = $deletedata->get_edusignid();
         $DB->delete_records_select('edusignfeedback_comments', "edusignment = :edusignment AND grade $sql", $params);
     }

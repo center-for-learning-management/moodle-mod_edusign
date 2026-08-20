@@ -32,7 +32,6 @@ use core_privacy\local\request\contextlist;
 defined('MOODLE_INTERNAL') || die();
 
 interface edusignsubmission_provider extends \core_privacy\local\request\plugin\subplugin_provider {
-
     /**
      * Retrieves the contextids associated with the provided userid for this subplugin.
      * NOTE if your subplugin must have an entry in the edusign_submission table to work, then this
