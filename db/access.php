@@ -22,29 +22,29 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$capabilities = array(
+$capabilities = [
 
-        'mod/edusign:view' => array(
+        'mod/edusign:view' => [
 
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => array(
+                'archetypes' => [
                         'guest' => CAP_ALLOW,
                         'student' => CAP_ALLOW,
                         'teacher' => CAP_ALLOW,
                         'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
-                )
-        ),
+                        'manager' => CAP_ALLOW,
+                ],
+        ],
 
-        'mod/edusign:submit' => array(
+        'mod/edusign:submit' => [
 
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => array(
-                        'student' => CAP_ALLOW
-                )
-        ),
+                'archetypes' => [
+                        'student' => CAP_ALLOW,
+                ],
+        ],
 
         /*
          *
@@ -60,9 +60,9 @@ $capabilities = array(
                 )
         ),
          */
-       /*
+        /*
         *
-       'mod/assign:exportownsubmission' => array(
+        'mod/assign:exportownsubmission' => array(
 
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
@@ -75,28 +75,28 @@ $capabilities = array(
         ),
         */
 
-        'mod/edusign:addinstance' => array(
+        'mod/edusign:addinstance' => [
                 'riskbitmask' => RISK_XSS,
 
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_COURSE,
-                'archetypes' => array(
+                'archetypes' => [
                         'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
-                ),
-                'clonepermissionsfrom' => 'moodle/course:manageactivities'
-        ),
-        
-        'mod/edusign:editothersubmission' => array(
+                        'manager' => CAP_ALLOW,
+                ],
+                'clonepermissionsfrom' => 'moodle/course:manageactivities',
+        ],
+
+        'mod/edusign:editothersubmission' => [
                 'riskbitmask' => RISK_MANAGETRUST | RISK_DATALOSS | RISK_PERSONAL,
                 'captype' => 'write',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => array(
+                'archetypes' => [
                         'editingteacher' => CAP_ALLOW,
-                        'manager' => CAP_ALLOW
-                )
-        ),
-        
+                        'manager' => CAP_ALLOW,
+                ],
+        ],
+
         /*
         'mod/assign:grantextension' => array(
                 'captype' => 'write',
@@ -163,15 +163,15 @@ $capabilities = array(
                 'clonepermissionsfrom' => 'moodle/grade:manage'
         ),
         */
-        'mod/edusign:viewsignings' => array(
+        'mod/edusign:viewsignings' => [
                 'captype' => 'read',
                 'contextlevel' => CONTEXT_MODULE,
-                'archetypes' => array(
+                'archetypes' => [
                         'editingteacher' => CAP_ALLOW,
                         'manager' => CAP_ALLOW,
-                        'teacher' => CAP_ALLOW
-                )
-        ),
+                        'teacher' => CAP_ALLOW,
+                ],
+        ],
         /*
         'mod/assign:viewblinddetails' => array(
                 'riskbitmask' => RISK_PERSONAL,
@@ -193,7 +193,7 @@ $capabilities = array(
                 )
         ),
         */
-    // Edit the edusign overrides.
+        // Edit the edusign overrides.
         /*
         'mod/assign:manageoverrides' => array(
                 'captype' => 'write',
@@ -204,5 +204,4 @@ $capabilities = array(
                 )
         ),
         */
-);
-
+];

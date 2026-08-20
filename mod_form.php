@@ -35,7 +35,6 @@ require_once($CFG->dirroot . '/mod/edusign/locallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_edusign_mod_form extends moodleform_mod {
-
     /**
      * Called to define this moodle form
      *
@@ -47,7 +46,7 @@ class mod_edusign_mod_form extends moodleform_mod {
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        $mform->addElement('text', 'name', get_string('edusignmentname', 'edusign'), array('size' => '64'));
+        $mform->addElement('text', 'name', get_string('edusignmentname', 'edusign'), ['size' => '64']);
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
@@ -59,11 +58,11 @@ class mod_edusign_mod_form extends moodleform_mod {
         $this->standard_intro_elements(get_string('description', 'edusign'));
 
         $mform->addElement(
-                'filemanager',
-                'introattachments',
-                get_string('introattachments', 'edusign'),
-                null,
-                array('subdirs' => 0, 'maxbytes' => $COURSE->maxbytes)
+            'filemanager',
+            'introattachments',
+            get_string('introattachments', 'edusign'),
+            null,
+            ['subdirs' => 0, 'maxbytes' => $COURSE->maxbytes]
         );
         $mform->addHelpButton('introattachments', 'introattachments', 'edusign');
 
@@ -77,7 +76,7 @@ class mod_edusign_mod_form extends moodleform_mod {
             if (!$ctx) {
                 $ctx = context_course::instance($this->current->course);
             }
-            $course = $DB->get_record('course', array('id' => $this->current->course), '*', MUST_EXIST);
+            $course = $DB->get_record('course', ['id' => $this->current->course], '*', MUST_EXIST);
             $edusignment->set_course($course);
         }
 
@@ -87,16 +86,16 @@ class mod_edusign_mod_form extends moodleform_mod {
         $mform->setExpanded('availability', true);
 
         $name = get_string('allowsubmissionsfromdate', 'edusign');
-        $options = array('optional' => true);
+        $options = ['optional' => true];
         $mform->addElement('date_time_selector', 'allowsubmissionsfromdate', $name, $options);
         $mform->addHelpButton('allowsubmissionsfromdate', 'allowsubmissionsfromdate', 'edusign');
 
         $name = get_string('duedate', 'edusign');
-        $mform->addElement('date_time_selector', 'duedate', $name, array('optional' => true));
+        $mform->addElement('date_time_selector', 'duedate', $name, ['optional' => true]);
         $mform->addHelpButton('duedate', 'duedate', 'edusign');
 
         $name = get_string('cutoffdate', 'edusign');
-        $mform->addElement('date_time_selector', 'cutoffdate', $name, array('optional' => true));
+        $mform->addElement('date_time_selector', 'cutoffdate', $name, ['optional' => true]);
         $mform->addHelpButton('cutoffdate', 'cutoffdate', 'edusign');
 
         $name = get_string('alwaysshowdescription', 'edusign');
@@ -104,7 +103,7 @@ class mod_edusign_mod_form extends moodleform_mod {
         $mform->addHelpButton('alwaysshowdescription', 'alwaysshowdescription', 'edusign');
         $mform->disabledIf('alwaysshowdescription', 'allowsubmissionsfromdate[enabled]', 'notchecked');
 
-        //$edusignment->add_all_plugin_settings($mform);
+        // $edusignment->add_all_plugin_settings($mform);
 
         /*
         $mform->addElement('header', 'submissionsettings', get_string('submissionsettings', 'edusign'));
@@ -134,9 +133,9 @@ class mod_edusign_mod_form extends moodleform_mod {
         $name = get_string('preventsubmissionnotingroup', 'edusign');
         $mform->addElement('selectyesno', 'preventsubmissionnotingroup', $name);
         $mform->addHelpButton(
-                'preventsubmissionnotingroup',
-                'preventsubmissionnotingroup',
-                'edusign'
+            'preventsubmissionnotingroup',
+            'preventsubmissionnotingroup',
+            'edusign'
         );
         $mform->setType('preventsubmissionnotingroup', PARAM_BOOL);
         $mform->hideIf('preventsubmissionnotingroup', 'teamsubmission', 'eq', 0);
@@ -148,7 +147,7 @@ class mod_edusign_mod_form extends moodleform_mod {
         $mform->disabledIf('requireallteammemberssubmit', 'submissiondrafts', 'eq', 0);
 
         $groupings = groups_get_all_groupings($edusignment->get_course()->id);
-        $options = array();
+        $options = [];
         $options[0] = get_string('none');
         foreach ($groupings as $grouping) {
             $options[$grouping->id] = $grouping->name;
@@ -161,7 +160,7 @@ class mod_edusign_mod_form extends moodleform_mod {
         if ($edusignment->has_submissions_or_grades()) {
             $mform->freeze('teamsubmissiongroupingid');
         }
-    /*
+        /*
         $mform->addElement('header', 'notifications', get_string('notifications', 'edusign'));
 
         $name = get_string('sendnotifications', 'edusign');
@@ -254,18 +253,18 @@ class mod_edusign_mod_form extends moodleform_mod {
             if (!$ctx) {
                 $ctx = context_course::instance($this->current->course);
             }
-            $course = $DB->get_record('course', array('id' => $this->current->course), '*', MUST_EXIST);
+            $course = $DB->get_record('course', ['id' => $this->current->course], '*', MUST_EXIST);
             $edusignment->set_course($course);
         }
 
         $draftitemid = file_get_submitted_draft_itemid('introattachments');
         file_prepare_draft_area(
-                $draftitemid,
-                $ctx->id,
-                'mod_edusign',
-                EDUSIGN_INTROATTACHMENT_FILEAREA,
-                0,
-                array('subdirs' => 0)
+            $draftitemid,
+            $ctx->id,
+            'mod_edusign',
+            EDUSIGN_INTROATTACHMENT_FILEAREA,
+            0,
+            ['subdirs' => 0]
         );
         $defaultvalues['introattachments'] = $draftitemid;
 
@@ -283,7 +282,7 @@ class mod_edusign_mod_form extends moodleform_mod {
         $mform->addElement('advcheckbox', 'completionsubmit', '', get_string('completionsubmit', 'edusign'));
         // Enable this completion rule by default.
         $mform->setDefault('completionsubmit', 1);
-        return array('completionsubmit');
+        return ['completionsubmit'];
     }
 
     /**

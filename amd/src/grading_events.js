@@ -17,12 +17,12 @@
  * Events for the grading interface.
  *
  * @module     mod_edusign/grading_events
- * @package    mod_edusign
+ * @package
  * @copyright  2016 Ryan Wyllie <ryan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      3.1
  */
-define(function () {
+define(function() {
     return {
         COLLAPSE_REVIEW_PANEL: 'grading:collapse-review-panel',
         EXPAND_REVIEW_PANEL: 'grading:expand-review-panel',

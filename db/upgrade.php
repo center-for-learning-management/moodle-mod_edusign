@@ -36,7 +36,6 @@ function xmldb_edusign_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     if ($oldversion < 2016100301) {
-
         // Define table edusign_overrides to be created.
         $table = new xmldb_table('edusign_overrides');
 
@@ -51,10 +50,10 @@ function xmldb_edusign_upgrade($oldversion) {
         $table->add_field('cutoffdate', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
 
         // Adding keys to table edusign_overrides.
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('edusignid', XMLDB_KEY_FOREIGN, array('edusignid'), 'edusign', array('id'));
-        $table->add_key('groupid', XMLDB_KEY_FOREIGN, array('groupid'), 'groups', array('id'));
-        $table->add_key('userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('edusignid', XMLDB_KEY_FOREIGN, ['edusignid'], 'edusign', ['id']);
+        $table->add_key('groupid', XMLDB_KEY_FOREIGN, ['groupid'], 'groups', ['id']);
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
 
         // Conditionally launch create table for edusign_overrides.
         if (!$dbman->table_exists($table)) {
@@ -72,7 +71,7 @@ function xmldb_edusign_upgrade($oldversion) {
         // Fix event types of edusign events.
         $params = [
                 'modulename' => 'edusign',
-                'eventtype' => 'close'
+                'eventtype' => 'close',
         ];
         $select = "modulename = :modulename AND eventtype = :eventtype";
         $DB->set_field_select('event', 'eventtype', 'due', $select, $params);
@@ -80,7 +79,7 @@ function xmldb_edusign_upgrade($oldversion) {
         // Delete 'open' events.
         $params = [
                 'modulename' => 'edusign',
-                'eventtype' => 'open'
+                'eventtype' => 'open',
         ];
         $DB->delete_records('event', $params);
 

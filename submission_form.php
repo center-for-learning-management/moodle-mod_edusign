@@ -35,14 +35,13 @@ require_once($CFG->dirroot . '/mod/edusign/locallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_edusign_submission_form extends moodleform {
-
     /**
      * Define this form - called by the parent constructor
      */
     public function definition() {
         global $USER;
         $mform = $this->_form;
-        list($edusign, $data) = $this->_customdata;
+        [$edusign, $data] = $this->_customdata;
         $instance = $edusign->get_instance();
         if ($instance->teamsubmission) {
             $submission = $edusign->get_group_submission($data->userid, 0, true);
@@ -61,4 +60,3 @@ class mod_edusign_submission_form extends moodleform {
         }
     }
 }
-

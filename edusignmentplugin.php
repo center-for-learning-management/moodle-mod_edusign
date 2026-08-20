@@ -33,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class edusign_plugin {
-
     /** @var edusign $edusignment the edusignment record that contains the global
      *              settings for this edusign instance
      */
@@ -42,9 +41,9 @@ abstract class edusign_plugin {
     private $type = '';
     /** @var string $error error message */
     private $error = '';
-    /** @var boolean|null $enabledcache Cached lookup of the is_enabled function */
+    /** @var bool|null $enabledcache Cached lookup of the is_enabled function */
     private $enabledcache = null;
-    /** @var boolean|null $enabledcache Cached lookup of the is_visible function */
+    /** @var bool|null $enabledcache Cached lookup of the is_visible function */
     private $visiblecache = null;
 
     /**
@@ -53,7 +52,7 @@ abstract class edusign_plugin {
      * @param edusign $edusignment
      * @param string $type
      */
-    public final function __construct(edusign $edusignment, $type) {
+    final public function __construct(edusign $edusignment, $type) {
         $this->edusignment = $edusignment;
         $this->type = $type;
     }
@@ -63,7 +62,7 @@ abstract class edusign_plugin {
      *
      * @return bool
      */
-    public final function is_first() {
+    final public function is_first() {
         $order = get_config($this->get_subtype() . '_' . $this->get_type(), 'sortorder');
 
         if ($order == 0) {
@@ -77,7 +76,7 @@ abstract class edusign_plugin {
      *
      * @return bool
      */
-    public final function is_last() {
+    final public function is_last() {
         $lastindex = count(core_component::get_plugin_list($this->get_subtype())) - 1;
         $currentindex = get_config($this->get_subtype() . '_' . $this->get_type(), 'sortorder');
         if ($lastindex == $currentindex) {
@@ -125,7 +124,7 @@ abstract class edusign_plugin {
      *
      * @param string $msg - the error description
      */
-    protected final function set_error($msg) {
+    final protected function set_error($msg) {
         $this->error = $msg;
     }
 
@@ -134,7 +133,7 @@ abstract class edusign_plugin {
      *
      * @return string
      */
-    public final function get_error() {
+    final public function get_error() {
         return $this->error;
     }
 
@@ -143,21 +142,21 @@ abstract class edusign_plugin {
      *
      * @return string - the name
      */
-    public abstract function get_name();
+    abstract public function get_name();
 
     /**
      * Should return the subtype of this plugin.
      *
      * @return string - either 'edusignsubmission' or 'feedback'
      */
-    public abstract function get_subtype();
+    abstract public function get_subtype();
 
     /**
      * Should return the type of this plugin.
      *
      * @return string - the type
      */
-    public final function get_type() {
+    final public function get_type() {
         return $this->type;
     }
 
@@ -166,7 +165,7 @@ abstract class edusign_plugin {
      *
      * @return string
      */
-    public final function get_version() {
+    final public function get_version() {
         $version = get_config($this->get_subtype() . '_' . $this->get_type(), 'version');
         if ($version) {
             return $version;
@@ -180,7 +179,7 @@ abstract class edusign_plugin {
      *
      * @return string
      */
-    public final function get_requires() {
+    final public function get_requires() {
         $requires = get_config($this->get_subtype() . '_' . $this->get_type(), 'requires');
         if ($requires) {
             return $requires;
@@ -207,7 +206,7 @@ abstract class edusign_plugin {
      *
      * @return bool
      */
-    public final function enable() {
+    final public function enable() {
         $this->enabledcache = true;
         return $this->set_config('enabled', 1);
     }
@@ -217,7 +216,7 @@ abstract class edusign_plugin {
      *
      * @return bool
      */
-    public final function disable() {
+    final public function disable() {
         $this->enabledcache = false;
         return $this->set_config('enabled', 0);
     }
@@ -280,7 +279,7 @@ abstract class edusign_plugin {
      *
      * @return int
      */
-    public final function get_sort_order() {
+    final public function get_sort_order() {
         $order = get_config($this->get_subtype() . '_' . $this->get_type(), 'sortorder');
         return $order ? $order : 0;
     }
@@ -290,7 +289,7 @@ abstract class edusign_plugin {
      *
      * @return bool
      */
-    public final function is_visible() {
+    final public function is_visible() {
         if ($this->visiblecache === null) {
             $disabled = get_config($this->get_subtype() . '_' . $this->get_type(), 'disabled');
             $this->visiblecache = !$disabled;
@@ -303,7 +302,7 @@ abstract class edusign_plugin {
      *
      * @return bool
      */
-    public final function has_admin_settings() {
+    final public function has_admin_settings() {
         global $CFG;
 
         $pluginroot = $CFG->dirroot . '/mod/edusign/' . substr($this->get_subtype(), strlen('edusign')) . '/' . $this->get_type();
@@ -318,13 +317,13 @@ abstract class edusign_plugin {
      * @param string $value The config value
      * @return bool
      */
-    public final function set_config($name, $value) {
+    final public function set_config($name, $value) {
         global $DB;
 
-        $dbparams = array('edusignment' => $this->edusignment->get_instance()->id,
+        $dbparams = ['edusignment' => $this->edusignment->get_instance()->id,
                 'subtype' => $this->get_subtype(),
                 'plugin' => $this->get_type(),
-                'name' => $name);
+                'name' => $name];
         $current = $DB->get_record('edusign_plugin_config', $dbparams, '*', IGNORE_MISSING);
 
         if ($current) {
@@ -348,7 +347,7 @@ abstract class edusign_plugin {
      * @param mixed $setting The config key (string) or null
      * @return mixed string | false
      */
-    public final function get_config($setting = null) {
+    final public function get_config($setting = null) {
         global $DB;
 
         if ($setting) {
@@ -357,10 +356,10 @@ abstract class edusign_plugin {
             }
             $edusignment = $this->edusignment->get_instance();
             if ($edusignment) {
-                $dbparams = array('edusignment' => $edusignment->id,
+                $dbparams = ['edusignment' => $edusignment->id,
                         'subtype' => $this->get_subtype(),
                         'plugin' => $this->get_type(),
-                        'name' => $setting);
+                        'name' => $setting];
                 $result = $DB->get_record('edusign_plugin_config', $dbparams, '*', IGNORE_MISSING);
                 if ($result) {
                     return $result->value;
@@ -368,9 +367,9 @@ abstract class edusign_plugin {
             }
             return false;
         }
-        $dbparams = array('edusignment' => $this->edusignment->get_instance()->id,
+        $dbparams = ['edusignment' => $this->edusignment->get_instance()->id,
                 'subtype' => $this->get_subtype(),
-                'plugin' => $this->get_type());
+                'plugin' => $this->get_type()];
         $results = $DB->get_records('edusign_plugin_config', $dbparams);
 
         $config = new stdClass();
@@ -390,7 +389,7 @@ abstract class edusign_plugin {
      * @return array names of the fileareas, can be an empty array
      */
     public function get_config_file_areas() {
-        return array();
+        return [];
     }
 
     /**
@@ -401,7 +400,7 @@ abstract class edusign_plugin {
      * @param bool $showviewlink Modifed to return whether or not to show a link to the full submission/feedback
      * @return string - return a string representation of the submission in full
      */
-    public function view_summary(stdClass $submissionorgrade, & $showviewlink) {
+    public function view_summary(stdClass $submissionorgrade, &$showviewlink) {
         return '';
     }
 
@@ -435,7 +434,7 @@ abstract class edusign_plugin {
      * @return array - The list of field names (strings) and descriptions. ($name => $description)
      */
     public function get_editor_fields() {
-        return array();
+        return [];
     }
 
     /**
@@ -460,7 +459,7 @@ abstract class edusign_plugin {
      * @return array - return an array of files indexed by filename
      */
     public function get_files(stdClass $submissionorgrade, stdClass $user) {
-        return array();
+        return [];
     }
 
     /**
@@ -495,8 +494,8 @@ abstract class edusign_plugin {
      * @param string $log Record upgrade messages in the log
      * @return bool true or false - false will trigger a rollback
      */
-    public function upgrade_settings(context $oldcontext, stdClass $oldedusignment, & $log) {
-        $params = array('type' => $this->type, 'subtype' => $this->get_subtype());
+    public function upgrade_settings(context $oldcontext, stdClass $oldedusignment, &$log) {
+        $params = ['type' => $this->type, 'subtype' => $this->get_subtype()];
         $log .= ' ' . get_string('upgradenotimplemented', 'mod_edusign', $params);
         return false;
     }
@@ -511,12 +510,14 @@ abstract class edusign_plugin {
      * @param string $log Record upgrade messages in the log
      * @return boolean true or false - false will trigger a rollback
      */
-    public function upgrade(context $oldcontext,
-            stdClass $oldedusignment,
-            stdClass $oldsubmissionorgrade,
-            stdClass $submissionorgrade,
-            & $log) {
-        $params = array('type' => $this->type, 'subtype' => $this->get_subtype());
+    public function upgrade(
+        context $oldcontext,
+        stdClass $oldedusignment,
+        stdClass $oldsubmissionorgrade,
+        stdClass $submissionorgrade,
+        &$log
+    ) {
+        $params = ['type' => $this->type, 'subtype' => $this->get_subtype()];
         $log = $log . ' ' . get_string('upgradenotimplemented', 'mod_edusign', $params);
         return false;
     }
@@ -563,7 +564,7 @@ abstract class edusign_plugin {
      * @return array - An array of fileareas (keys) and descriptions (values)
      */
     public function get_file_areas() {
-        return array();
+        return [];
     }
 
     /**
@@ -588,7 +589,7 @@ abstract class edusign_plugin {
 
         if ($this->get_subtype() == 'edusignsubmission') {
             if ($itemid) {
-                $record = $DB->get_record('edusign_submission', array('id' => $itemid), 'userid,groupid', IGNORE_MISSING);
+                $record = $DB->get_record('edusign_submission', ['id' => $itemid], 'userid,groupid', IGNORE_MISSING);
                 if (!$record) {
                     return null;
                 }
@@ -616,24 +617,30 @@ abstract class edusign_plugin {
         $fs = get_file_storage();
         $filepath = is_null($filepath) ? '/' : $filepath;
         $filename = is_null($filename) ? '.' : $filename;
-        if (!($storedfile = $fs->get_file($edusignment->get_context()->id,
+        if (
+            !($storedfile = $fs->get_file(
+                $edusignment->get_context()->id,
                 $this->get_subtype() . '_' . $this->get_type(),
                 $filearea,
                 $itemid,
                 $filepath,
-                $filename))) {
+                $filename
+            ))
+        ) {
             return null;
         }
 
-        return new file_info_stored($browser,
-                $edusignment->get_context(),
-                $storedfile,
-                $urlbase,
-                $filearea,
-                $itemid,
-                true,
-                $writeaccess,
-                false);
+        return new file_info_stored(
+            $browser,
+            $edusignment->get_context(),
+            $storedfile,
+            $urlbase,
+            $filearea,
+            $itemid,
+            true,
+            $writeaccess,
+            false
+        );
     }
 
     /**
@@ -703,6 +710,6 @@ abstract class edusign_plugin {
      * @since Moodle 3.2
      */
     public function get_config_for_external() {
-        return array();
+        return [];
     }
 }

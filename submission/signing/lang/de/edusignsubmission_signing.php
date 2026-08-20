@@ -23,15 +23,15 @@
  */
 
 $string['allowsigningsubmissions'] = 'Aktiviert';
+$string['close'] = 'Schließen';
 $string['default'] = 'Standardmäßig aktiviert';
 $string['default_help'] = 'Die gewählte Methode für die Abgabe von Lösungen wird für alle neuen Aufgaben voreingestellt.';
+$string['delete'] = 'Unterschrift löschen';
+$string['delete:confirm'] = 'Wollen Sie wirklich die Unterschrift löschen?';
 $string['enabled'] = 'Unterschrift';
 $string['enabled_help'] = 'Diese Methode ermöglicht den Teilnehmer/innen die Lösung direkt in einem Texteingabefeld mit Editor einzutragen.';
 $string['eventassessableuploaded'] = 'Eine Unterschrift wurde hochgeladen';
 $string['nosubmission'] = 'Unterschrift fehlt';
-$string['signing'] = 'Unterschrift';
-$string['signingfilename'] = 'signing.html';
-$string['signingsubmission'] = 'Erlaube Unterschriftabgabe';
 $string['numwords'] = '({$a} words)';
 $string['numwordsforlog'] = 'Submission word count: {$a} words';
 $string['pluginname'] = 'Unterschrift';
@@ -41,11 +41,11 @@ $string['privacy:metadata:submissionpurpose'] = 'The submission ID that links to
 $string['privacy:metadata:tablepurpose'] = 'Stores the text submission for each attempt.';
 $string['privacy:metadata:textpurpose'] = 'The actual text submitted for this attempt of the edusignment.';
 $string['privacy:path'] = 'Submission Text';
+$string['signing'] = 'Unterschrift';
+$string['signingfilename'] = 'signing.html';
+$string['signingsubmission'] = 'Erlaube Unterschriftabgabe';
 $string['wordlimit'] = 'Word limit';
 $string['wordlimit_help'] = 'If online text submissions are enabled, this is the maximum number ' .
         'of words that each student will be allowed to submit.';
 $string['wordlimitexceeded'] = 'The word limit for this edusignment is {$a->limit} words and you ' .
         'are attempting to submit {$a->count} words. Please review your submission and try again.';
-$string['close'] = 'Schließen';
-$string['delete'] = 'Unterschrift löschen';
-$string['delete:confirm'] = 'Wollen Sie wirklich die Unterschrift löschen?';

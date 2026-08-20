@@ -52,11 +52,11 @@ class extension_granted extends base {
      *
      */
     public static function create_from_edusign(\edusign $edusign, $userid) {
-        $data = array(
+        $data = [
                 'context' => $edusign->get_context(),
                 'objectid' => $edusign->get_instance()->id,
                 'relateduserid' => $userid,
-        );
+        ];
         self::$preventcreatecall = false;
         /** @var extension_granted $event */
         $event = self::create($data);
@@ -114,6 +114,6 @@ class extension_granted extends base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'edusign', 'restore' => 'edusign');
+        return ['db' => 'edusign', 'restore' => 'edusign'];
     }
 }

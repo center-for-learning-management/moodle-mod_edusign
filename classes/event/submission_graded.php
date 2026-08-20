@@ -52,11 +52,11 @@ class submission_graded extends base {
      *
      */
     public static function create_from_grade(\edusign $edusign, \stdClass $grade) {
-        $data = array(
+        $data = [
                 'context' => $edusign->get_context(),
                 'objectid' => $grade->id,
-                'relateduserid' => $grade->userid
-        );
+                'relateduserid' => $grade->userid,
+        ];
         self::$preventcreatecall = false;
         /** @var submission_graded $event */
         $event = self::create($data);
@@ -115,6 +115,6 @@ class submission_graded extends base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'edusign_grades', 'restore' => 'grade');
+        return ['db' => 'edusign_grades', 'restore' => 'grade'];
     }
 }

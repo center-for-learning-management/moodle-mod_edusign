@@ -1,9 +1,9 @@
-define(['jquery'], function ($) {
+define(['jquery'], function($) {
     return {
-        init: function () {
+        init: function() {
             initialize();
         },
-        save: function () {
+        save: function() {
             initialize();
         }
 
@@ -11,8 +11,13 @@ define(['jquery'], function ($) {
 });
 
 
-// works out the X, Y position of the click inside the canvas from the X, Y position on the page
+// Works out the X, Y position of the click inside the canvas from the X, Y position on the page
 
+/**
+ *
+ * @param mouseEvent
+ * @param sigCanvas
+ */
 function getPosition(mouseEvent, sigCanvas) {
     var rect = sigCanvas.getBoundingClientRect();
     console.log(mouseEvent.clientX + " " + rect.left + " " + rect.right + " " + mouseEvent.offsetX + " " + rect.left + " " + sigCanvas.offsetLeft);
@@ -23,17 +28,20 @@ function getPosition(mouseEvent, sigCanvas) {
 }
 
 
+/**
+ *
+ */
 function initialize() {
-    // get references to the canvas element as well as the 2D drawing context
+    // Get references to the canvas element as well as the 2D drawing context
     var sigCanvas = document.getElementById("canvas");
     var context = sigCanvas.getContext("2d");
     context.strokeStyle = "#000";
     context.lineJoin = "round";
     context.lineWidth = 10;
-    $('#clearCanvas').bind('click', function () {
+    $('#clearCanvas').bind('click', function() {
         clearCanvas(sigCanvas, context);
     });
-    $('#id_submitbutton').click(function () {
+    $('#id_submitbutton').click(function() {
         var data = $('#canvas')[0].toDataURL();// Change here
         $('#id_signing').val(data);
     });
@@ -43,21 +51,21 @@ function initialize() {
     var is_touch_device = 'ontouchstart' in document.documentElement;
 
     if (is_touch_device) {
-        // create a drawer which tracks touch movements
+        // Create a drawer which tracks touch movements
         var drawer = {
             isDrawing: false,
-            touchstart: function (coors) {
+            touchstart: function(coors) {
                 context.beginPath();
                 context.moveTo(coors.x, coors.y);
                 this.isDrawing = true;
             },
-            touchmove: function (coors) {
+            touchmove: function(coors) {
                 if (this.isDrawing) {
                     context.lineTo(coors.x, coors.y);
                     context.stroke();
                 }
             },
-            touchend: function (coors) {
+            touchend: function(coors) {
                 if (this.isDrawing) {
                     this.touchmove(coors);
                     this.isDrawing = false;
@@ -65,13 +73,17 @@ function initialize() {
             }
         };
 
-        // create a function to pass touch events and coordinates to drawer
+        // Create a function to pass touch events and coordinates to drawer
+        /**
+         *
+         * @param event
+         */
         function draw(event) {
 
-            // get the touch coordinates.  Using the first touch in case of multi-touch
+            // Get the touch coordinates.  Using the first touch in case of multi-touch
             var coors = {
-                //x: event.targetTouches[0].pageX,
-                //y: event.targetTouches[0].pageY
+                // X: event.targetTouches[0].pageX,
+                // y: event.targetTouches[0].pageY
                 x: mouseEvent.offsetX,
                 y: mouseEvent.offsetX
             };
@@ -90,34 +102,34 @@ function initialize() {
                 while ((obj = obj.offsetParent) != null);
             }
 
-            // pass the coordinates to the appropriate handler
+            // Pass the coordinates to the appropriate handler
             drawer[event.type](coors);
         }
 
-        // attach the touchstart, touchmove, touchend event listeners.
+        // Attach the touchstart, touchmove, touchend event listeners.
         sigCanvas.addEventListener('touchstart', draw, false);
         sigCanvas.addEventListener('touchmove', draw, false);
         sigCanvas.addEventListener('touchend', draw, false);
 
-        // prevent elastic scrolling
-        sigCanvas.addEventListener('touchmove', function (event) {
+        // Prevent elastic scrolling
+        sigCanvas.addEventListener('touchmove', function(event) {
             event.preventDefault();
         }, false);
     } else {
 
-        // start drawing when the mousedown event fires, and attach handlers to
+        // Start drawing when the mousedown event fires, and attach handlers to
         // draw a line to wherever the mouse moves to
-        $("#canvas").mousedown(function (mouseEvent) {
+        $("#canvas").mousedown(function(mouseEvent) {
             var position = getPosition(mouseEvent, sigCanvas);
             context.moveTo(position.X, position.Y);
             context.beginPath();
 
-            // attach event handlers
-            $(this).mousemove(function (mouseEvent) {
+            // Attach event handlers
+            $(this).mousemove(function(mouseEvent) {
                 drawLine(mouseEvent, sigCanvas, context);
-            }).mouseup(function (mouseEvent) {
+            }).mouseup(function(mouseEvent) {
                 finishDrawing(mouseEvent, sigCanvas, context);
-            }).mouseout(function (mouseEvent) {
+            }).mouseout(function(mouseEvent) {
                 finishDrawing(mouseEvent, sigCanvas, context);
             });
         });
@@ -125,8 +137,14 @@ function initialize() {
     }
 }
 
-// draws a line to the x and y coordinates of the mouse event inside
+// Draws a line to the x and y coordinates of the mouse event inside
 // the specified element using the specified context
+/**
+ *
+ * @param mouseEvent
+ * @param sigCanvas
+ * @param context
+ */
 function drawLine(mouseEvent, sigCanvas, context) {
 
     var position = getPosition(mouseEvent, sigCanvas);
@@ -135,31 +153,49 @@ function drawLine(mouseEvent, sigCanvas, context) {
     context.stroke();
 }
 
-// draws a line from the last coordiantes in the path to the finishing
+// Draws a line from the last coordiantes in the path to the finishing
 // coordinates and unbind any event handlers which need to be preceded
 // by the mouse down event
+/**
+ *
+ * @param mouseEvent
+ * @param sigCanvas
+ * @param context
+ */
 function finishDrawing(mouseEvent, sigCanvas, context) {
-    // draw the line to the finishing coordinates
+    // Draw the line to the finishing coordinates
     drawLine(mouseEvent, sigCanvas, context);
 
     context.closePath();
 
-    // unbind any events which could draw
+    // Unbind any events which could draw
     $(sigCanvas).unbind("mousemove")
         .unbind("mouseup")
         .unbind("mouseout");
 }
 
 // Clear the canvas context using the canvas width and height
+/**
+ *
+ * @param canvas
+ * @param ctx
+ */
 function clearCanvas(canvas, ctx) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
+/**
+ *
+ * @param canvas
+ */
 function downloadCanvas(canvas) {
     this.href = canvas.toDataURL();
 
 }
 
+/**
+ *
+ */
 function save() {
     this.href = canvas.toDataURL();
     $('#signing').val("this.href");

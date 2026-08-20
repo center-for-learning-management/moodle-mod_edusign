@@ -52,11 +52,11 @@ class submission_unlocked extends base {
      *
      */
     public static function create_from_user(\edusign $edusign, \stdClass $user) {
-        $data = array(
+        $data = [
                 'context' => $edusign->get_context(),
                 'objectid' => $edusign->get_instance()->id,
                 'relateduserid' => $user->id,
-        );
+        ];
         self::$preventcreatecall = false;
         /** @var submission_unlocked $event */
         $event = self::create($data);
@@ -114,6 +114,6 @@ class submission_unlocked extends base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'edusign', 'restore' => 'edusign');
+        return ['db' => 'edusign', 'restore' => 'edusign'];
     }
 }

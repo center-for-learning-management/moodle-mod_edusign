@@ -59,14 +59,14 @@ class workflow_state_updated extends base {
      *
      */
     public static function create_from_user(\edusign $edusign, \stdClass $user, $state) {
-        $data = array(
+        $data = [
                 'context' => $edusign->get_context(),
                 'objectid' => $edusign->get_instance()->id,
                 'relateduserid' => $user->id,
-                'other' => array(
+                'other' => [
                         'newstate' => $state,
-                ),
-        );
+                ],
+        ];
         self::$preventcreatecall = false;
         /** @var workflow_state_updated $event */
         $event = self::create($data);
@@ -128,7 +128,7 @@ class workflow_state_updated extends base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'edusign', 'restore' => 'edusign');
+        return ['db' => 'edusign', 'restore' => 'edusign'];
     }
 
     public static function get_other_mapping() {

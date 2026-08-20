@@ -34,7 +34,6 @@ require_once($CFG->libdir . '/adminlib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edusign_admin_page_manage_edusign_plugins extends admin_externalpage {
-
     /** @var string the name of plugin subtype */
     private $subtype = '';
 
@@ -45,10 +44,12 @@ class edusign_admin_page_manage_edusign_plugins extends admin_externalpage {
      */
     public function __construct($subtype) {
         $this->subtype = $subtype;
-        $url = new moodle_url('/mod/edusign/adminmanageplugins.php', array('subtype' => $subtype));
-        parent::__construct('manage' . $subtype . 'plugins',
-                get_string('manage' . $subtype . 'plugins', 'edusign'),
-                $url);
+        $url = new moodle_url('/mod/edusign/adminmanageplugins.php', ['subtype' => $subtype]);
+        parent::__construct(
+            'manage' . $subtype . 'plugins',
+            get_string('manage' . $subtype . 'plugins', 'edusign'),
+            $url
+        );
     }
 
     /**
@@ -65,8 +66,12 @@ class edusign_admin_page_manage_edusign_plugins extends admin_externalpage {
         $found = false;
 
         foreach (core_component::get_plugin_list($this->subtype) as $name => $notused) {
-            if (strpos(core_text::strtolower(get_string('pluginname', $this->subtype . '_' . $name)),
-                            $query) !== false) {
+            if (
+                strpos(
+                    core_text::strtolower(get_string('pluginname', $this->subtype . '_' . $name)),
+                    $query
+                ) !== false
+            ) {
                 $found = true;
                 break;
             }
@@ -74,10 +79,10 @@ class edusign_admin_page_manage_edusign_plugins extends admin_externalpage {
         if ($found) {
             $result = new stdClass();
             $result->page = $this;
-            $result->settings = array();
-            return array($this->name => $result);
+            $result->settings = [];
+            return [$this->name => $result];
         } else {
-            return array();
+            return [];
         }
     }
 }
@@ -90,7 +95,6 @@ class edusign_admin_page_manage_edusign_plugins extends admin_externalpage {
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edusign_plugin_manager {
-
     /** @var object the url of the manage submission plugin page */
     private $pageurl;
     /** @var string any error from the current action */
@@ -104,7 +108,7 @@ class edusign_plugin_manager {
      * @param string $subtype - either edusignsubmission or edusignfeedback
      */
     public function __construct($subtype) {
-        $this->pageurl = new moodle_url('/mod/edusign/adminmanageplugins.php', array('subtype' => $subtype));
+        $this->pageurl = new moodle_url('/mod/edusign/adminmanageplugins.php', ['subtype' => $subtype]);
         $this->subtype = $subtype;
     }
 
@@ -116,7 +120,7 @@ class edusign_plugin_manager {
     public function get_sorted_plugins_list() {
         $names = core_component::get_plugin_list($this->subtype);
 
-        $result = array();
+        $result = [];
 
         foreach ($names as $name => $path) {
             $idx = get_config($this->subtype . '_' . $name, 'sortorder');
@@ -155,10 +159,14 @@ class edusign_plugin_manager {
             return html_writer::link($url, get_string('uninstallplugin', 'core_admin'));
         }
 
-        return $OUTPUT->action_icon(new moodle_url($url,
-                        array('action' => $action, 'plugin' => $plugin, 'sesskey' => sesskey())),
-                        new pix_icon($icon, $alt, 'moodle', array('title' => $alt)),
-                        null, array('title' => $alt)) . ' ';
+        return $OUTPUT->action_icon(
+            new moodle_url(
+                $url,
+                ['action' => $action, 'plugin' => $plugin, 'sesskey' => sesskey()]
+            ),
+            new pix_icon($icon, $alt, 'moodle', ['title' => $alt]),
+            null, ['title' => $alt]
+        ) . ' ';
     }
 
     /**
@@ -174,11 +182,11 @@ class edusign_plugin_manager {
         $this->view_header();
         $table = new flexible_table($this->subtype . 'pluginsadminttable');
         $table->define_baseurl($this->pageurl);
-        $table->define_columns(array('pluginname', 'version', 'hideshow', 'order',
-                'settings', 'uninstall'));
-        $table->define_headers(array(get_string($this->subtype . 'pluginname', 'edusign'),
+        $table->define_columns(['pluginname', 'version', 'hideshow', 'order',
+                'settings', 'uninstall']);
+        $table->define_headers([get_string($this->subtype . 'pluginname', 'edusign'),
                 get_string('version'), get_string('hideshow', 'edusign'),
-                get_string('order'), get_string('settings'), get_string('uninstallplugin', 'core_admin')));
+                get_string('order'), get_string('settings'), get_string('uninstallplugin', 'core_admin')]);
         $table->set_attribute('id', $this->subtype . 'plugins');
         $table->set_attribute('class', 'admintable generaltable');
         $table->setup();
@@ -187,7 +195,7 @@ class edusign_plugin_manager {
         $shortsubtype = substr($this->subtype, strlen('edusign'));
 
         foreach ($plugins as $idx => $plugin) {
-            $row = array();
+            $row = [];
             $class = '';
 
             $row[] = get_string('pluginname', $this->subtype . '_' . $plugin);
@@ -206,7 +214,7 @@ class edusign_plugin_manager {
             if (!$idx == 0) {
                 $movelinks .= $this->format_icon_link('moveup', $plugin, 't/up', get_string('up'));
             } else {
-                $movelinks .= $OUTPUT->spacer(array('width' => 16));
+                $movelinks .= $OUTPUT->spacer(['width' => 16]);
             }
             if ($idx != count($plugins) - 1) {
                 $movelinks .= $this->format_icon_link('movedown', $plugin, 't/down', get_string('down'));
@@ -215,8 +223,10 @@ class edusign_plugin_manager {
 
             $exists = file_exists($CFG->dirroot . '/mod/edusign/' . $shortsubtype . '/' . $plugin . '/settings.php');
             if ($row[1] != '' && $exists) {
-                $row[] = html_writer::link(new moodle_url('/admin/settings.php',
-                        array('section' => $this->subtype . '_' . $plugin)), get_string('settings'));
+                $row[] = html_writer::link(new moodle_url(
+                    '/admin/settings.php',
+                    ['section' => $this->subtype . '_' . $plugin]
+                ), get_string('settings'));
             } else {
                 $row[] = '&nbsp;';
             }

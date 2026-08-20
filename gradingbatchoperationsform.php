@@ -43,7 +43,7 @@ class mod_edusign_grading_batch_operations_form extends moodleform {
         $instance = $this->_customdata;
 
         // Visible elements.
-        $options = array();
+        $options = [];
         $options['lock'] = get_string('locksubmissions', 'edusign');
         $options['unlock'] = get_string('unlocksubmissions', 'edusign');
         $options['downloadselected'] = get_string('downloadselectedsubmissions', 'edusign');
@@ -76,12 +76,12 @@ class mod_edusign_grading_batch_operations_form extends moodleform {
         $mform->setType('action', PARAM_ALPHA);
         $mform->addElement('hidden', 'id', $instance['cm']);
         $mform->setType('id', PARAM_INT);
-        $mform->addElement('hidden', 'selectedusers', '', array('class' => 'selectedusers'));
+        $mform->addElement('hidden', 'selectedusers', '', ['class' => 'selectedusers']);
         $mform->setType('selectedusers', PARAM_SEQUENCE);
         $mform->addElement('hidden', 'returnaction', 'grading');
         $mform->setType('returnaction', PARAM_ALPHA);
 
-        $objs = array();
+        $objs = [];
         $objs[] =& $mform->createElement('select', 'operation', get_string('chooseoperation', 'edusign'), $options);
         $objs[] =& $mform->createElement('submit', 'submit', get_string('go'));
         $batchdescription = get_string('batchoperationsdescription', 'edusign');

@@ -45,7 +45,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class submission_updated extends base {
-
     /**
      * Init method.
      */
@@ -83,9 +82,9 @@ abstract class submission_updated extends base {
     }
 
     public static function get_other_mapping() {
-        $othermapped = array();
-        $othermapped['submissionid'] = array('db' => 'edusign_submission', 'restore' => 'submission');
-        $othermapped['groupid'] = array('db' => 'groups', 'restore' => 'group');
+        $othermapped = [];
+        $othermapped['submissionid'] = ['db' => 'edusign_submission', 'restore' => 'submission'];
+        $othermapped['groupid'] = ['db' => 'groups', 'restore' => 'group'];
 
         return $othermapped;
     }

@@ -35,13 +35,15 @@ defined('MOODLE_INTERNAL') || die();
  * @param array $options - List of options affecting file serving.
  * @return bool false if file not found, does not return if found - just send the file
  */
-function edusignsubmission_signing_pluginfile($course,
-        $cm,
-        context $context,
-        $filearea,
-        $args,
-        $forcedownload,
-        array $options = array()) {
+function edusignsubmission_signing_pluginfile(
+    $course,
+    $cm,
+    context $context,
+    $filearea,
+    $args,
+    $forcedownload,
+    array $options = []
+) {
     global $DB, $CFG;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
@@ -50,10 +52,12 @@ function edusignsubmission_signing_pluginfile($course,
 
     require_login($course, false, $cm);
     $itemid = (int) array_shift($args);
-    $record = $DB->get_record('edusign_submission',
-            array('id' => $itemid),
-            'userid, edusignment, groupid',
-            MUST_EXIST);
+    $record = $DB->get_record(
+        'edusign_submission',
+        ['id' => $itemid],
+        'userid, edusignment, groupid',
+        MUST_EXIST
+    );
     $userid = $record->userid;
     $groupid = $record->groupid;
 
@@ -65,13 +69,17 @@ function edusignsubmission_signing_pluginfile($course,
         return false;
     }
 
-    if ($edusign->get_instance()->teamsubmission &&
-            !$edusign->can_view_group_submission($groupid)) {
+    if (
+        $edusign->get_instance()->teamsubmission &&
+            !$edusign->can_view_group_submission($groupid)
+    ) {
         return false;
     }
 
-    if (!$edusign->get_instance()->teamsubmission &&
-            !$edusign->can_view_submission($userid)) {
+    if (
+        !$edusign->get_instance()->teamsubmission &&
+            !$edusign->can_view_submission($userid)
+    ) {
         return false;
     }
 

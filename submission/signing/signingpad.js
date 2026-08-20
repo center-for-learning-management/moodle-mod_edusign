@@ -1,8 +1,8 @@
-(function (root, factory) {
+(function(root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module unless amdModuleId is set
-        define([], function () {
-            return (root['SignaturePad'] = factory());
+        define([], function() {
+            return (root.SignaturePad = factory());
         });
     } else if (typeof exports === 'object') {
         // Node. Does not work with strict CommonJS, but
@@ -10,11 +10,11 @@
         // like Node.
         module.exports = factory();
     } else {
-        root['SignaturePad'] = factory();
+        root.SignaturePad = factory();
     }
-}(this, function () {
+}(this, function() {
 
-    /*!
+    /* !
      * Signature Pad v1.5.3
      * https://github.com/szimek/signature_pad
      *
@@ -31,17 +31,17 @@
      * http://www.lemoda.net/maths/bezier-length/index.html
      *
      */
-    var SignaturePad = (function (document) {
+    var SignaturePad = (function(document) {
         "use strict";
 
-        var SignaturePad = function (canvas, options) {
+        var SignaturePad = function(canvas, options) {
             var self = this,
                 opts = options || {};
 
             this.velocityFilterWeight = opts.velocityFilterWeight || 0.7;
             this.minWidth = opts.minWidth || 0.5;
             this.maxWidth = opts.maxWidth || 2.5;
-            this.dotSize = opts.dotSize || function () {
+            this.dotSize = opts.dotSize || function() {
                 return (this.minWidth + this.maxWidth) / 2;
             };
             this.penColor = opts.penColor || "black";
@@ -53,36 +53,36 @@
             this._ctx = canvas.getContext("2d");
             this.clear();
 
-            // we need add these inline so they are available to unbind while still having
+            // We need add these inline so they are available to unbind while still having
             //  access to 'self' we could use _.bind but it's not worth adding a dependency
-            this._handleMouseDown = function (event) {
+            this._handleMouseDown = function(event) {
                 if (event.which === 1) {
                     self._mouseButtonDown = true;
                     self._strokeBegin(event);
                 }
             };
 
-            this._handleMouseMove = function (event) {
+            this._handleMouseMove = function(event) {
                 if (self._mouseButtonDown) {
                     self._strokeUpdate(event);
                 }
             };
 
-            this._handleMouseUp = function (event) {
+            this._handleMouseUp = function(event) {
                 if (event.which === 1 && self._mouseButtonDown) {
                     self._mouseButtonDown = false;
                     self._strokeEnd(event);
                 }
             };
 
-            this._handleTouchStart = function (event) {
+            this._handleTouchStart = function(event) {
                 if (event.targetTouches.length == 1) {
                     var touch = event.changedTouches[0];
                     self._strokeBegin(touch);
                 }
             };
 
-            this._handleTouchMove = function (event) {
+            this._handleTouchMove = function(event) {
                 // Prevent scrolling.
                 event.preventDefault();
 
@@ -90,7 +90,7 @@
                 self._strokeUpdate(touch);
             };
 
-            this._handleTouchEnd = function (event) {
+            this._handleTouchEnd = function(event) {
                 var wasCanvasTouched = event.target === self._canvas;
                 if (wasCanvasTouched) {
                     event.preventDefault();
@@ -102,7 +102,7 @@
             this._handleTouchEvents();
         };
 
-        SignaturePad.prototype.clear = function () {
+        SignaturePad.prototype.clear = function() {
             var ctx = this._ctx,
                 canvas = this._canvas;
 
@@ -112,12 +112,12 @@
             this._reset();
         };
 
-        SignaturePad.prototype.toDataURL = function (imageType, quality) {
+        SignaturePad.prototype.toDataURL = function(imageType, quality) {
             var canvas = this._canvas;
             return canvas.toDataURL.apply(canvas, arguments);
         };
 
-        SignaturePad.prototype.fromDataURL = function (dataUrl) {
+        SignaturePad.prototype.fromDataURL = function(dataUrl) {
             var self = this,
                 image = new Image(),
                 ratio = window.devicePixelRatio || 1,
@@ -126,18 +126,18 @@
 
             this._reset();
             image.src = dataUrl;
-            image.onload = function () {
+            image.onload = function() {
                 self._ctx.drawImage(image, 0, 0, width, height);
             };
             this._isEmpty = false;
         };
 
-        SignaturePad.prototype._strokeUpdate = function (event) {
+        SignaturePad.prototype._strokeUpdate = function(event) {
             var point = this._createPoint(event);
             this._addPoint(point);
         };
 
-        SignaturePad.prototype._strokeBegin = function (event) {
+        SignaturePad.prototype._strokeBegin = function(event) {
             this._reset();
             this._strokeUpdate(event);
             if (typeof this.onBegin === 'function') {
@@ -145,7 +145,7 @@
             }
         };
 
-        SignaturePad.prototype._strokeDraw = function (point) {
+        SignaturePad.prototype._strokeDraw = function(point) {
             var ctx = this._ctx,
                 dotSize = typeof (this.dotSize) === 'function' ? this.dotSize() : this.dotSize;
 
@@ -155,7 +155,7 @@
             ctx.fill();
         };
 
-        SignaturePad.prototype._strokeEnd = function (event) {
+        SignaturePad.prototype._strokeEnd = function(event) {
             var canDrawCurve = this.points.length > 2,
                 point = this.points[0];
 
@@ -167,7 +167,7 @@
             }
         };
 
-        SignaturePad.prototype._handleMouseEvents = function () {
+        SignaturePad.prototype._handleMouseEvents = function() {
             this._mouseButtonDown = false;
 
             this._canvas.addEventListener("mousedown", this._handleMouseDown);
@@ -175,7 +175,7 @@
             document.addEventListener("mouseup", this._handleMouseUp);
         };
 
-        SignaturePad.prototype._handleTouchEvents = function () {
+        SignaturePad.prototype._handleTouchEvents = function() {
             // Pass touch events to canvas element on mobile IE11 and Edge.
             this._canvas.style.msTouchAction = 'none';
             this._canvas.style.touchAction = 'none';
@@ -185,12 +185,12 @@
             this._canvas.addEventListener("touchend", this._handleTouchEnd);
         };
 
-        SignaturePad.prototype.on = function () {
+        SignaturePad.prototype.on = function() {
             this._handleMouseEvents();
             this._handleTouchEvents();
         };
 
-        SignaturePad.prototype.off = function () {
+        SignaturePad.prototype.off = function() {
             this._canvas.removeEventListener("mousedown", this._handleMouseDown);
             this._canvas.removeEventListener("mousemove", this._handleMouseMove);
             document.removeEventListener("mouseup", this._handleMouseUp);
@@ -200,11 +200,11 @@
             this._canvas.removeEventListener("touchend", this._handleTouchEnd);
         };
 
-        SignaturePad.prototype.isEmpty = function () {
+        SignaturePad.prototype.isEmpty = function() {
             return this._isEmpty;
         };
 
-        SignaturePad.prototype._reset = function () {
+        SignaturePad.prototype._reset = function() {
             this.points = [];
             this._lastVelocity = 0;
             this._lastWidth = (this.minWidth + this.maxWidth) / 2;
@@ -212,7 +212,7 @@
             this._ctx.fillStyle = this.penColor;
         };
 
-        SignaturePad.prototype._createPoint = function (event) {
+        SignaturePad.prototype._createPoint = function(event) {
             var rect = this._canvas.getBoundingClientRect();
             return new Point(
                 event.clientX - rect.left,
@@ -220,7 +220,7 @@
             );
         };
 
-        SignaturePad.prototype._addPoint = function (point) {
+        SignaturePad.prototype._addPoint = function(point) {
             var points = this.points,
                 c2, c3,
                 curve, tmp;
@@ -230,7 +230,9 @@
             if (points.length > 2) {
                 // To reduce the initial lag make it work with 3 points
                 // by copying the first point to the beginning.
-                if (points.length === 3) points.unshift(points[0]);
+                if (points.length === 3) {
+ points.unshift(points[0]);
+}
 
                 tmp = this._calculateCurveControlPoints(points[0], points[1], points[2]);
                 c2 = tmp.c2;
@@ -245,9 +247,11 @@
             }
         };
 
-        SignaturePad.prototype._calculateCurveControlPoints = function (s1, s2, s3) {
-            var dx1 = s1.x - s2.x, dy1 = s1.y - s2.y,
-                dx2 = s2.x - s3.x, dy2 = s2.y - s3.y,
+        SignaturePad.prototype._calculateCurveControlPoints = function(s1, s2, s3) {
+            var dx1 = s1.x - s2.x,
+dy1 = s1.y - s2.y,
+                dx2 = s2.x - s3.x,
+dy2 = s2.y - s3.y,
 
                 m1 = {x: (s1.x + s2.x) / 2.0, y: (s1.y + s2.y) / 2.0},
                 m2 = {x: (s2.x + s3.x) / 2.0, y: (s2.y + s3.y) / 2.0},
@@ -270,7 +274,7 @@
             };
         };
 
-        SignaturePad.prototype._addCurve = function (curve) {
+        SignaturePad.prototype._addCurve = function(curve) {
             var startPoint = curve.startPoint,
                 endPoint = curve.endPoint,
                 velocity, newWidth;
@@ -286,7 +290,7 @@
             this._lastWidth = newWidth;
         };
 
-        SignaturePad.prototype._drawPoint = function (x, y, size) {
+        SignaturePad.prototype._drawPoint = function(x, y, size) {
             var ctx = this._ctx;
 
             ctx.moveTo(x, y);
@@ -294,7 +298,7 @@
             this._isEmpty = false;
         };
 
-        SignaturePad.prototype._drawCurve = function (curve, startWidth, endWidth) {
+        SignaturePad.prototype._drawCurve = function(curve, startWidth, endWidth) {
             var ctx = this._ctx,
                 widthDelta = endWidth - startWidth,
                 drawSteps, width, i, t, tt, ttt, u, uu, uuu, x, y;
@@ -327,26 +331,26 @@
             ctx.fill();
         };
 
-        SignaturePad.prototype._strokeWidth = function (velocity) {
+        SignaturePad.prototype._strokeWidth = function(velocity) {
             return Math.max(this.maxWidth / (velocity + 1), this.minWidth);
         };
 
 
-        var Point = function (x, y, time) {
+        var Point = function(x, y, time) {
             this.x = x;
             this.y = y;
             this.time = time || new Date().getTime();
         };
 
-        Point.prototype.velocityFrom = function (start) {
+        Point.prototype.velocityFrom = function(start) {
             return (this.time !== start.time) ? this.distanceTo(start) / (this.time - start.time) : 1;
         };
 
-        Point.prototype.distanceTo = function (start) {
+        Point.prototype.distanceTo = function(start) {
             return Math.sqrt(Math.pow(this.x - start.x, 2) + Math.pow(this.y - start.y, 2));
         };
 
-        var Bezier = function (startPoint, control1, control2, endPoint) {
+        var Bezier = function(startPoint, control1, control2, endPoint) {
             this.startPoint = startPoint;
             this.control1 = control1;
             this.control2 = control2;
@@ -354,7 +358,7 @@
         };
 
         // Returns approximated length.
-        Bezier.prototype.length = function () {
+        Bezier.prototype.length = function() {
             var steps = 10,
                 length = 0,
                 i, t, cx, cy, px, py, xdiff, ydiff;
@@ -374,7 +378,7 @@
             return length;
         };
 
-        Bezier.prototype._point = function (t, start, c1, c2, end) {
+        Bezier.prototype._point = function(t, start, c1, c2, end) {
             return start * (1.0 - t) * (1.0 - t) * (1.0 - t)
                 + 3.0 * c1 * (1.0 - t) * (1.0 - t) * t
                 + 3.0 * c2 * (1.0 - t) * t * t

@@ -56,13 +56,13 @@ class submission_form_viewed extends base {
      * @return submission_form_viewed
      */
     public static function create_from_user(\edusign $edusign, \stdClass $user) {
-        $data = array(
+        $data = [
                 'relateduserid' => $user->id,
                 'context' => $edusign->get_context(),
-                'other' => array(
+                'other' => [
                         'edusignid' => $edusign->get_instance()->id,
-                ),
-        );
+                ],
+        ];
         self::$preventcreatecall = false;
         /** @var submission_form_viewed $event */
         $event = self::create($data);
@@ -126,8 +126,8 @@ class submission_form_viewed extends base {
     }
 
     public static function get_other_mapping() {
-        $othermapped = array();
-        $othermapped['edusignid'] = array('db' => 'edusign', 'restore' => 'edusign');
+        $othermapped = [];
+        $othermapped['edusignid'] = ['db' => 'edusign', 'restore' => 'edusign'];
 
         return $othermapped;
     }

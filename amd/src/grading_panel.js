@@ -17,7 +17,7 @@
  * Javascript controller for the "Grading" panel at the right of the page.
  *
  * @module     mod_edusign/grading_panel
- * @package    mod_edusign
+ * @package
  * @class      GradingPanel
  * @copyright  2016 Damyon Wiese <damyon@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,7 +26,7 @@
 define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragment',
         'core/ajax', 'core/str', 'mod_edusign/grading_form_change_checker',
         'mod_edusign/grading_events'],
-    function ($, Y, notification, templates, fragment, ajax, str, checker, GradingEvents) {
+    function($, Y, notification, templates, fragment, ajax, str, checker, GradingEvents) {
 
         /**
          * GradingPanel class.
@@ -34,7 +34,7 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
          * @class GradingPanel
          * @param {String} selector The selector for the page region containing the user navigation.
          */
-        var GradingPanel = function (selector) {
+        var GradingPanel = function(selector) {
             this._regionSelector = selector;
             this._region = $(selector);
             this._userCache = [];
@@ -70,12 +70,12 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
          * @param {String} js
          * @return {Deferred} promise resolved when the animations are complete.
          */
-        GradingPanel.prototype._niceReplaceNodeContents = function (node, html, js) {
+        GradingPanel.prototype._niceReplaceNodeContents = function(node, html, js) {
             var promise = $.Deferred();
 
-            node.fadeOut("fast", function () {
+            node.fadeOut("fast", function() {
                 templates.replaceNodeContents(node, html, js);
-                node.fadeIn("fast", function () {
+                node.fadeIn("fast", function() {
                     promise.resolve();
                 });
             });
@@ -88,7 +88,7 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
          * @private
          * @method _saveFormState
          */
-        GradingPanel.prototype._saveFormState = function () {
+        GradingPanel.prototype._saveFormState = function() {
             // Grrrrr! TinyMCE you know what you did.
             if (typeof window.tinyMCE !== 'undefined') {
                 window.tinyMCE.triggerSave();
@@ -108,7 +108,7 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
          * @param {Boolean} nextUser optional. Load next user in the grading list.
          * @method _submitForm
          */
-        GradingPanel.prototype._submitForm = function (event, nextUserId, nextUser) {
+        GradingPanel.prototype._submitForm = function(event, nextUserId, nextUser) {
             // The form was submitted - send it via ajax instead.
             var form = $(this._region.find('form.gradeform'));
 
@@ -140,7 +140,7 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
          * @param {Array} response List of errors.
          * @param {Boolean} nextUser - optional. If true, switch to next user in the grading list.
          */
-        GradingPanel.prototype._handleFormSubmissionResponse = function (formdata, nextUserId, nextUser, response) {
+        GradingPanel.prototype._handleFormSubmissionResponse = function(formdata, nextUserId, nextUser, response) {
             if (typeof nextUserId === "undefined") {
                 nextUserId = this._lastUserId;
             }
@@ -152,10 +152,10 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
                 str.get_strings([
                     {key: 'changessaved', component: 'core'},
                     {key: 'gradechangessaveddetail', component: 'mod_edusign'},
-                ]).done(function (strs) {
+                ]).done(function(strs) {
                     notification.alert(strs[0], strs[1]);
                 }).fail(notification.exception);
-                Y.use('moodle-core-formchangechecker', function () {
+                Y.use('moodle-core-formchangechecker', function() {
                     M.core_formchangechecker.reset_form_dirty_state();
                 });
                 if (nextUserId == this._lastUserId) {
@@ -178,7 +178,7 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
          * @param {Integer} userid
          * @param {Array} formdata
          */
-        GradingPanel.prototype._resetForm = function (e, userid, formdata) {
+        GradingPanel.prototype._resetForm = function(e, userid, formdata) {
             // The form was cancelled - refresh with default values.
             var event = $.Event("custom");
             if (typeof userid == "undefined") {
@@ -195,7 +195,7 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
          * @param {Object} e
          * @method _chooseAttempt
          */
-        GradingPanel.prototype._chooseAttempt = function (e) {
+        GradingPanel.prototype._chooseAttempt = function(e) {
             // Show a dialog.
 
             // The form is in the element pointed to by data-submissions.
@@ -209,8 +209,8 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
                 {key: 'viewadifferentattempt', component: 'mod_edusign'},
                 {key: 'view', component: 'core'},
                 {key: 'cancel', component: 'core'},
-            ]).done(function (strs) {
-                notification.confirm(strs[0], formhtml, strs[1], strs[2], function () {
+            ]).done(function(strs) {
+                notification.confirm(strs[0], formhtml, strs[1], strs[2], function() {
                     var attemptnumber = $("input:radio[name='select-attemptnumber']:checked").val();
 
                     this._refreshGradingPanel(null, this._lastUserId, '', attemptnumber);
@@ -225,10 +225,10 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
          * @method _addPopoutButtons
          * @param {JQuery} selector The region selector to add popout buttons to.
          */
-        GradingPanel.prototype._addPopoutButtons = function (selector) {
+        GradingPanel.prototype._addPopoutButtons = function(selector) {
             var region = $(selector);
 
-            templates.render('mod_edusign/popout_button', {}).done(function (html) {
+            templates.render('mod_edusign/popout_button', {}).done(function(html) {
                 var parents = region.find('[data-fieldtype="filemanager"],[data-fieldtype="editor"],[data-fieldtype="grading"]')
                     .closest('.fitem');
                 parents.addClass('has-popout').find('label').parent().append(html);
@@ -244,7 +244,7 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
          * @method _togglePopout
          * @param {Event} event
          */
-        GradingPanel.prototype._togglePopout = function (event) {
+        GradingPanel.prototype._togglePopout = function(event) {
             event.preventDefault();
             var container = $(event.target).closest('.fitem');
             if (container.hasClass('popout')) {
@@ -266,7 +266,7 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
          * @param {String} submissiondata serialised submission data.
          * @param {Integer} attemptnumber
          */
-        GradingPanel.prototype._refreshGradingPanel = function (event, userid, submissiondata, attemptnumber) {
+        GradingPanel.prototype._refreshGradingPanel = function(event, userid, submissiondata, attemptnumber) {
             var contextid = this._region.attr('data-contextid');
             if (typeof submissiondata === 'undefined') {
                 submissiondata = '';
@@ -284,18 +284,18 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
             // Tell behat to back off too.
             window.M.util.js_pending('mod-edusign-loading-user');
             // First insert the loading template.
-            templates.render('mod_edusign/loading', {}).done(function (html, js) {
+            templates.render('mod_edusign/loading', {}).done(function(html, js) {
                 // Update the page.
-                this._niceReplaceNodeContents(this._region, html, js).done(function () {
+                this._niceReplaceNodeContents(this._region, html, js).done(function() {
                     if (userid > 0) {
                         this._region.show();
                         // Reload the grading form "fragment" for this user.
                         var params = {userid: userid, attemptnumber: attemptnumber, jsonformdata: JSON.stringify(submissiondata)};
-                        fragment.loadFragment('mod_edusign', 'gradingpanel', contextid, params).done(function (html, js) {
+                        fragment.loadFragment('mod_edusign', 'gradingpanel', contextid, params).done(function(html, js) {
                             this._niceReplaceNodeContents(this._region, html, js)
-                                .done(function () {
+                                .done(function() {
                                     checker.saveFormState('[data-region="grade-panel"] .gradeform');
-                                    $(document).on('editor-content-restored', function () {
+                                    $(document).on('editor-content-restored', function() {
                                         // If the editor has some content that has been restored
                                         // then save the form state again for comparison.
                                         checker.saveFormState('[data-region="grade-panel"] .gradeform');
@@ -328,7 +328,7 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
          * @param {Event} event
          * @param {Object} data Next user's data
          */
-        GradingPanel.prototype._getNextUser = function (event, data) {
+        GradingPanel.prototype._getNextUser = function(event, data) {
             this.nextUserId = data.nextUserId;
             this.nextUser = data.nextUser;
         };
@@ -339,7 +339,7 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
          * @private
          * @method _handleSaveAndShowNext
          */
-        GradingPanel.prototype._handleSaveAndShowNext = function () {
+        GradingPanel.prototype._handleSaveAndShowNext = function() {
             this._submitForm(null, this.nextUserId, this.nextUser);
         };
 
@@ -349,7 +349,7 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
          * @method getPanelElement
          * @return {jQuery}
          */
-        GradingPanel.prototype.getPanelElement = function () {
+        GradingPanel.prototype.getPanelElement = function() {
             return $('[data-region="grade-panel"]');
         };
 
@@ -358,7 +358,7 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
          *
          * @method collapsePanel
          */
-        GradingPanel.prototype.collapsePanel = function () {
+        GradingPanel.prototype.collapsePanel = function() {
             this.getPanelElement().addClass('collapsed');
         };
 
@@ -367,7 +367,7 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
          *
          * @method expandPanel
          */
-        GradingPanel.prototype.expandPanel = function () {
+        GradingPanel.prototype.expandPanel = function() {
             this.getPanelElement().removeClass('collapsed');
         };
 
@@ -376,11 +376,11 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
          *
          * @method registerEventListeners
          */
-        GradingPanel.prototype.registerEventListeners = function () {
+        GradingPanel.prototype.registerEventListeners = function() {
             var docElement = $(document);
             var region = $(this._region);
             // Add an event listener to prevent form submission when pressing enter key.
-            region.on('submit', 'form', function (e) {
+            region.on('submit', 'form', function(e) {
                 e.preventDefault();
             });
 
@@ -392,16 +392,16 @@ define(['jquery', 'core/yui', 'core/notification', 'core/templates', 'core/fragm
 
             docElement.on('save-form-state', this._saveFormState.bind(this));
 
-            docElement.on(GradingEvents.COLLAPSE_GRADE_PANEL, function () {
+            docElement.on(GradingEvents.COLLAPSE_GRADE_PANEL, function() {
                 this.collapsePanel();
             }.bind(this));
 
             // We should expand if the review panel is collapsed.
-            docElement.on(GradingEvents.COLLAPSE_REVIEW_PANEL, function () {
+            docElement.on(GradingEvents.COLLAPSE_REVIEW_PANEL, function() {
                 this.expandPanel();
             }.bind(this));
 
-            docElement.on(GradingEvents.EXPAND_GRADE_PANEL, function () {
+            docElement.on(GradingEvents.EXPAND_GRADE_PANEL, function() {
                 this.expandPanel();
             }.bind(this));
         };

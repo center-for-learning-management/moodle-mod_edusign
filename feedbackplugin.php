@@ -34,7 +34,6 @@ require_once($CFG->dirroot . '/mod/edusign/edusignmentplugin.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class edusign_feedback_plugin extends edusign_plugin {
-
     /**
      * Return subtype name of the plugin.
      *
@@ -143,7 +142,7 @@ abstract class edusign_feedback_plugin extends edusign_plugin {
      *                 The action will be passed to grading_batch_operation.
      */
     public function get_grading_batch_operations() {
-        return array();
+        return [];
     }
 
     /**
@@ -155,7 +154,7 @@ abstract class edusign_feedback_plugin extends edusign_plugin {
      *                 The action will be passed to grading_action.
      */
     public function get_grading_actions() {
-        return array();
+        return [];
     }
 
     /**

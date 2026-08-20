@@ -36,7 +36,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edusign_plugin_request_data {
-
     /** @var context The context that we are dealing with. */
     protected $context;
 
@@ -70,8 +69,13 @@ class edusign_plugin_request_data {
      * @param \stdClass $user The user object.
      * @param \edusign $edusign The edusign object.
      */
-    public function __construct(\context $context, \edusign $edusign, \stdClass $pluginobject = null, array $subcontext = [],
-            \stdClass $user = null) {
+    public function __construct(
+        \context $context,
+        \edusign $edusign,
+        \stdClass $pluginobject = null,
+        array $subcontext = [],
+        \stdClass $user = null
+    ) {
         $this->context = $context;
         $this->pluginobject = $pluginobject;
         $this->subcontext = $subcontext;
@@ -199,7 +203,7 @@ class edusign_plugin_request_data {
             throw new \coding_exception('Please use set_userids() before calling this method.');
         }
 
-        list($sql, $params) = $DB->get_in_or_equal($this->get_userids(), SQL_PARAMS_NAMED);
+        [$sql, $params] = $DB->get_in_or_equal($this->get_userids(), SQL_PARAMS_NAMED);
         $params['edusign'] = $this->get_edusign()->get_instance()->id;
         $this->submissions = $DB->get_records_select('edusign_submission', "edusignment = :edusign AND userid $sql", $params);
         $this->grades = $DB->get_records_select('edusign_grades', "edusignment = :edusign AND userid $sql", $params);

@@ -52,10 +52,10 @@ class statement_accepted extends base {
      *
      */
     public static function create_from_submission(\edusign $edusign, \stdClass $submission) {
-        $data = array(
+        $data = [
                 'context' => $edusign->get_context(),
-                'objectid' => $submission->id
-        );
+                'objectid' => $submission->id,
+        ];
         self::$preventcreatecall = false;
         /** @var statement_accepted $event */
         $event = self::create($data);
@@ -110,6 +110,6 @@ class statement_accepted extends base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'edusign_submission', 'restore' => 'submission');
+        return ['db' => 'edusign_submission', 'restore' => 'submission'];
     }
 }

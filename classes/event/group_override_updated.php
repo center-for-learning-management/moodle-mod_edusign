@@ -42,7 +42,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class group_override_updated extends \core\event\base {
-
     /**
      * Init method.
      */
@@ -77,7 +76,7 @@ class group_override_updated extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/mod/edusign/overrideedit.php', array('id' => $this->objectid));
+        return new \moodle_url('/mod/edusign/overrideedit.php', ['id' => $this->objectid]);
     }
 
     /**
@@ -102,16 +101,16 @@ class group_override_updated extends \core\event\base {
      * Get objectid mapping
      */
     public static function get_objectid_mapping() {
-        return array('db' => 'edusign_overrides', 'restore' => 'edusign_override');
+        return ['db' => 'edusign_overrides', 'restore' => 'edusign_override'];
     }
 
     /**
      * Get other mapping
      */
     public static function get_other_mapping() {
-        $othermapped = array();
-        $othermapped['edusignid'] = array('db' => 'edusign', 'restore' => 'edusign');
-        $othermapped['groupid'] = array('db' => 'groups', 'restore' => 'group');
+        $othermapped = [];
+        $othermapped['edusignid'] = ['db' => 'edusign', 'restore' => 'edusign'];
+        $othermapped['groupid'] = ['db' => 'groups', 'restore' => 'group'];
 
         return $othermapped;
     }

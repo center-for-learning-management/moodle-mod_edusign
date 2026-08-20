@@ -30,11 +30,11 @@ require_once($CFG->dirroot . '/mod/edusign/override_form.php');
 $overrideid = required_param('id', PARAM_INT);
 $confirm = optional_param('confirm', false, PARAM_BOOL);
 
-if (!$override = $DB->get_record('edusign_overrides', array('id' => $overrideid))) {
+if (!$override = $DB->get_record('edusign_overrides', ['id' => $overrideid])) {
     print_error('invalidoverrideid', 'edusign');
 }
 
-list($course, $cm) = get_course_and_cm_from_instance($override->edusignid, 'edusign');
+[$course, $cm] = get_course_and_cm_from_instance($override->edusignid, 'edusign');
 $context = context_module::instance($cm->id);
 $edusign = new edusign($context, null, null);
 
@@ -53,9 +53,9 @@ if ($override->groupid) {
     }
 }
 
-$url = new moodle_url('/mod/edusign/overridedelete.php', array('id' => $override->id));
-$confirmurl = new moodle_url($url, array('id' => $override->id, 'confirm' => 1));
-$cancelurl = new moodle_url('/mod/edusign/overrides.php', array('cmid' => $cm->id));
+$url = new moodle_url('/mod/edusign/overridedelete.php', ['id' => $override->id]);
+$confirmurl = new moodle_url($url, ['id' => $override->id, 'confirm' => 1]);
+$cancelurl = new moodle_url('/mod/edusign/overrides.php', ['cmid' => $cm->id]);
 
 if (!empty($override->userid)) {
     $cancelurl->param('mode', 'user');
@@ -83,13 +83,13 @@ $PAGE->set_title($title);
 $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($edusign->get_instance()->name, true, array('context' => $context)));
+echo $OUTPUT->heading(format_string($edusign->get_instance()->name, true, ['context' => $context]));
 
 if ($override->groupid) {
-    $group = $DB->get_record('groups', array('id' => $override->groupid), 'id, name');
+    $group = $DB->get_record('groups', ['id' => $override->groupid], 'id, name');
     $confirmstr = get_string("overridedeletegroupsure", "edusign", $group->name);
 } else {
-    $user = $DB->get_record('user', array('id' => $override->userid));
+    $user = $DB->get_record('user', ['id' => $override->userid]);
     $confirmstr = get_string("overridedeleteusersure", "edusign", fullname($user));
 }
 

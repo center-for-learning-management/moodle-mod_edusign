@@ -39,15 +39,14 @@ class mod_edusign_grading_options_form extends moodleform
     /**
      * Define this form - called from the parent constructor.
      */
-    public function definition()
-    {
+    public function definition() {
         $mform = $this->_form;
         $instance = $this->_customdata;
-        $dirtyclass = array('class' => 'ignoredirty');
+        $dirtyclass = ['class' => 'ignoredirty'];
 
         $mform->addElement('header', 'general', get_string('gradingoptions', 'edusign'));
         // Visible elements.
-        $options = array(-1 => get_string('all'), 10 => '10', 20 => '20', 50 => '50', 100 => '100');
+        $options = [-1 => get_string('all'), 10 => '10', 20 => '20', 50 => '50', 100 => '100'];
         $maxperpage = get_config('edusign', 'maxperpage');
         if (isset($maxperpage) && $maxperpage != -1) {
             unset($options[-1]);
@@ -58,11 +57,11 @@ class mod_edusign_grading_options_form extends moodleform
             }
         }
         $mform->addElement('select', 'perpage', get_string('edusignmentsperpage', 'edusign'), $options, $dirtyclass);
-        $options = array('' => get_string('filternone', 'edusign'),
+        $options = ['' => get_string('filternone', 'edusign'),
                 EDUSIGN_FILTER_NOT_SUBMITTED => get_string('filternotsubmitted', 'edusign'),
                 EDUSIGN_FILTER_SUBMITTED => get_string('filtersubmitted', 'edusign'),
                 EDUSIGN_FILTER_REQUIRE_GRADING => get_string('filterrequiregrading', 'edusign'),
-                EDUSIGN_FILTER_GRANTED_EXTENSION => get_string('filtergrantedextension', 'edusign'));
+                EDUSIGN_FILTER_GRANTED_EXTENSION => get_string('filtergrantedextension', 'edusign')];
         if ($instance['submissionsenabled']) {
             $mform->addElement('select', 'filter', get_string('filter', 'edusign'), $options, $dirtyclass);
         }
