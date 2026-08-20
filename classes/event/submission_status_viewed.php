@@ -55,12 +55,12 @@ class submission_status_viewed extends base {
      * @return submission_status_viewed
      */
     public static function create_from_edusign(\edusign $edusign) {
-        $data = array(
+        $data = [
                 'context' => $edusign->get_context(),
-                'other' => array(
+                'other' => [
                         'edusignid' => $edusign->get_instance()->id,
-                ),
-        );
+                ],
+        ];
         self::$preventcreatecall = false;
         /** @var submission_status_viewed $event */
         $event = self::create($data);
@@ -117,8 +117,8 @@ class submission_status_viewed extends base {
     }
 
     public static function get_other_mapping() {
-        $othermapped = array();
-        $othermapped['edusignid'] = array('db' => 'edusign', 'restore' => 'edusign');
+        $othermapped = [];
+        $othermapped['edusignid'] = ['db' => 'edusign', 'restore' => 'edusign'];
 
         return $othermapped;
     }

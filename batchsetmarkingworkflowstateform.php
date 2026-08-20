@@ -61,7 +61,6 @@ class mod_edusign_batch_set_marking_workflow_state_form extends moodleform {
         $mform->addElement('hidden', 'selectedusers');
         $mform->setType('selectedusers', PARAM_SEQUENCE);
         $this->add_action_buttons(true, get_string('savechanges'));
-
     }
 
     /**
@@ -84,4 +83,3 @@ class mod_edusign_batch_set_marking_workflow_state_form extends moodleform {
         return $errors;
     }
 }
-

@@ -62,16 +62,20 @@ class mod_edusign_extension_form extends moodleform {
                 $usershtml .= get_string('moreusers', 'edusign', count($userlist) - 5);
                 break;
             }
-            $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
+            $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
 
-            $usershtml .= $edusign->get_renderer()->render(new edusign_user_summary($user,
-                    $edusign->get_course()->id,
-                    has_capability('moodle/site:viewfullnames',
-                            $edusign->get_course_context()),
-                    $edusign->is_blind_marking(),
-                    $edusign->get_uniqueid_for_user($user->id),
-                    ['firstname', 'lastname'],
-                    !$edusign->is_active_user($userid)));
+            $usershtml .= $edusign->get_renderer()->render(new edusign_user_summary(
+                $user,
+                $edusign->get_course()->id,
+                has_capability(
+                    'moodle/site:viewfullnames',
+                    $edusign->get_course_context()
+                ),
+                $edusign->is_blind_marking(),
+                $edusign->get_uniqueid_for_user($user->id),
+                ['firstname', 'lastname'],
+                !$edusign->is_active_user($userid)
+            ));
             $usercount += 1;
         }
 
@@ -82,8 +86,10 @@ class mod_edusign_extension_form extends moodleform {
         $mform->addElement('static', 'userslist', get_string('selectedusers', 'edusign'), $usershtml);
 
         if ($instance->allowsubmissionsfromdate) {
-            $mform->addElement('static', 'allowsubmissionsfromdate', get_string('allowsubmissionsfromdate', 'edusign'),
-                    userdate($instance->allowsubmissionsfromdate));
+            $mform->addElement(
+                'static', 'allowsubmissionsfromdate', get_string('allowsubmissionsfromdate', 'edusign'),
+                userdate($instance->allowsubmissionsfromdate)
+            );
         }
 
         $finaldate = 0;
@@ -95,8 +101,10 @@ class mod_edusign_extension_form extends moodleform {
             $mform->addElement('static', 'cutoffdate', get_string('cutoffdate', 'edusign'), userdate($instance->cutoffdate));
             $finaldate = $instance->cutoffdate;
         }
-        $mform->addElement('date_time_selector', 'extensionduedate',
-                get_string('extensionduedate', 'edusign'), array('optional' => true));
+        $mform->addElement(
+            'date_time_selector', 'extensionduedate',
+            get_string('extensionduedate', 'edusign'), ['optional' => true]
+        );
         $mform->setDefault('extensionduedate', $finaldate);
 
         $mform->addElement('hidden', 'id');

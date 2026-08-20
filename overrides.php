@@ -33,8 +33,8 @@ $mode = optional_param('mode', '', PARAM_ALPHA); // One of 'user' or 'group', de
 $action = optional_param('action', '', PARAM_ALPHA);
 $redirect = $CFG->wwwroot . '/mod/edusign/overrides.php?cmid=' . $cmid . '&amp;mode=group';
 
-list($course, $cm) = get_course_and_cm_from_cmid($cmid, 'edusign');
-$edusign = $DB->get_record('edusign', array('id' => $cm->instance), '*', MUST_EXIST);
+[$course, $cm] = get_course_and_cm_from_cmid($cmid, 'edusign');
+$edusign = $DB->get_record('edusign', ['id' => $cm->instance], '*', MUST_EXIST);
 
 require_login($course, false, $cm);
 
@@ -46,7 +46,7 @@ require_capability('mod/assign:manageoverrides', $context);
 $edusigngroupmode = groups_get_activity_groupmode($cm);
 $accessallgroups = ($edusigngroupmode == NOGROUPS) || has_capability('moodle/site:accessallgroups', $context);
 
-$overridecountgroup = $DB->count_records('edusign_overrides', array('userid' => null, 'edusignid' => $edusign->id));
+$overridecountgroup = $DB->count_records('edusign_overrides', ['userid' => null, 'edusignid' => $edusign->id]);
 
 // Get the course groups that the current user can access.
 $groups = $accessallgroups ? groups_get_all_groups($cm->course) : groups_get_activity_allowed_groups($cm);
@@ -61,7 +61,7 @@ if ($mode != "user" and $mode != "group") {
 }
 $groupmode = ($mode == "group");
 
-$url = new moodle_url('/mod/edusign/overrides.php', array('cmid' => $cm->id, 'mode' => $mode));
+$url = new moodle_url('/mod/edusign/overrides.php', ['cmid' => $cm->id, 'mode' => $mode]);
 
 $PAGE->set_url($url);
 
@@ -80,7 +80,7 @@ $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('overrides', 'edusign'));
 $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($edusign->name, true, array('context' => $context)));
+echo $OUTPUT->heading(format_string($edusign->name, true, ['context' => $context]));
 
 // Delete orphaned group overrides.
 $sql = 'SELECT o.id
@@ -89,7 +89,7 @@ $sql = 'SELECT o.id
          WHERE o.groupid IS NOT NULL
                AND g.id IS NULL
                AND o.edusignid = ?';
-$params = array($edusign->id);
+$params = [$edusign->id];
 $orphaned = $DB->get_records_sql($sql, $params);
 if (!empty($orphaned)) {
     $DB->delete_records_list('edusign_overrides', 'id', array_keys($orphaned));
@@ -103,7 +103,7 @@ if ($groupmode) {
     // To filter the result by the list of groups that the current user has access to.
     if ($groups) {
         $params = ['edusignid' => $edusign->id];
-        list($insql, $inparams) = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
+        [$insql, $inparams] = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
         $params += $inparams;
 
         $sql = "SELECT o.*, g.name
@@ -116,7 +116,7 @@ if ($groupmode) {
     }
 } else {
     $colname = get_string('user');
-    list($sort, $params) = users_order_by_sql('u');
+    [$sort, $params] = users_order_by_sql('u');
     $params['edusignid'] = $edusign->id;
 
     $extrauserfields = \core_user\fields::for_userpic()->get_sql('u', true);
@@ -131,7 +131,7 @@ if ($groupmode) {
 
         $overrides = $DB->get_records_sql($sql, $extrauserfields->params + $params);
     } else if ($groups) {
-        list($insql, $inparams) = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
+        [$insql, $inparams] = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
         $params += $inparams;
 
         $sql = 'SELECT o.* ' . $extrauserfields->selects . '
@@ -148,16 +148,16 @@ if ($groupmode) {
 
 // Initialise table.
 $table = new html_table();
-$table->headspan = array(1, 2, 1);
-$table->colclasses = array('colname', 'colsetting', 'colvalue', 'colaction');
-$table->head = array(
+$table->headspan = [1, 2, 1];
+$table->colclasses = ['colname', 'colsetting', 'colvalue', 'colaction'];
+$table->head = [
         $colname,
         get_string('overrides', 'edusign'),
         get_string('action'),
-);
+];
 
-$userurl = new moodle_url('/user/view.php', array());
-$groupurl = new moodle_url('/group/overview.php', array('id' => $cm->course));
+$userurl = new moodle_url('/user/view.php', []);
+$groupurl = new moodle_url('/group/overview.php', ['id' => $cm->course]);
 
 $overridedeleteurl = new moodle_url('/mod/edusign/overridedelete.php');
 $overrideediturl = new moodle_url('/mod/edusign/overrideedit.php');
@@ -165,8 +165,8 @@ $overrideediturl = new moodle_url('/mod/edusign/overrideedit.php');
 $hasinactive = false; // Whether there are any inactive overrides.
 
 foreach ($overrides as $override) {
-    $fields = array();
-    $values = array();
+    $fields = [];
+    $values = [];
     $active = true;
 
     // Check for inactive overrides.
@@ -206,13 +206,13 @@ foreach ($overrides as $override) {
 
     if ($active) {
         // Edit.
-        $editurlstr = $overrideediturl->out(true, array('id' => $override->id));
+        $editurlstr = $overrideediturl->out(true, ['id' => $override->id]);
         $iconstr = '<a title="' . get_string('edit') . '" href="' . $editurlstr . '">' .
                 $OUTPUT->pix_icon('t/edit', get_string('edit')) . '</a> ';
         // Duplicate.
         $copyurlstr = $overrideediturl->out(
             true,
-            array('id' => $override->id, 'action' => 'duplicate')
+            ['id' => $override->id, 'action' => 'duplicate']
         );
         $iconstr .= '<a title="' . get_string('copy') . '" href="' . $copyurlstr . '">' .
                 $OUTPUT->pix_icon('t/copy', get_string('copy')) . '</a> ';
@@ -220,7 +220,7 @@ foreach ($overrides as $override) {
     // Delete.
     $deleteurlstr = $overridedeleteurl->out(
         true,
-        array('id' => $override->id, 'sesskey' => sesskey())
+        ['id' => $override->id, 'sesskey' => sesskey()]
     );
     $iconstr .= '<a title="' . get_string('delete') . '" href="' . $deleteurlstr . '">' .
             $OUTPUT->pix_icon('t/delete', get_string('delete')) . '</a> ';
@@ -228,7 +228,7 @@ foreach ($overrides as $override) {
     if ($groupmode) {
         $usergroupstr = '<a href="' . $groupurl->out(
             true,
-            array('group' => $override->groupid)
+            ['group' => $override->groupid]
         ) . '" >' . $override->name . '</a>';
 
         // Move up.
@@ -252,7 +252,7 @@ foreach ($overrides as $override) {
         $usergroupstr = html_writer::link(
             $userurl->out(
                 false,
-                array('id' => $override->userid, 'course' => $course->id)
+                ['id' => $override->userid, 'course' => $course->id]
             ),
             fullname($override)
         );
@@ -292,7 +292,7 @@ foreach ($overrides as $override) {
 }
 
 // Output the table and button.
-echo html_writer::start_tag('div', array('id' => 'edusignoverrides'));
+echo html_writer::start_tag('div', ['id' => 'edusignoverrides']);
 if (count($table->data)) {
     echo html_writer::table($table);
 }
@@ -300,8 +300,8 @@ if ($hasinactive) {
     echo $OUTPUT->notification(get_string('inactiveoverridehelp', 'edusign'), 'dimmed_text');
 }
 
-echo html_writer::start_tag('div', array('class' => 'buttons'));
-$options = array();
+echo html_writer::start_tag('div', ['class' => 'buttons']);
+$options = [];
 if ($groupmode) {
     if (empty($groups)) {
         // There are no groups.
@@ -311,21 +311,21 @@ if ($groupmode) {
     echo $OUTPUT->single_button(
         $overrideediturl->out(
             true,
-            array('action' => 'addgroup', 'cmid' => $cm->id)
+            ['action' => 'addgroup', 'cmid' => $cm->id]
         ),
         get_string('addnewgroupoverride', 'edusign'),
         'post',
         $options
     );
 } else {
-    $users = array();
+    $users = [];
     // See if there are any users in the edusign.
     if ($accessallgroups) {
         $users = get_enrolled_users($context, '', 0, 'u.id');
         $nousermessage = get_string('usersnone', 'edusign');
     } else if ($groups) {
         $enrolledjoin = get_enrolled_join($context, 'u.id');
-        list($ingroupsql, $ingroupparams) = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
+        [$ingroupsql, $ingroupparams] = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
         $params = $enrolledjoin->params + $ingroupparams;
         $sql = "SELECT u.id
                   FROM {user} u
@@ -350,7 +350,7 @@ if ($groupmode) {
     echo $OUTPUT->single_button(
         $overrideediturl->out(
             true,
-            array('action' => 'adduser', 'cmid' => $cm->id)
+            ['action' => 'adduser', 'cmid' => $cm->id]
         ),
         get_string('addnewuseroverride', 'edusign'),
         'get',

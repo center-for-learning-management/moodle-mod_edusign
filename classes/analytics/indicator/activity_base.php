@@ -34,14 +34,13 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class activity_base extends \core_analytics\local\indicator\community_of_inquiry_activity {
-
     /**
      * feedback_viewed_events
      *
      * @return string[]
      */
     protected function feedback_viewed_events() {
-        return array('\mod_edusign\event\feedback_viewed');
+        return ['\mod_edusign\event\feedback_viewed'];
     }
 
     /**
@@ -62,5 +61,4 @@ abstract class activity_base extends \core_analytics\local\indicator\community_o
     protected function get_timeclose_field() {
         return 'duedate';
     }
-
 }

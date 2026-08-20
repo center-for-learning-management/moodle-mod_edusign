@@ -32,7 +32,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edusign_feedback_comments extends edusign_feedback_plugin {
-
     /**
      * Get the name of the online comment feedback plugin.
      *
@@ -51,7 +50,7 @@ class edusign_feedback_comments extends edusign_feedback_plugin {
      */
     public function get_feedback_comments($gradeid) {
         global $DB;
-        return $DB->get_record('edusignfeedback_comments', array('grade' => $gradeid));
+        return $DB->get_record('edusignfeedback_comments', ['grade' => $gradeid]);
     }
 
     /**
@@ -71,11 +70,11 @@ class edusign_feedback_comments extends edusign_feedback_plugin {
         }
 
         $pluginname = get_string('pluginname', 'edusignfeedback_comments');
-        $labeloptions = array('for' => 'quickgrade_comments_' . $userid,
-                'class' => 'accesshide');
-        $textareaoptions = array('name' => 'quickgrade_comments_' . $userid,
+        $labeloptions = ['for' => 'quickgrade_comments_' . $userid,
+                'class' => 'accesshide'];
+        $textareaoptions = ['name' => 'quickgrade_comments_' . $userid,
                 'id' => 'quickgrade_comments_' . $userid,
-                'class' => 'quickgrade');
+                'class' => 'quickgrade'];
         return html_writer::tag('label', $pluginname, $labeloptions) .
                 html_writer::tag('textarea', $commenttext, $textareaoptions);
     }
@@ -139,7 +138,7 @@ class edusign_feedback_comments extends edusign_feedback_plugin {
      * @return array An array of field names and descriptions. (name=>description, ...)
      */
     public function get_editor_fields() {
-        return array('comments' => get_string('pluginname', 'edusignfeedback_comments'));
+        return ['comments' => get_string('pluginname', 'edusignfeedback_comments')];
     }
 
     /**
@@ -239,9 +238,11 @@ class edusign_feedback_comments extends edusign_feedback_plugin {
             // Apply the admin default if we don't have a value yet.
             $default = get_config('edusignfeedback_comments', 'inline');
         }
-        $mform->addElement('selectyesno',
-                'edusignfeedback_comments_commentinline',
-                get_string('commentinline', 'edusignfeedback_comments'));
+        $mform->addElement(
+            'selectyesno',
+            'edusignfeedback_comments_commentinline',
+            get_string('commentinline', 'edusignfeedback_comments')
+        );
         $mform->addHelpButton('edusignfeedback_comments_commentinline', 'commentinline', 'edusignfeedback_comments');
         $mform->setDefault('edusignfeedback_comments_commentinline', $default);
         // Disable comment online if comment feedback plugin is disabled.
@@ -351,12 +352,14 @@ class edusign_feedback_comments extends edusign_feedback_plugin {
      * @param bool $showviewlink Set to true to show a link to view the full feedback
      * @return string
      */
-    public function view_summary(stdClass $grade, & $showviewlink) {
+    public function view_summary(stdClass $grade, &$showviewlink) {
         $feedbackcomments = $this->get_feedback_comments($grade->id);
         if ($feedbackcomments) {
-            $text = format_text($feedbackcomments->commenttext,
-                    $feedbackcomments->commentformat,
-                    array('context' => $this->edusignment->get_context()));
+            $text = format_text(
+                $feedbackcomments->commenttext,
+                $feedbackcomments->commentformat,
+                ['context' => $this->edusignment->get_context()]
+            );
             $short = shorten_text($text, 140);
 
             // Show the view all link if the text has been shortened.
@@ -375,9 +378,11 @@ class edusign_feedback_comments extends edusign_feedback_plugin {
     public function view(stdClass $grade) {
         $feedbackcomments = $this->get_feedback_comments($grade->id);
         if ($feedbackcomments) {
-            return format_text($feedbackcomments->commenttext,
-                    $feedbackcomments->commentformat,
-                    array('context' => $this->edusignment->get_context()));
+            return format_text(
+                $feedbackcomments->commenttext,
+                $feedbackcomments->commentformat,
+                ['context' => $this->edusignment->get_context()]
+            );
         }
         return '';
     }
@@ -392,8 +397,10 @@ class edusign_feedback_comments extends edusign_feedback_plugin {
      */
     public function can_upgrade($type, $version) {
 
-        if (($type == 'upload' || $type == 'uploadsingle' ||
-                        $type == 'online' || $type == 'offline') && $version >= 2011112900) {
+        if (
+            ($type == 'upload' || $type == 'uploadsingle' ||
+                        $type == 'online' || $type == 'offline') && $version >= 2011112900
+        ) {
             return true;
         }
         return false;
@@ -407,7 +414,7 @@ class edusign_feedback_comments extends edusign_feedback_plugin {
      * @param string $log - can be appended to by the upgrade
      * @return bool was it a success? (false will trigger a rollback)
      */
-    public function upgrade_settings(context $oldcontext, stdClass $oldedusignment, & $log) {
+    public function upgrade_settings(context $oldcontext, stdClass $oldedusignment, &$log) {
         if ($oldedusignment->edusignmenttype == 'online') {
             $this->set_config('commentinline', $oldedusignment->var1);
             return true;
@@ -425,11 +432,13 @@ class edusign_feedback_comments extends edusign_feedback_plugin {
      * @param string $log Record upgrade messages in the log
      * @return bool true or false - false will trigger a rollback
      */
-    public function upgrade(context $oldcontext,
-            stdClass $oldedusignment,
-            stdClass $oldsubmission,
-            stdClass $grade,
-            & $log) {
+    public function upgrade(
+        context $oldcontext,
+        stdClass $oldedusignment,
+        stdClass $oldsubmission,
+        stdClass $grade,
+        &$log
+    ) {
         global $DB;
 
         $feedbackcomments = new stdClass();
@@ -490,8 +499,10 @@ class edusign_feedback_comments extends edusign_feedback_plugin {
     public function delete_instance() {
         global $DB;
         // Will throw exception on failure.
-        $DB->delete_records('edusignfeedback_comments',
-                array('edusignment' => $this->edusignment->get_instance()->id));
+        $DB->delete_records(
+            'edusignfeedback_comments',
+            ['edusignment' => $this->edusignment->get_instance()->id]
+        );
         return true;
     }
 
@@ -511,10 +522,10 @@ class edusign_feedback_comments extends edusign_feedback_plugin {
      * @return external_description|null
      */
     public function get_external_parameters() {
-        $editorparams = array('text' => new external_value(PARAM_RAW, 'The text for this feedback.'),
-                'format' => new external_value(PARAM_INT, 'The format for this feedback'));
+        $editorparams = ['text' => new external_value(PARAM_RAW, 'The text for this feedback.'),
+                'format' => new external_value(PARAM_INT, 'The format for this feedback')];
         $editorstructure = new external_single_structure($editorparams, 'Editor structure', VALUE_OPTIONAL);
-        return array('edusignfeedbackcomments_editor' => $editorstructure);
+        return ['edusignfeedbackcomments_editor' => $editorstructure];
     }
 
     /**

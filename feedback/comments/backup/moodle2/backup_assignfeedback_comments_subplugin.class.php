@@ -34,7 +34,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_edusignfeedback_comments_subplugin extends backup_subplugin {
-
     /**
      * Returns the subplugin information to attach to submission element.
      *
@@ -45,17 +44,21 @@ class backup_edusignfeedback_comments_subplugin extends backup_subplugin {
         // Create XML elements.
         $subplugin = $this->get_subplugin_element();
         $subpluginwrapper = new backup_nested_element($this->get_recommended_name());
-        $subpluginelement = new backup_nested_element('feedback_comments',
-                null,
-                array('commenttext', 'commentformat', 'grade'));
+        $subpluginelement = new backup_nested_element(
+            'feedback_comments',
+            null,
+            ['commenttext', 'commentformat', 'grade']
+        );
 
         // Connect XML elements into the tree.
         $subplugin->add_child($subpluginwrapper);
         $subpluginwrapper->add_child($subpluginelement);
 
         // Set source to populate the data.
-        $subpluginelement->set_source_table('edusignfeedback_comments',
-                array('grade' => backup::VAR_PARENTID));
+        $subpluginelement->set_source_table(
+            'edusignfeedback_comments',
+            ['grade' => backup::VAR_PARENTID]
+        );
 
         return $subplugin;
     }

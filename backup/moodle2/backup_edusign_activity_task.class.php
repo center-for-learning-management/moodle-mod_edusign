@@ -34,7 +34,6 @@ require_once($CFG->dirroot . '/mod/edusign/backup/moodle2/backup_edusign_stepsli
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_edusign_activity_task extends backup_activity_task {
-
     /**
      * Define (add) particular settings this activity can have
      */
@@ -56,7 +55,7 @@ class backup_edusign_activity_task extends backup_activity_task {
      * @param string $content
      * @return string
      */
-    static public function encode_content_links($content) {
+    public static function encode_content_links($content) {
         global $CFG;
 
         $base = preg_quote($CFG->wwwroot, "/");
@@ -69,6 +68,4 @@ class backup_edusign_activity_task extends backup_activity_task {
 
         return $content;
     }
-
 }
-

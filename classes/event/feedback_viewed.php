@@ -49,14 +49,14 @@ class feedback_viewed extends base {
      * @return feedback_viewed
      */
     public static function create_from_grade(\edusign $edusign, \stdClass $grade) {
-        $data = array(
+        $data = [
                 'objectid' => $grade->id,
                 'relateduserid' => $grade->userid,
                 'context' => $edusign->get_context(),
-                'other' => array(
+                'other' => [
                         'edusignid' => $edusign->get_instance()->id,
-                ),
-        );
+                ],
+        ];
         /** @var feedback_viewed $event */
         $event = self::create($data);
         $event->set_edusign($edusign);
@@ -110,12 +110,12 @@ class feedback_viewed extends base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'edusign_grades', 'restore' => 'grade');
+        return ['db' => 'edusign_grades', 'restore' => 'grade'];
     }
 
     public static function get_other_mapping() {
-        $othermapped = array();
-        $othermapped['edusignid'] = array('db' => 'edusign', 'restore' => 'edusign');
+        $othermapped = [];
+        $othermapped['edusignid'] = ['db' => 'edusign', 'restore' => 'edusign'];
 
         return $othermapped;
     }

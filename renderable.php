@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class edusign_submit_for_grading_page implements renderable {
     /** @var array $notifications is a list of notification messages returned from the plugins */
-    public $notifications = array();
+    public $notifications = [];
     /** @var int $coursemoduleid */
     public $coursemoduleid = 0;
     /** @var moodleform $confirmform */
@@ -51,7 +51,6 @@ class edusign_submit_for_grading_page implements renderable {
         $this->coursemoduleid = $coursemoduleid;
         $this->confirmform = $confirmform;
     }
-
 }
 
 /**
@@ -87,7 +86,6 @@ class edusign_gradingmessage implements renderable {
         $this->gradingerror = $gradingerror;
         $this->page = $page;
     }
-
 }
 
 /**
@@ -117,7 +115,6 @@ class edusign_form implements renderable {
         $this->form = $form;
         $this->jsinitfunction = $jsinitfunction;
     }
-
 }
 
 /**
@@ -154,13 +151,15 @@ class edusign_user_summary implements renderable {
      * @param array $extrauserfields
      * @param bool $suspendeduser
      */
-    public function __construct(stdClass $user,
-            $courseid,
-            $viewfullnames,
-            $blindmarking,
-            $uniqueidforuser,
-            $extrauserfields,
-            $suspendeduser = false) {
+    public function __construct(
+        stdClass $user,
+        $courseid,
+        $viewfullnames,
+        $blindmarking,
+        $uniqueidforuser,
+        $extrauserfields,
+        $suspendeduser = false
+    ) {
         $this->user = $user;
         $this->courseid = $courseid;
         $this->viewfullnames = $viewfullnames;
@@ -195,7 +194,7 @@ class edusign_feedback_plugin_feedback implements renderable {
     /** @var string returnaction The action to take you back to the current page */
     public $returnaction = '';
     /** @var array returnparams The params to take you back to the current page */
-    public $returnparams = array();
+    public $returnparams = [];
 
     /**
      * Feedback for a single plugin
@@ -207,12 +206,14 @@ class edusign_feedback_plugin_feedback implements renderable {
      * @param string $returnaction The action required to return to this page
      * @param array $returnparams The params required to return to this page
      */
-    public function __construct(edusign_feedback_plugin $plugin,
-            stdClass $grade,
-            $view,
-            $coursemoduleid,
-            $returnaction,
-            $returnparams) {
+    public function __construct(
+        edusign_feedback_plugin $plugin,
+        stdClass $grade,
+        $view,
+        $coursemoduleid,
+        $returnaction,
+        $returnparams
+    ) {
         $this->plugin = $plugin;
         $this->grade = $grade;
         $this->view = $view;
@@ -220,7 +221,6 @@ class edusign_feedback_plugin_feedback implements renderable {
         $this->returnaction = $returnaction;
         $this->returnparams = $returnparams;
     }
-
 }
 
 /**
@@ -247,7 +247,7 @@ class edusign_submission_plugin_submission implements renderable {
     /** @var string returnaction The action to take you back to the current page */
     public $returnaction = '';
     /** @var array returnparams The params to take you back to the current page */
-    public $returnparams = array();
+    public $returnparams = [];
 
     /**
      * Constructor
@@ -259,12 +259,14 @@ class edusign_submission_plugin_submission implements renderable {
      * @param string $returnaction The action to return to the current page
      * @param array $returnparams The params to return to the current page
      */
-    public function __construct(edusign_submission_plugin $plugin,
-            stdClass $submission,
-            $view,
-            $coursemoduleid,
-            $returnaction,
-            $returnparams) {
+    public function __construct(
+        edusign_submission_plugin $plugin,
+        stdClass $submission,
+        $view,
+        $coursemoduleid,
+        $returnaction,
+        $returnparams
+    ) {
         $this->plugin = $plugin;
         $this->submission = $submission;
         $this->view = $view;
@@ -282,7 +284,6 @@ class edusign_submission_plugin_submission implements renderable {
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edusign_feedback_status implements renderable {
-
     /** @var stding $gradefordisplay the student grade rendered into a format suitable for display */
     public $gradefordisplay = '';
     /** @var mixed the graded date (may be null) */
@@ -290,7 +291,7 @@ class edusign_feedback_status implements renderable {
     /** @var mixed the grader (may be null) */
     public $grader = null;
     /** @var array feedbackplugins - array of feedback plugins */
-    public $feedbackplugins = array();
+    public $feedbackplugins = [];
     /** @var stdClass edusign_grade record */
     public $grade = null;
     /** @var int coursemoduleid */
@@ -298,7 +299,7 @@ class edusign_feedback_status implements renderable {
     /** @var string returnaction */
     public $returnaction = '';
     /** @var array returnparams */
-    public $returnparams = array();
+    public $returnparams = [];
     /** @var bool canviewfullnames */
     public $canviewfullnames = false;
 
@@ -315,15 +316,17 @@ class edusign_feedback_status implements renderable {
      * @param array $returnparams The list of params required to return to this page
      * @param bool $canviewfullnames
      */
-    public function __construct($gradefordisplay,
-            $gradeddate,
-            $grader,
-            $feedbackplugins,
-            $grade,
-            $coursemoduleid,
-            $returnaction,
-            $returnparams,
-            $canviewfullnames) {
+    public function __construct(
+        $gradefordisplay,
+        $gradeddate,
+        $grader,
+        $feedbackplugins,
+        $grade,
+        $coursemoduleid,
+        $returnaction,
+        $returnparams,
+        $canviewfullnames
+    ) {
         $this->gradefordisplay = $gradefordisplay;
         $this->gradeddate = $gradeddate;
         $this->grader = $grader;
@@ -355,14 +358,14 @@ class edusign_submission_status implements renderable {
     public $alwaysshowdescription = false;
     /** @var stdClass the submission info (may be null) */
     public $submission = null;
-    /** @var boolean teamsubmissionenabled - true or false */
+    /** @var bool teamsubmissionenabled - true or false */
     public $teamsubmissionenabled = false;
     /** @var stdClass teamsubmission the team submission info (may be null) */
     public $teamsubmission = null;
     /** @var stdClass submissiongroup the submission group info (may be null) */
     public $submissiongroup = null;
     /** @var array submissiongroupmemberswhoneedtosubmit list of users who still need to submit */
-    public $submissiongroupmemberswhoneedtosubmit = array();
+    public $submissiongroupmemberswhoneedtosubmit = [];
     /** @var bool submissionsenabled */
     public $submissionsenabled = false;
     /** @var bool locked */
@@ -374,11 +377,11 @@ class edusign_submission_status implements renderable {
     /** @var int cutoffdate */
     public $cutoffdate = 0;
     /** @var array submissionplugins - the list of submission plugins */
-    public $submissionplugins = array();
+    public $submissionplugins = [];
     /** @var string returnaction */
     public $returnaction = '';
     /** @var string returnparams */
-    public $returnparams = array();
+    public $returnparams = [];
     /** @var int courseid */
     public $courseid = 0;
     /** @var int coursemoduleid */
@@ -408,7 +411,7 @@ class edusign_submission_status implements renderable {
     /** @var bool preventsubmissionnotingroup */
     public $preventsubmissionnotingroup = 0;
     /** @var array usergroups */
-    public $usergroups = array();
+    public $usergroups = [];
 
     /**
      * Constructor
@@ -444,36 +447,38 @@ class edusign_submission_status implements renderable {
      * @param bool $preventsubmissionnotingroup - Prevent submission if user is not in a group
      * @param array $usergroups - Array containing all groups the user is edusigned to
      */
-    public function __construct($allowsubmissionsfromdate,
-            $alwaysshowdescription,
-            $submission,
-            $teamsubmissionenabled,
-            $teamsubmission,
-            $submissiongroup,
-            $submissiongroupmemberswhoneedtosubmit,
-            $submissionsenabled,
-            $locked,
-            $graded,
-            $duedate,
-            $cutoffdate,
-            $submissionplugins,
-            $returnaction,
-            $returnparams,
-            $coursemoduleid,
-            $courseid,
-            $view,
-            $canedit,
-            $cansubmit,
-            $canviewfullnames,
-            $extensionduedate,
-            $context,
-            $blindmarking,
-            $gradingcontrollerpreview,
-            $attemptreopenmethod,
-            $maxattempts,
-            $gradingstatus,
-            $preventsubmissionnotingroup,
-            $usergroups) {
+    public function __construct(
+        $allowsubmissionsfromdate,
+        $alwaysshowdescription,
+        $submission,
+        $teamsubmissionenabled,
+        $teamsubmission,
+        $submissiongroup,
+        $submissiongroupmemberswhoneedtosubmit,
+        $submissionsenabled,
+        $locked,
+        $graded,
+        $duedate,
+        $cutoffdate,
+        $submissionplugins,
+        $returnaction,
+        $returnparams,
+        $coursemoduleid,
+        $courseid,
+        $view,
+        $canedit,
+        $cansubmit,
+        $canviewfullnames,
+        $extensionduedate,
+        $context,
+        $blindmarking,
+        $gradingcontrollerpreview,
+        $attemptreopenmethod,
+        $maxattempts,
+        $gradingstatus,
+        $preventsubmissionnotingroup,
+        $usergroups
+    ) {
         $this->allowsubmissionsfromdate = $allowsubmissionsfromdate;
         $this->alwaysshowdescription = $alwaysshowdescription;
         $this->submission = $submission;
@@ -526,21 +531,20 @@ class edusign_submission_status_compact extends edusign_submission_status implem
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edusign_attempt_history implements renderable {
-
     /** @var array submissions - The list of previous attempts */
-    public $submissions = array();
+    public $submissions = [];
     /** @var array grades - The grades for the previous attempts */
-    public $grades = array();
+    public $grades = [];
     /** @var array submissionplugins - The list of submission plugins to render the previous attempts */
-    public $submissionplugins = array();
+    public $submissionplugins = [];
     /** @var array feedbackplugins - The list of feedback plugins to render the previous attempts */
-    public $feedbackplugins = array();
+    public $feedbackplugins = [];
     /** @var int coursemoduleid - The cmid for the edusignment */
     public $coursemoduleid = 0;
     /** @var string returnaction - The action for the next page. */
     public $returnaction = '';
     /** @var string returnparams - The params for the next page. */
-    public $returnparams = array();
+    public $returnparams = [];
     /** @var bool cangrade - Does this user have grade capability? */
     public $cangrade = false;
     /** @var string useridlistid - Id of the useridlist stored in cache, this plus rownum determines the userid */
@@ -562,16 +566,18 @@ class edusign_attempt_history implements renderable {
      * @param int $useridlistid
      * @param int $rownum
      */
-    public function __construct($submissions,
-            $grades,
-            $submissionplugins,
-            $feedbackplugins,
-            $coursemoduleid,
-            $returnaction,
-            $returnparams,
-            $cangrade,
-            $useridlistid,
-            $rownum) {
+    public function __construct(
+        $submissions,
+        $grades,
+        $submissionplugins,
+        $feedbackplugins,
+        $coursemoduleid,
+        $returnaction,
+        $returnparams,
+        $cangrade,
+        $useridlistid,
+        $rownum
+    ) {
         $this->submissions = $submissions;
         $this->grades = $grades;
         $this->submissionplugins = $submissionplugins;
@@ -593,11 +599,10 @@ class edusign_attempt_history implements renderable {
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edusign_attempt_history_chooser implements renderable, templatable {
-
     /** @var array submissions - The list of previous attempts */
-    public $submissions = array();
+    public $submissions = [];
     /** @var array grades - The grades for the previous attempts */
-    public $grades = array();
+    public $grades = [];
     /** @var int coursemoduleid - The cmid for the edusignment */
     public $coursemoduleid = 0;
     /** @var int userid - The current userid */
@@ -611,10 +616,12 @@ class edusign_attempt_history_chooser implements renderable, templatable {
      * @param int $coursemoduleid
      * @param int $userid
      */
-    public function __construct($submissions,
-            $grades,
-            $coursemoduleid,
-            $userid) {
+    public function __construct(
+        $submissions,
+        $grades,
+        $coursemoduleid,
+        $userid
+    ) {
         $this->submissions = $submissions;
         $this->grades = $grades;
         $this->coursemoduleid = $coursemoduleid;
@@ -654,11 +661,10 @@ class edusign_attempt_history_chooser implements renderable, templatable {
                 $submissionsummary = get_string('nosubmission', 'edusign');
             }
 
-            $attemptsummaryparams = array('attemptnumber' => $submission->attemptnumber + 1,
-                    'submissionsummary' => $submissionsummary);
+            $attemptsummaryparams = ['attemptnumber' => $submission->attemptnumber + 1,
+                    'submissionsummary' => $submissionsummary];
             $submission->attemptsummary = get_string('attemptheading', 'edusign', $attemptsummaryparams);
             $submission->statussummary = get_string('submissionstatus_' . $submission->status, 'edusign');
-
         }
 
         return $export;
@@ -698,13 +704,15 @@ class edusign_header implements renderable {
      * @param string $subpage - an optional sub page in the navigation
      * @param string $preface - an optional preface to show before the heading
      */
-    public function __construct(stdClass $edusign,
-            $context,
-            $showintro,
-            $coursemoduleid,
-            $subpage = '',
-            $preface = '',
-            $postfix = '') {
+    public function __construct(
+        stdClass $edusign,
+        $context,
+        $showintro,
+        $coursemoduleid,
+        $subpage = '',
+        $preface = '',
+        $postfix = ''
+    ) {
         $this->edusign = $edusign;
         $this->context = $context;
         $this->showintro = $showintro;
@@ -762,11 +770,11 @@ class edusign_grading_summary implements renderable {
     public $cutoffdate = 0;
     /** @var int coursemoduleid - The edusignment course module id */
     public $coursemoduleid = 0;
-    /** @var boolean teamsubmission - Are team submissions enabled for this edusignment */
+    /** @var bool teamsubmission - Are team submissions enabled for this edusignment */
     public $teamsubmission = false;
-    /** @var boolean warnofungroupedusers - Do we need to warn people that there are users without groups */
+    /** @var bool warnofungroupedusers - Do we need to warn people that there are users without groups */
     public $warnofungroupedusers = false;
-    /** @var boolean cangrade - Can the current user grade students? */
+    /** @var bool cangrade - Can the current user grade students? */
     public $cangrade = false;
 
     /**
@@ -784,18 +792,20 @@ class edusign_grading_summary implements renderable {
      * @param bool $teamsubmission
      * @param bool $cangrade
      */
-    public function __construct($participantcount,
-            $submissiondraftsenabled,
-            $submissiondraftscount,
-            $submissionsenabled,
-            $submissionssubmittedcount,
-            $cutoffdate,
-            $duedate,
-            $coursemoduleid,
-            $submissionsneedgradingcount,
-            $teamsubmission,
-            $warnofungroupedusers,
-            $cangrade = true) {
+    public function __construct(
+        $participantcount,
+        $submissiondraftsenabled,
+        $submissiondraftscount,
+        $submissionsenabled,
+        $submissionssubmittedcount,
+        $cutoffdate,
+        $duedate,
+        $coursemoduleid,
+        $submissionsneedgradingcount,
+        $teamsubmission,
+        $warnofungroupedusers,
+        $cangrade = true
+    ) {
         $this->participantcount = $participantcount;
         $this->submissiondraftsenabled = $submissiondraftsenabled;
         $this->submissiondraftscount = $submissiondraftscount;
@@ -820,8 +830,8 @@ class edusign_grading_summary implements renderable {
  */
 class edusign_course_index_summary implements renderable {
     /** @var array edusignments - A list of course module info and submission counts or statuses */
-    public $edusignments = array();
-    /** @var boolean usesections - Does this course format support sections? */
+    public $edusignments = [];
+    /** @var bool usesections - Does this course format support sections? */
     public $usesections = false;
     /** @var string courseformat - The current course format name */
     public $courseformatname = '';
@@ -849,14 +859,13 @@ class edusign_course_index_summary implements renderable {
      * @param string $gradeinfo - The current users grade if they have been graded and it is not hidden.
      */
     public function add_edusign_info($cmid, $cmname, $sectionname, $timedue, $submissioninfo, $gradeinfo) {
-        $this->edusignments[] = array('cmid' => $cmid,
+        $this->edusignments[] = ['cmid' => $cmid,
                 'cmname' => $cmname,
                 'sectionname' => $sectionname,
                 'timedue' => $timedue,
                 'submissioninfo' => $submissioninfo,
-                'gradeinfo' => $gradeinfo);
+                'gradeinfo' => $gradeinfo];
     }
-
 }
 
 /**
@@ -889,35 +898,40 @@ class edusign_files implements renderable {
     public function __construct(context $context, $sid, $filearea, $component) {
         global $CFG;
         $this->context = $context;
-        list($context, $course, $cm) = get_context_info_array($context->id);
+        [$context, $course, $cm] = get_context_info_array($context->id);
         $this->cm = $cm;
         $this->course = $course;
         $fs = get_file_storage();
         $this->dir = $fs->get_area_tree($this->context->id, $component, $filearea, $sid);
 
-        $files = $fs->get_area_files($this->context->id,
-                $component,
-                $filearea,
-                $sid,
-                'timemodified',
-                false);
+        $files = $fs->get_area_files(
+            $this->context->id,
+            $component,
+            $filearea,
+            $sid,
+            'timemodified',
+            false
+        );
 
         if (!empty($CFG->enableportfolios)) {
             require_once($CFG->libdir . '/portfoliolib.php');
-            if (count($files) >= 1 && !empty($sid) &&
-                    has_capability('mod/assign:exportownsubmission', $this->context)) {
+            if (
+                count($files) >= 1 && !empty($sid) &&
+                    has_capability('mod/assign:exportownsubmission', $this->context)
+            ) {
                 $button = new portfolio_add_button();
-                $callbackparams = array('cmid' => $this->cm->id,
+                $callbackparams = ['cmid' => $this->cm->id,
                         'sid' => $sid,
                         'area' => $filearea,
-                        'component' => $component);
-                $button->set_callback_options('edusign_portfolio_caller',
-                        $callbackparams,
-                        'mod_edusign');
+                        'component' => $component];
+                $button->set_callback_options(
+                    'edusign_portfolio_caller',
+                    $callbackparams,
+                    'mod_edusign'
+                );
                 $button->reset_formats();
                 $this->portfolioform = $button->to_html(PORTFOLIO_ADD_TEXT_LINK);
             }
-
         }
 
         $this->preprocess($this->dir, $filearea, $component);
@@ -943,10 +957,12 @@ class edusign_files implements renderable {
                 require_once($CFG->libdir . '/portfoliolib.php');
                 $button = new portfolio_add_button();
                 if (has_capability('mod/assign:exportownsubmission', $this->context)) {
-                    $portfolioparams = array('cmid' => $this->cm->id, 'fileid' => $file->get_id());
-                    $button->set_callback_options('edusign_portfolio_caller',
-                            $portfolioparams,
-                            'mod_edusign');
+                    $portfolioparams = ['cmid' => $this->cm->id, 'fileid' => $file->get_id()];
+                    $button->set_callback_options(
+                        'edusign_portfolio_caller',
+                        $portfolioparams,
+                        'mod_edusign'
+                    );
                     $button->set_format_by_file($file);
                     $file->portfoliobutton = $button->to_html(PORTFOLIO_ADD_ICON_LINK);
                 }

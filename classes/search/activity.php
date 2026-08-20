@@ -36,7 +36,6 @@ require_once($CFG->dirroot . '/mod/edusign/locallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class activity extends \core_search\base_activity {
-
     /**
      * Returns true if this area uses file indexing.
      *
@@ -53,7 +52,7 @@ class activity extends \core_search\base_activity {
      * @return array
      */
     public function get_search_fileareas() {
-        $fileareas = array('intro', EDUSIGN_INTROATTACHMENT_FILEAREA); // Fileareas.
+        $fileareas = ['intro', EDUSIGN_INTROATTACHMENT_FILEAREA]; // Fileareas.
 
         return $fileareas;
     }

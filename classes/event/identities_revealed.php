@@ -51,10 +51,10 @@ class identities_revealed extends base {
      *
      */
     public static function create_from_edusign(\edusign $edusign) {
-        $data = array(
+        $data = [
                 'context' => $edusign->get_context(),
-                'objectid' => $edusign->get_instance()->id
-        );
+                'objectid' => $edusign->get_instance()->id,
+        ];
         self::$preventcreatecall = false;
         /** @var identities_revealed $event */
         $event = self::create($data);
@@ -108,6 +108,6 @@ class identities_revealed extends base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'edusign', 'restore' => 'edusign');
+        return ['db' => 'edusign', 'restore' => 'edusign'];
     }
 }

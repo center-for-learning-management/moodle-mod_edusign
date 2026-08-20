@@ -39,8 +39,7 @@ use stdClass;
  * @copyright  2016 Damyon Wiese
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class grading_app implements templatable, renderable {
-
+class grading_app implements renderable, templatable {
     /**
      * @var $userid - The initial user id.
      */
@@ -90,7 +89,7 @@ class grading_app implements templatable, renderable {
         $export->groupid = $this->groupid;
         $export->name = $this->edusignment->get_context()->get_context_name();
         $export->courseid = $this->edusignment->get_course()->id;
-        $export->participants = array();
+        $export->participants = [];
         $num = 1;
         foreach ($this->participants as $idx => $record) {
             $user = new stdClass();
@@ -163,5 +162,4 @@ class grading_app implements templatable, renderable {
 
         return $export;
     }
-
 }

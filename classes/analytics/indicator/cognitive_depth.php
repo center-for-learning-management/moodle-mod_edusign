@@ -34,7 +34,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cognitive_depth extends activity_base {
-
     /**
      * Returns the name.
      *
@@ -60,7 +59,7 @@ class cognitive_depth extends activity_base {
      * @return string[]
      */
     protected function feedback_submitted_events() {
-        return array('\mod_edusign\event\assessable_submitted');
+        return ['\mod_edusign\event\assessable_submitted'];
     }
 
     /**
@@ -76,5 +75,4 @@ class cognitive_depth extends activity_base {
         // No level 4.
         return false;
     }
-
 }

@@ -33,7 +33,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_edusignsubmission_signing_subplugin extends restore_subplugin {
-
     /**
      * Returns array the paths to be handled by the subplugin at edusignment level
      *
@@ -41,7 +40,7 @@ class restore_edusignsubmission_signing_subplugin extends restore_subplugin {
      */
     protected function define_submission_subplugin_structure() {
 
-        $paths = array();
+        $paths = [];
 
         $elename = $this->get_namefor('submission');
 
@@ -71,5 +70,4 @@ class restore_edusignsubmission_signing_subplugin extends restore_subplugin {
 
         $this->add_related_files('edusignsubmission_signing', 'submissions_signing', 'submission', null, $oldsubmissionid);
     }
-
 }

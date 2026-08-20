@@ -38,7 +38,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_edusignfeedback_comments_subplugin extends restore_subplugin {
-
     /**
      * Returns the paths to be handled by the subplugin at workshop level
      *
@@ -46,7 +45,7 @@ class restore_edusignfeedback_comments_subplugin extends restore_subplugin {
      */
     protected function define_grade_subplugin_structure() {
 
-        $paths = array();
+        $paths = [];
 
         $elename = $this->get_namefor('grade');
         // We used get_recommended_name() so this works.

@@ -59,14 +59,14 @@ class marker_updated extends base {
      *
      */
     public static function create_from_marker(\edusign $edusign, \stdClass $user, \stdClass $marker) {
-        $data = array(
+        $data = [
                 'context' => $edusign->get_context(),
                 'objectid' => $edusign->get_instance()->id,
                 'relateduserid' => $user->id,
-                'other' => array(
+                'other' => [
                         'markerid' => $marker->id,
-                ),
-        );
+                ],
+        ];
         self::$preventcreatecall = false;
         /** @var marker_updated $event */
         $event = self::create($data);
@@ -129,12 +129,12 @@ class marker_updated extends base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'edusign', 'restore' => 'edusign');
+        return ['db' => 'edusign', 'restore' => 'edusign'];
     }
 
     public static function get_other_mapping() {
-        $othermapped = array();
-        $othermapped['markerid'] = array('db' => 'user', 'restore' => 'user');
+        $othermapped = [];
+        $othermapped['markerid'] = ['db' => 'user', 'restore' => 'user'];
 
         return $othermapped;
     }

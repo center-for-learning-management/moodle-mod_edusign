@@ -35,7 +35,6 @@ require_once($CFG->dirroot . '/mod/edusign/locallib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class group_observers {
-
     /**
      * Flag whether a course reset is in progress or not.
      *

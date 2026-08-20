@@ -34,7 +34,6 @@ require_once($CFG->dirroot . '/mod/edusign/mod_form.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edusign_override_form extends moodleform {
-
     /** @var object course module object. */
     protected $cm;
 
@@ -77,7 +76,6 @@ class edusign_override_form extends moodleform {
         $this->sortorder = empty($override->sortorder) ? null : $override->sortorder;
 
         parent::__construct($submiturl, null, 'post');
-
     }
 
     /**
@@ -98,10 +96,12 @@ class edusign_override_form extends moodleform {
             // Group override.
             if ($this->groupid) {
                 // There is already a groupid, so freeze the selector.
-                $groupchoices = array();
+                $groupchoices = [];
                 $groupchoices[$this->groupid] = groups_get_group_name($this->groupid);
-                $mform->addElement('select', 'groupid',
-                        get_string('overridegroup', 'edusign'), $groupchoices);
+                $mform->addElement(
+                    'select', 'groupid',
+                    get_string('overridegroup', 'edusign'), $groupchoices
+                );
                 $mform->freeze('groupid');
                 // Add a sortorder element.
                 $mform->addElement('hidden', 'sortorder', $this->sortorder);
@@ -113,11 +113,11 @@ class edusign_override_form extends moodleform {
                 $groups = $accessallgroups ? groups_get_all_groups($cm->course) : groups_get_activity_allowed_groups($cm);
                 if (empty($groups)) {
                     // Generate an error.
-                    $link = new moodle_url('/mod/edusign/overrides.php', array('cmid' => $cm->id));
+                    $link = new moodle_url('/mod/edusign/overrides.php', ['cmid' => $cm->id]);
                     print_error('groupsnone', 'edusign', $link);
                 }
 
-                $groupchoices = array();
+                $groupchoices = [];
                 foreach ($groups as $group) {
                     $groupchoices[$group->id] = $group->name;
                 }
@@ -127,33 +127,39 @@ class edusign_override_form extends moodleform {
                     $groupchoices[0] = get_string('none');
                 }
 
-                $mform->addElement('select', 'groupid',
-                        get_string('overridegroup', 'edusign'), $groupchoices);
+                $mform->addElement(
+                    'select', 'groupid',
+                    get_string('overridegroup', 'edusign'), $groupchoices
+                );
                 $mform->addRule('groupid', get_string('required'), 'required', null, 'client');
             }
         } else {
             // User override.
             if ($this->userid) {
                 // There is already a userid, so freeze the selector.
-                $user = $DB->get_record('user', array('id' => $this->userid));
-                $userchoices = array();
+                $user = $DB->get_record('user', ['id' => $this->userid]);
+                $userchoices = [];
                 $userchoices[$this->userid] = fullname($user);
-                $mform->addElement('select', 'userid',
-                        get_string('overrideuser', 'edusign'), $userchoices);
+                $mform->addElement(
+                    'select', 'userid',
+                    get_string('overrideuser', 'edusign'), $userchoices
+                );
                 $mform->freeze('userid');
             } else {
                 // Prepare the list of users.
                 $users = [];
-                list($sort) = users_order_by_sql('u');
+                [$sort] = users_order_by_sql('u');
 
                 // Get the list of appropriate users, depending on whether and how groups are used.
                 if ($accessallgroups) {
-                    $users = get_enrolled_users($this->context, '', 0,
-                            'u.id, u.email, ' . \core_user\fields::get_sql_fullname('u'), $sort);
+                    $users = get_enrolled_users(
+                        $this->context, '', 0,
+                        'u.id, u.email, ' . \core_user\fields::get_sql_fullname('u'), $sort
+                    );
                 } else if ($groups = groups_get_activity_allowed_groups($cm)) {
                     $enrolledjoin = get_enrolled_join($this->context, 'u.id');
                     $userfields = 'u.id, u.email, ' . \core_user\fields::get_sql_fullname('u');
-                    list($ingroupsql, $ingroupparams) = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
+                    [$ingroupsql, $ingroupparams] = $DB->get_in_or_equal(array_keys($groups), SQL_PARAMS_NAMED);
                     $params = $enrolledjoin->params + $ingroupparams;
                     $sql = "SELECT $userfields
                               FROM {user} u
@@ -171,15 +177,17 @@ class edusign_override_form extends moodleform {
 
                 if (empty($users)) {
                     // Generate an error.
-                    $link = new moodle_url('/mod/edusign/overrides.php', array('cmid' => $cm->id));
+                    $link = new moodle_url('/mod/edusign/overrides.php', ['cmid' => $cm->id]);
                     print_error('usersnone', 'edusign', $link);
                 }
 
-                $userchoices = array();
+                $userchoices = [];
                 $canviewemail = in_array('email', \core_user\fields::get_identity_fields($this->context, false));
                 foreach ($users as $id => $user) {
-                    if (empty($invalidusers[$id]) || (!empty($override) &&
-                                    $id == $override->userid)) {
+                    if (
+                        empty($invalidusers[$id]) || (!empty($override) &&
+                                    $id == $override->userid)
+                    ) {
                         if ($canviewemail) {
                             $userchoices[$id] = fullname($user) . ', ' . $user->email;
                         } else {
@@ -192,18 +200,20 @@ class edusign_override_form extends moodleform {
                 if (count($userchoices) == 0) {
                     $userchoices[0] = get_string('none');
                 }
-                $mform->addElement('searchableselector', 'userid',
-                        get_string('overrideuser', 'edusign'), $userchoices);
+                $mform->addElement(
+                    'searchableselector', 'userid',
+                    get_string('overrideuser', 'edusign'), $userchoices
+                );
                 $mform->addRule('userid', get_string('required'), 'required', null, 'client');
             }
         }
 
-        $users = $DB->get_fieldset_select('groups_members', 'userid', 'groupid = ?', array($this->groupid));
+        $users = $DB->get_fieldset_select('groups_members', 'userid', 'groupid = ?', [$this->groupid]);
         array_push($users, $this->userid);
         $extensionmax = 0;
         foreach ($users as $value) {
-            $extension = $DB->get_record('edusign_user_flags', array('edusignment' => $this->edusign->get_instance()->id,
-                    'userid' => $value));
+            $extension = $DB->get_record('edusign_user_flags', ['edusignment' => $this->edusign->get_instance()->id,
+                    'userid' => $value]);
             if ($extension) {
                 if ($extensionmax < $extension->extensionduedate) {
                     $extensionmax = $extension->extensionduedate;
@@ -216,35 +226,44 @@ class edusign_override_form extends moodleform {
         }
 
         // Open and close dates.
-        $mform->addElement('date_time_selector', 'allowsubmissionsfromdate',
-                get_string('allowsubmissionsfromdate', 'edusign'), array('optional' => true));
+        $mform->addElement(
+            'date_time_selector', 'allowsubmissionsfromdate',
+            get_string('allowsubmissionsfromdate', 'edusign'), ['optional' => true]
+        );
         $mform->setDefault('allowsubmissionsfromdate', $this->edusign->get_instance()->allowsubmissionsfromdate);
 
-        $mform->addElement('date_time_selector', 'duedate', get_string('duedate', 'edusign'), array('optional' => true));
+        $mform->addElement('date_time_selector', 'duedate', get_string('duedate', 'edusign'), ['optional' => true]);
         $mform->setDefault('duedate', $this->edusign->get_instance()->duedate);
 
-        $mform->addElement('date_time_selector', 'cutoffdate', get_string('cutoffdate', 'edusign'), array('optional' => true));
+        $mform->addElement('date_time_selector', 'cutoffdate', get_string('cutoffdate', 'edusign'), ['optional' => true]);
         $mform->setDefault('cutoffdate', $this->edusign->get_instance()->cutoffdate);
 
         if (isset($this->edusign->get_instance()->extensionduedate)) {
-            $mform->addElement('static', 'extensionduedate', get_string('extensionduedate', 'edusign'),
-                    userdate($this->edusign->get_instance()->extensionduedate));
+            $mform->addElement(
+                'static', 'extensionduedate', get_string('extensionduedate', 'edusign'),
+                userdate($this->edusign->get_instance()->extensionduedate)
+            );
         }
 
         // Submit buttons.
-        $mform->addElement('submit', 'resetbutton',
-                get_string('reverttodefaults', 'edusign'));
+        $mform->addElement(
+            'submit', 'resetbutton',
+            get_string('reverttodefaults', 'edusign')
+        );
 
-        $buttonarray = array();
-        $buttonarray[] = $mform->createElement('submit', 'submitbutton',
-                get_string('save', 'edusign'));
-        $buttonarray[] = $mform->createElement('submit', 'againbutton',
-                get_string('saveoverrideandstay', 'edusign'));
+        $buttonarray = [];
+        $buttonarray[] = $mform->createElement(
+            'submit', 'submitbutton',
+            get_string('save', 'edusign')
+        );
+        $buttonarray[] = $mform->createElement(
+            'submit', 'againbutton',
+            get_string('saveoverrideandstay', 'edusign')
+        );
         $buttonarray[] = $mform->createElement('cancel');
 
-        $mform->addGroup($buttonarray, 'buttonbar', '', array(' '), false);
+        $mform->addGroup($buttonarray, 'buttonbar', '', [' '], false);
         $mform->closeHeaderBefore('buttonbar');
-
     }
 
     /**
@@ -305,7 +324,7 @@ class edusign_override_form extends moodleform {
 
         // Ensure that at least one edusign setting was changed.
         $changed = false;
-        $keys = array('duedate', 'cutoffdate', 'allowsubmissionsfromdate');
+        $keys = ['duedate', 'cutoffdate', 'allowsubmissionsfromdate'];
         foreach ($keys as $key) {
             if ($data[$key] != $edusign->get_instance()->{$key}) {
                 $changed = true;

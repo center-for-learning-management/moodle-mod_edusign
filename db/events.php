@@ -25,18 +25,18 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$observers = array(
+$observers = [
 
-        array(
+        [
                 'eventname' => '\core\event\course_reset_started',
                 'callback' => '\mod_edusign\group_observers::course_reset_started',
-        ),
-        array(
+        ],
+        [
                 'eventname' => '\core\event\course_reset_ended',
                 'callback' => '\mod_edusign\group_observers::course_reset_ended',
-        ),
-        array(
+        ],
+        [
                 'eventname' => '\core\event\group_deleted',
-                'callback' => '\mod_edusign\group_observers::group_deleted'
-        ),
-);
+                'callback' => '\mod_edusign\group_observers::group_deleted',
+        ],
+];

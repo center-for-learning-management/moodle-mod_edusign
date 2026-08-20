@@ -27,9 +27,9 @@ require_once($CFG->dirroot . '/mod/edusign/locallib.php');
 // For this type of page this is the course id.
 $id = required_param('id', PARAM_INT);
 
-$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
 require_login($course);
-$PAGE->set_url('/mod/edusign/index.php', array('id' => $id));
+$PAGE->set_url('/mod/edusign/index.php', ['id' => $id]);
 $PAGE->set_pagelayout('incourse');
 
 \mod_edusign\event\course_module_instance_list_viewed::create_from_course($course)->trigger();

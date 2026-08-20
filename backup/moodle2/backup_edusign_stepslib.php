@@ -34,7 +34,6 @@ require_once($CFG->dirroot . '/mod/edusign/locallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_edusign_activity_structure_step extends backup_activity_structure_step {
-
     /**
      * Annotate files from plugin configuration
      *
@@ -66,8 +65,9 @@ class backup_edusign_activity_structure_step extends backup_activity_structure_s
         $groupinfo = $this->get_setting_value('groups');
 
         // Define each element separated.
-        $edusign = new backup_nested_element('edusign', array('id'),
-                array('name',
+        $edusign = new backup_nested_element(
+            'edusign', ['id'],
+            ['name',
                         'intro',
                         'introformat',
                         'alwaysshowdescription',
@@ -91,51 +91,60 @@ class backup_edusign_activity_structure_step extends backup_activity_structure_s
                         'maxattempts',
                         'markingworkflow',
                         'markingallocation',
-                        'preventsubmissionnotingroup'));
+            'preventsubmissionnotingroup']
+        );
 
         $userflags = new backup_nested_element('userflags');
 
-        $userflag = new backup_nested_element('userflag', array('id'),
-                array('userid',
+        $userflag = new backup_nested_element(
+            'userflag', ['id'],
+            ['userid',
                         'edusignment',
                         'mailed',
                         'locked',
                         'extensionduedate',
                         'workflowstate',
-                        'allocatedmarker'));
+            'allocatedmarker']
+        );
 
         $submissions = new backup_nested_element('submissions');
 
-        $submission = new backup_nested_element('submission', array('id'),
-                array('userid',
+        $submission = new backup_nested_element(
+            'submission', ['id'],
+            ['userid',
                         'timecreated',
                         'timemodified',
                         'status',
                         'groupid',
                         'attemptnumber',
-                        'latest'));
+            'latest']
+        );
 
         $grades = new backup_nested_element('grades');
 
-        $grade = new backup_nested_element('grade', array('id'),
-                array('userid',
+        $grade = new backup_nested_element(
+            'grade', ['id'],
+            ['userid',
                         'timecreated',
                         'timemodified',
                         'grader',
                         'grade',
-                        'attemptnumber'));
+            'attemptnumber']
+        );
 
         $pluginconfigs = new backup_nested_element('plugin_configs');
 
-        $pluginconfig = new backup_nested_element('plugin_config', array('id'),
-                array('plugin',
+        $pluginconfig = new backup_nested_element(
+            'plugin_config', ['id'],
+            ['plugin',
                         'subtype',
                         'name',
-                        'value'));
+            'value']
+        );
 
         $overrides = new backup_nested_element('overrides');
-        $override = new backup_nested_element('override', array('id'), array(
-                'groupid', 'userid', 'sortorder', 'allowsubmissionsfromdate', 'duedate', 'cutoffdate'));
+        $override = new backup_nested_element('override', ['id'], [
+                'groupid', 'userid', 'sortorder', 'allowsubmissionsfromdate', 'duedate', 'cutoffdate']);
 
         // Build the tree.
         $edusign->add_child($userflags);
@@ -150,26 +159,32 @@ class backup_edusign_activity_structure_step extends backup_activity_structure_s
         $overrides->add_child($override);
 
         // Define sources.
-        $edusign->set_source_table('edusign', array('id' => backup::VAR_ACTIVITYID));
-        $pluginconfig->set_source_table('edusign_plugin_config',
-                array('edusignment' => backup::VAR_PARENTID));
+        $edusign->set_source_table('edusign', ['id' => backup::VAR_ACTIVITYID]);
+        $pluginconfig->set_source_table(
+            'edusign_plugin_config',
+            ['edusignment' => backup::VAR_PARENTID]
+        );
 
         // edusign overrides to backup are different depending of user info.
-        $overrideparams = array('edusignid' => backup::VAR_PARENTID);
+        $overrideparams = ['edusignid' => backup::VAR_PARENTID];
 
         if ($userinfo) {
-            $userflag->set_source_table('edusign_user_flags',
-                    array('edusignment' => backup::VAR_PARENTID));
+            $userflag->set_source_table(
+                'edusign_user_flags',
+                ['edusignment' => backup::VAR_PARENTID]
+            );
 
-            $submissionparams = array('edusignment' => backup::VAR_PARENTID);
+            $submissionparams = ['edusignment' => backup::VAR_PARENTID];
             if (!$groupinfo) {
                 // Without group info, skip group submissions.
                 $submissionparams['groupid'] = backup_helper::is_sqlparam(0);
             }
             $submission->set_source_table('edusign_submission', $submissionparams);
 
-            $grade->set_source_table('edusign_grades',
-                    array('edusignment' => backup::VAR_PARENTID));
+            $grade->set_source_table(
+                'edusign_grades',
+                ['edusignment' => backup::VAR_PARENTID]
+            );
 
             // Support 2 types of subplugins.
             $this->add_subplugin_structure('edusignsubmission', $submission, true);

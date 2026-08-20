@@ -27,7 +27,7 @@ require_once($CFG->dirroot . '/mod/edusign/locallib.php');
 
 $id = required_param('id', PARAM_INT);
 
-list ($course, $cm) = get_course_and_cm_from_cmid($id, 'edusign');
+ [$course, $cm] = get_course_and_cm_from_cmid($id, 'edusign');
 
 require_login($course, true, $cm);
 
@@ -36,10 +36,10 @@ $context = context_module::instance($cm->id);
 require_capability('mod/edusign:view', $context);
 
 $edusign = new edusign($context, $cm, $course);
-$urlparams = array('id' => $id,
+$urlparams = ['id' => $id,
         'action' => optional_param('action', '', PARAM_ALPHA),
         'rownum' => optional_param('rownum', 0, PARAM_INT),
-        'useridlistid' => optional_param('useridlistid', $edusign->get_useridlist_key_id(), PARAM_ALPHANUM));
+        'useridlistid' => optional_param('useridlistid', $edusign->get_useridlist_key_id(), PARAM_ALPHANUM)];
 
 $url = new moodle_url('/mod/edusign/view.php', $urlparams);
 $PAGE->set_url($url);

@@ -17,14 +17,14 @@
  * Javascript to handle changing users via the user selector in the header.
  *
  * @module     mod_edusign/grading_navigation
- * @package    mod_edusign
+ * @package
  * @copyright  2016 Damyon Wiese <damyon@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      3.1
  */
 define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
         'core/ajax', 'mod_edusign/grading_form_change_checker'],
-    function ($, notification, str, autocomplete, ajax, checker) {
+    function($, notification, str, autocomplete, ajax, checker) {
 
         /**
          * GradingNavigation class.
@@ -32,7 +32,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
          * @class GradingNavigation
          * @param {String} selector The selector for the page region containing the user navigation.
          */
-        var GradingNavigation = function (selector) {
+        var GradingNavigation = function(selector) {
             this._regionSelector = selector;
             this._region = $(selector);
             this._filters = [];
@@ -63,17 +63,17 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
                 this._selectUserById(userid);
             }
 
-            str.get_string('changeuser', 'mod_edusign').done(function (s) {
+            str.get_string('changeuser', 'mod_edusign').done(function(s) {
                     autocomplete.enhance('[data-action=change-user]', false, 'mod_edusign/participant_selector', s);
                 }
             ).fail(notification.exception);
 
             // We do not allow navigation while ajax requests are pending.
 
-            $(document).bind("start-loading-user", function () {
+            $(document).bind("start-loading-user", function() {
                 this._isLoading = true;
             }.bind(this));
-            $(document).bind("finish-loading-user", function () {
+            $(document).bind("finish-loading-user", function() {
                 this._isLoading = false;
             }.bind(this));
         };
@@ -99,7 +99,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
          * @private
          * @method _loadAllUsers
          */
-        GradingNavigation.prototype._loadAllUsers = function () {
+        GradingNavigation.prototype._loadAllUsers = function() {
             var select = this._region.find('[data-action=change-user]');
             var edusignmentid = select.attr('data-edusignmentid');
             var groupid = select.attr('data-groupid');
@@ -119,7 +119,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
          * @method _usersLoaded
          * @param {Array} users
          */
-        GradingNavigation.prototype._usersLoaded = function (users) {
+        GradingNavigation.prototype._usersLoaded = function(users) {
             this._filteredUsers = this._users = users;
             if (this._users.length) {
                 // Position the configure filters panel under the link that expands it.
@@ -140,7 +140,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
          * @method _checkClickOutsideConfigureFilters
          * @param {Event} event
          */
-        GradingNavigation.prototype._checkClickOutsideConfigureFilters = function (event) {
+        GradingNavigation.prototype._checkClickOutsideConfigureFilters = function(event) {
             var configPanel = this._region.find('[data-region="configure-filters"]');
 
             if (!configPanel.is(event.target) && configPanel.has(event.target).length === 0) {
@@ -160,7 +160,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
          * @method _filterChanged
          * @param {Event} event
          */
-        GradingNavigation.prototype._filterChanged = function (event) {
+        GradingNavigation.prototype._filterChanged = function(event) {
             var name = $(event.target).attr('name');
             var key = name.split('_').pop();
             var enabled = $(event.target).prop('checked');
@@ -178,7 +178,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
 
             // Update the active filter string.
             var filterlist = [];
-            this._region.find('[data-region="configure-filters"]').find('[type="checkbox"]').each(function (idx, ele) {
+            this._region.find('[data-region="configure-filters"]').find('[type="checkbox"]').each(function(idx, ele) {
                 if ($(ele).prop('checked')) {
                     filterlist[filterlist.length] = $(ele).closest('label').text();
                 }
@@ -186,7 +186,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
             if (filterlist.length) {
                 this._region.find('[data-region="user-filters"] span').text(filterlist.join(', '));
             } else {
-                str.get_string('nofilters', 'mod_edusign').done(function (s) {
+                str.get_string('nofilters', 'mod_edusign').done(function(s) {
                     this._region.find('[data-region="user-filters"] span').text(s);
                 }.bind(this)).fail(notification.exception);
             }
@@ -199,9 +199,9 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
 
             this._filteredUsers = [];
 
-            $.each(this._users, function (index, user) {
+            $.each(this._users, function(index, user) {
                 var show = true;
-                $.each(this._filters, function (filterindex, filter) {
+                $.each(this._filters, function(filterindex, filter) {
                     if (filter == "submitted") {
                         if (user.submitted == "0") {
                             show = false;
@@ -243,7 +243,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
          * @private
          * @method _selectNoUser
          */
-        GradingNavigation.prototype._selectNoUser = function () {
+        GradingNavigation.prototype._selectNoUser = function() {
             // Detect unsaved changes, and offer to save them - otherwise change user right now.
             if (this._isLoading) {
                 return;
@@ -255,8 +255,8 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
                     {key: 'unsavedchangesquestion', component: 'mod_edusign'},
                     {key: 'saveandcontinue', component: 'mod_edusign'},
                     {key: 'cancel', component: 'core'},
-                ]).done(function (strs) {
-                    notification.confirm(strs[0], strs[1], strs[2], strs[3], function () {
+                ]).done(function(strs) {
+                    notification.confirm(strs[0], strs[1], strs[2], strs[3], function() {
                         $(document).trigger('save-changes', -1);
                     });
                 });
@@ -272,7 +272,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
          * @method _selectUserById
          * @param {Number} userid
          */
-        GradingNavigation.prototype._selectUserById = function (userid) {
+        GradingNavigation.prototype._selectUserById = function(userid) {
             var select = this._region.find('[data-action=change-user]');
             var useridnumber = parseInt(userid, 10);
 
@@ -287,8 +287,8 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
                     {key: 'unsavedchangesquestion', component: 'mod_edusign'},
                     {key: 'saveandcontinue', component: 'mod_edusign'},
                     {key: 'cancel', component: 'core'},
-                ]).done(function (strs) {
-                    notification.confirm(strs[0], strs[1], strs[2], strs[3], function () {
+                ]).done(function(strs) {
+                    notification.confirm(strs[0], strs[1], strs[2], strs[3], function() {
                         $(document).trigger('save-changes', useridnumber);
                     });
                 });
@@ -308,7 +308,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
          * @method _toggleExpandFilters
          * @param {Event} event
          */
-        GradingNavigation.prototype._toggleExpandFilters = function (event) {
+        GradingNavigation.prototype._toggleExpandFilters = function(event) {
             event.preventDefault();
             var toggleLink = $(event.target).closest('[data-region="user-filters"]');
             var expanded = toggleLink.attr('aria-expanded') == 'true';
@@ -335,7 +335,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
          * @method _handlePreviousUser
          * @param {Event} e
          */
-        GradingNavigation.prototype._handlePreviousUser = function (e) {
+        GradingNavigation.prototype._handlePreviousUser = function(e) {
             e.preventDefault();
             var select = this._region.find('[data-action=change-user]');
             var currentUserId = select.attr('data-selected');
@@ -366,7 +366,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
          * @param {Event} e
          * @param {Boolean} saved Has the form already been saved? Skips checking for changes if true.
          */
-        GradingNavigation.prototype._handleNextUser = function (e, saved) {
+        GradingNavigation.prototype._handleNextUser = function(e, saved) {
             e.preventDefault();
             var select = this._region.find('[data-action=change-user]');
             var currentUserId = select.attr('data-selected');
@@ -402,7 +402,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
          * @private
          * @method _refreshCount
          */
-        GradingNavigation.prototype._refreshCount = function () {
+        GradingNavigation.prototype._refreshCount = function() {
             var select = this._region.find('[data-action=change-user]');
             var userid = select.attr('data-selected');
             var i = 0;
@@ -425,7 +425,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
                 }
                 var param = {x: currentIndex, y: count};
 
-                str.get_string('xofy', 'mod_edusign', param).done(function (s) {
+                str.get_string('xofy', 'mod_edusign', param).done(function(s) {
                     this._region.find('[data-region="user-count-summary"]').text(s);
                 }.bind(this)).fail(notification.exception);
             }
@@ -439,7 +439,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
          * @param {Event} event
          * @param {String} userid
          */
-        GradingNavigation.prototype._refreshSelector = function (event, userid) {
+        GradingNavigation.prototype._refreshSelector = function(event, userid) {
             var select = this._region.find('[data-action=change-user]');
             userid = parseInt(userid, 10);
 
@@ -455,7 +455,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
          * @private
          * @method _triggerNextUserEvent
          */
-        GradingNavigation.prototype._triggerNextUserEvent = function () {
+        GradingNavigation.prototype._triggerNextUserEvent = function() {
             if (this._filteredUsers.length > 1) {
                 $(document).trigger('next-user', {nextUserId: null, nextUser: true});
             } else {
@@ -470,7 +470,7 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
          * @method _handleChangeUser
          * @param {Event} event
          */
-        GradingNavigation.prototype._handleChangeUser = function () {
+        GradingNavigation.prototype._handleChangeUser = function() {
             var select = this._region.find('[data-action=change-user]');
             var userid = parseInt(select.val(), 10);
 
@@ -484,8 +484,8 @@ define(['jquery', 'core/notification', 'core/str', 'core/form-autocomplete',
                     {key: 'unsavedchangesquestion', component: 'mod_edusign'},
                     {key: 'saveandcontinue', component: 'mod_edusign'},
                     {key: 'cancel', component: 'core'},
-                ]).done(function (strs) {
-                    notification.confirm(strs[0], strs[1], strs[2], strs[3], function () {
+                ]).done(function(strs) {
+                    notification.confirm(strs[0], strs[1], strs[2], strs[3], function() {
                         $(document).trigger('save-changes', userid);
                     });
                 });

@@ -55,12 +55,12 @@ class grading_table_viewed extends base {
      * @return grading_table_viewed
      */
     public static function create_from_edusign(\edusign $edusign) {
-        $data = array(
+        $data = [
                 'context' => $edusign->get_context(),
-                'other' => array(
+                'other' => [
                         'edusignid' => $edusign->get_instance()->id,
-                ),
-        );
+                ],
+        ];
         self::$preventcreatecall = false;
         /** @var grading_table_viewed $event */
         $event = self::create($data);
@@ -115,8 +115,8 @@ class grading_table_viewed extends base {
     }
 
     public static function get_other_mapping() {
-        $othermapped = array();
-        $othermapped['edusignid'] = array('db' => 'edusign', 'restore' => 'edusign');
+        $othermapped = [];
+        $othermapped['edusignid'] = ['db' => 'edusign', 'restore' => 'edusign'];
 
         return $othermapped;
     }

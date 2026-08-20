@@ -1,5 +1,8 @@
 import $ from 'jquery';
 
+/**
+ *
+ */
 export function init() {
   let canvas = document.getElementById('canvas');
   let ctx = canvas.getContext('2d');
@@ -18,15 +21,15 @@ export function init() {
   let isMobile = ('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch;
 
 
-  $('#clearCanvas').bind('click', function () {
+  $('#clearCanvas').bind('click', function() {
     clearCanvas(canvas, ctx);
   });
-  $('#id_submitbutton').click(function () {
+  $('#id_submitbutton').click(function() {
     var data = $('#canvas')[0].toDataURL(); // Change here
     $('[name="signing"]').val(data);
   });
 // Mouse/touch events ..
-  canvas.addEventListener('pointerdown', function (e) {
+  canvas.addEventListener('pointerdown', function(e) {
     e.preventDefault();
     e.stopPropagation();
     drawing = true;
@@ -34,30 +37,30 @@ export function init() {
     lastPos = getMousePos(canvas, e);
     mousePos = lastPos;
   }, false);
-  canvas.addEventListener('pointermove', function (e) {
+  canvas.addEventListener('pointermove', function(e) {
     e.preventDefault();
     e.stopPropagation();
     mousePos = getMousePos(canvas, e);
   }, false);
-  canvas.addEventListener('pointerup', function (e) {
+  canvas.addEventListener('pointerup', function(e) {
     e.preventDefault();
     e.stopPropagation();
     drawing = false;
   }, false);
 
-  document.body.addEventListener("pointerdown", function (e) {
+  document.body.addEventListener("pointerdown", function(e) {
     if (e.target == canvas) {
       e.preventDefault();
       e.stopPropagation();
     }
   }, false);
-  document.body.addEventListener("pointermove", function (e) {
+  document.body.addEventListener("pointermove", function(e) {
     if (e.target == canvas) {
       e.preventDefault();
       e.stopPropagation();
     }
   }, false);
-  document.body.addEventListener("pointerup", function (e) {
+  document.body.addEventListener("pointerup", function(e) {
     if (e.target == canvas) {
       e.preventDefault();
       e.stopPropagation();
@@ -65,6 +68,11 @@ export function init() {
   }, false);
 
 // Helper functions ..
+  /**
+   *
+   * @param canvasDom
+   * @param touchOrMouseEvent
+   */
   function getMousePos(canvasDom, touchOrMouseEvent) {
     var rect = canvasDom.getBoundingClientRect();
     console.log(touchOrMouseEvent.clientX);
@@ -75,17 +83,20 @@ export function init() {
   }
 
 // Drawing ..
-  window.requestAnimFrame = (function (callback) {
+  window.requestAnimFrame = (function(callback) {
     return window.requestAnimationFrame ||
       window.webkitRequestAnimationFrame ||
       window.mozRequestAnimationFrame ||
       window.oRequestAnimationFrame ||
       window.msRequestAnimationFrame ||
-      function (callback) {
+      function(callback) {
         window.setTimeout(callback, 1000 / 60);
       };
   })();
 
+  /**
+   *
+   */
   function renderCanvas() {
     if (drawing) {
       ctx.moveTo(lastPos.x, lastPos.y);
@@ -105,7 +116,7 @@ export function init() {
     renderCanvas();
   })();
 
-  $(window).resize(function () {
+  $(window).resize(function() {
     var W = canvas.width,
       H = canvas.height;
     var temp = ctx.getImageData(0, 0, W, H);
@@ -117,16 +128,28 @@ export function init() {
   });
 
 
+  /**
+   *
+   * @param canvas
+   * @param ctx
+   */
   function clearCanvas(canvas, ctx) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     canvas.width = canvas.width;
   }
 
+  /**
+   *
+   * @param canvas
+   */
   function downloadCanvas(canvas) {
     this.href = canvas.toDataURL();
 
   }
 
+  /**
+   *
+   */
   function save() {
     this.href = canvas.toDataURL();
 
@@ -139,6 +162,9 @@ export function init() {
   }
 }
 
+/**
+ *
+ */
 export function save() {
   init();
 }

@@ -55,8 +55,5 @@ class mod_edusign_batch_set_allocatedmarker_form extends moodleform {
         $mform->addElement('hidden', 'selectedusers');
         $mform->setType('selectedusers', PARAM_SEQUENCE);
         $this->add_action_buttons(true, get_string('savechanges'));
-
     }
-
 }
-

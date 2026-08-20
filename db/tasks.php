@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Definition of assignment scheduled tasks.
  *
@@ -21,14 +22,14 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
-$tasks = array(
-    array(
+$tasks = [
+    [
         'classname' => '\mod_edusign\task\cron_task',
         'blocking' => 0,
         'minute' => '*',
         'hour' => '*',
         'day' => '*',
         'month' => '*',
-        'dayofweek' => '*'
-    )
-);
+        'dayofweek' => '*',
+    ],
+];
